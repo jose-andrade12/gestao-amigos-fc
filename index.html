@@ -44,7 +44,7 @@
         
         /* Formulários */
         .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; color: var(--text-muted); }
+        label { display: block; margin-bottom: 5px; color: var(--text-muted); font-size: 14px;}
         input, select { width: 100%; padding: 10px; background-color: #1d1e2b; border: 1px solid #2b3553; color: white; border-radius: 5px; box-sizing: border-box; }
         
         .btn-acao { background-color: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 16px; width: 100%; margin-top: 10px; font-weight: bold; }
@@ -122,7 +122,7 @@
 
         <div class="menu-wrapper">
             <button class="menu-btn active" onclick="abrirAba('cadastro')">1. Atletas</button>
-            <button class="menu-btn" onclick="abrirAba('jogo')">2. Ao Vivo</button>
+            <button class="menu-btn" onclick="abrirAba('jogo')">2. Ao Vivo / Resumo</button>
             <button class="menu-btn" onclick="abrirAba('resenha')">3. Resenha</button>
             <button class="menu-btn" onclick="abrirAba('dashboard')">📊 Dashboard</button>
             <button class="menu-btn" onclick="toggleAdmin()" id="btnAdmin" style="color: #ffb236; border-top: 1px solid #333; margin-top: 10px;">🔑 Ativar Admin</button>
@@ -158,7 +158,7 @@
             </div>
             <button id="btnSalvarAtleta" class="btn-acao" onclick="salvarAtleta()">Registrar Atleta</button>
 
-            <h3 style="margin-top: 40px;">Elenco Cadastrado</h3>
+            <h3 style="margin-top: 40px;">Elenco Cadastrado (Ordem Alfabética)</h3>
             <div class="table-responsive">
                 <table>
                     <thead><tr><th>Nome</th><th>Posição</th><th class="admin-cell">Ações</th></tr></thead>
@@ -169,10 +169,19 @@
 
         <!-- Módulo 2: Jogo Ao Vivo -->
         <div id="jogo" class="modulo">
-            <h3>Painel da Partida</h3>
-            <div class="form-group">
-                <label>Data da Partida:</label>
-                <input type="date" id="dataJogo" onchange="filtroDataGlobal = this.value; refreshTelas();">
+            <h3>Painel da Partida & Histórico</h3>
+            
+            <div class="flex-row" style="align-items: flex-end; background-color: #1d1e2b; padding: 15px; border-radius: 8px;">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>Nova Partida (Data):</label>
+                    <input type="date" id="dataJogo" onchange="mudarDataGlobal(this.value)">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label style="color: #ffb236;">Ou carregar partida salva:</label>
+                    <select id="selectPartidaAnterior" onchange="if(this.value) mudarDataGlobal(this.value)">
+                        <option value="">Selecione para ver o resumo...</option>
+                    </select>
+                </div>
             </div>
             
             <div class="placar-container">
@@ -213,7 +222,7 @@
             <h3>Resenha Pós-Jogo</h3>
             <div class="form-group">
                 <label>Data da Partida:</label>
-                <input type="date" id="dataPremio">
+                <input type="date" id="dataPremio" onchange="mudarDataGlobal(this.value)">
             </div>
             <div class="flex-row">
                 <div class="form-group"><label>🏆 Craque</label><select id="premioCraque" class="select-jogadores"></select></div>
@@ -285,7 +294,20 @@
         let atletasFC = []; let scoutsFC = []; let premiacoesFC = [];
         let atletaEditandoId = null; let filtroDataGlobal = "";
 
-        db.collection("atletas").onSnapshot(snap => { atletasFC = snap.docs.map(doc => ({id: doc.id, ...doc.data()})); refreshTelas(); });
+        // FUNÇÃO GLOBAL DE MUDANÇA DE DATA
+        function mudarDataGlobal(novaData) {
+            filtroDataGlobal = novaData;
+            document.getElementById('dataJogo').value = novaData;
+            document.getElementById('dataPremio').value = novaData;
+            refreshTelas();
+        }
+
+        db.collection("atletas").onSnapshot(snap => { 
+            // Salva ordenando alfabeticamente por NOME (A-Z)
+            atletasFC = snap.docs.map(doc => ({id: doc.id, ...doc.data()}))
+                                  .sort((a, b) => a.nome.localeCompare(b.nome)); 
+            refreshTelas(); 
+        });
         db.collection("scouts").onSnapshot(snap => { scoutsFC = snap.docs.map(doc => ({id: doc.id, ...doc.data()})).sort((a,b) => a.timestamp - b.timestamp); refreshTelas(); });
         db.collection("premiacoes").onSnapshot(snap => { premiacoesFC = snap.docs.map(doc => ({id: doc.id, ...doc.data()})).sort((a,b) => b.timestamp - a.timestamp); refreshTelas(); });
 
@@ -297,14 +319,25 @@
         function fimCronometro() { pausarCronometro(); alert("Apito Final! ⏱️ Tempo: " + document.getElementById('displayCronometro').innerText); }
 
         function refreshTelas() {
+            // Tabela Elenco
             const list = document.getElementById('listaAtletas');
             list.innerHTML = atletasFC.map(a => `<tr><td>${a.nome}</td><td>${a.posicao}</td><td class="admin-cell"><button class="btn-sm" style="background:#ffb236; color:#000;" onclick="editarAtleta('${a.id}')">✏️ Editar</button><button class="btn-sm" style="background:#fd5d93; color:#fff;" onclick="excluirDoc('atletas','${a.id}')">🗑️</button></td></tr>`).join('');
 
+            // Atualiza Combo Boxes de Jogadores (Agora em Ordem Alfabética)
             document.querySelectorAll('.select-jogadores').forEach(sel => {
                 const val = sel.value; sel.innerHTML = atletasFC.map(a => `<option value="${a.nome}">${a.nome}</option>`).join('');
                 if(val) sel.value = val;
             });
 
+            // Atualiza Combo Box de Partidas Anteriores
+            const datasUnicas = [...new Set(scoutsFC.map(s => s.data))].sort((a,b) => b.localeCompare(a));
+            const selectPartida = document.getElementById('selectPartidaAnterior');
+            const valAnterior = selectPartida.value;
+            selectPartida.innerHTML = `<option value="">Selecione para ver o resumo...</option>` + 
+                datasUnicas.map(d => `<option value="${d}">${d.split('-').reverse().join('/')}</option>`).join('');
+            if(datasUnicas.includes(filtroDataGlobal)) selectPartida.value = filtroDataGlobal;
+
+            // Painel da Partida Atual
             const data = filtroDataGlobal || document.getElementById('dataJogo').value;
             const scoutsDia = scoutsFC.filter(s => s.data === data);
             
@@ -314,6 +347,7 @@
             document.getElementById('logPartida').innerHTML = scoutsDia.length === 0 ? `<div style="padding: 15px; text-align: center; color: #9a9a9a;">Nenhum evento registrado hoje.</div>` : scoutsDia.slice().reverse().map(s => `
                 <div class="log-item"><div style="font-size:20px; margin-right:15px; width: 30px; text-align: center;">${s.acao === 'Gol' ? '⚽' : s.acao === 'Assistência' ? '👟' : s.acao === 'Amarelo' ? '🟨' : '🟥'}</div><div style="flex:1"><b>${s.jogador}</b><br><small style="color:#9a9a9a">${s.time}</small></div><div class="admin-block"><button onclick="excluirDoc('scouts','${s.id}')" style="background:none; border:none; cursor:pointer; font-size:18px;">❌</button></div></div>`).join('');
 
+            // Dashboard
             const stats = {};
             scoutsFC.forEach(s => { if(!stats[s.jogador]) stats[s.jogador] = {g:0, a:0}; if(s.acao === 'Gol') stats[s.jogador].g++; if(s.acao === 'Assistência') stats[s.jogador].a++; });
             document.getElementById('tabelaArtilharia').innerHTML = Object.entries(stats).sort((a,b) => b[1].g - a[1].g).filter(item => item[1].g > 0 || item[1].a > 0).map(([nome, d]) => `<tr><td><strong>${nome}</strong></td><td>${d.g}</td><td>${d.a}</td></tr>`).join('');
@@ -321,6 +355,7 @@
             document.getElementById('tabelaPremiacoes').innerHTML = premiacoesFC.map(p => `<tr><td>${p.data.split('-').reverse().join('/')}</td><td>🌟 ${p.craque}</td><td>🧱 ${p.paredao}</td><td>🛡️ ${p.xerifao}</td><td>🎈 ${p.bolamurcha}</td><td class="admin-cell"><button class="btn-sm" style="background:#fd5d93; color:#fff;" onclick="excluirDoc('premiacoes','${p.id}')">🗑️</button></td></tr>`).join('');
         }
 
+        // --- FUNÇÕES CRUD ---
         function salvarAtleta() {
             const n = document.getElementById('cadNome').value; const p = document.getElementById('cadPosicao').value;
             if(!n) return alert("Digite o nome!");
@@ -372,34 +407,47 @@
             const golsR = scoutsDia.filter(s => s.time === 'Real Madrid' && s.acao === 'Gol').length;
             const golsM = scoutsDia.filter(s => s.time === 'Milan' && s.acao === 'Gol').length;
             
-            let artilheiros = {}; let garcons = {};
+            // Separa os status por time
+            const times = ['Real Madrid', 'Milan'];
+            let stats = {
+                'Real Madrid': { gols: {}, assists: {} },
+                'Milan': { gols: {}, assists: {} }
+            };
+
             scoutsDia.forEach(s => {
-                if (s.acao === 'Gol') artilheiros[s.jogador] = (artilheiros[s.jogador] || 0) + 1;
-                if (s.acao === 'Assistência') garcons[s.jogador] = (garcons[s.jogador] || 0) + 1;
+                if (s.acao === 'Gol') stats[s.time].gols[s.jogador] = (stats[s.time].gols[s.jogador] || 0) + 1;
+                if (s.acao === 'Assistência') stats[s.time].assists[s.jogador] = (stats[s.time].assists[s.jogador] || 0) + 1;
             });
 
             const dataBR = data.split('-').reverse().join('/');
             let txt = `⚽ *RESUMO DA PARTIDA* ⚽\n📅 Data: ${dataBR}\n\n`;
             txt += `🏆 *Real Madrid ${golsR} x ${golsM} Milan*\n\n`;
 
-            if(Object.keys(artilheiros).length > 0) {
-                txt += `*⚽ Gols:*\n`;
-                Object.entries(artilheiros).sort((a,b)=>b[1]-a[1]).forEach(([j,q]) => txt += `- ${j} (${q})\n`);
-                txt += `\n`;
-            }
-            if(Object.keys(garcons).length > 0) {
-                txt += `*👟 Assistências:*\n`;
-                Object.entries(garcons).sort((a,b)=>b[1]-a[1]).forEach(([j,q]) => txt += `- ${j} (${q})\n`);
-                txt += `\n`;
-            }
+            times.forEach(t => {
+                const gols = stats[t].gols;
+                const assists = stats[t].assists;
+
+                if(Object.keys(gols).length > 0 || Object.keys(assists).length > 0) {
+                    txt += `🛡️ *${t.toUpperCase()}*\n`;
+                    if(Object.keys(gols).length > 0) {
+                        txt += `*⚽ Gols:*\n`;
+                        Object.entries(gols).sort((a,b)=>b[1]-a[1]).forEach(([j,q]) => txt += `- ${j} (${q})\n`);
+                    }
+                    if(Object.keys(assists).length > 0) {
+                        txt += `*👟 Assists:*\n`;
+                        Object.entries(assists).sort((a,b)=>b[1]-a[1]).forEach(([j,q]) => txt += `- ${j} (${q})\n`);
+                    }
+                    txt += `\n`;
+                }
+            });
 
             const premios = premiacoesFC.find(p => p.data === data);
             if(premios) {
-                txt += `*🏅 Premiações da Resenha:*\n`;
+                txt += `*🏅 PREMIAÇÕES DA RESENHA*\n`;
                 txt += `🌟 Craque: ${premios.craque}\n🧱 Paredão: ${premios.paredao}\n`;
                 txt += `🛡️ Xerifão: ${premios.xerifao}\n🎈 Bola Murcha: ${premios.bolamurcha}\n`;
             } else {
-                txt += `_(Resenha ainda não salva)_\n`;
+                txt += `_(Votação da resenha pendente)_\n`;
             }
 
             window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(txt)}`, '_blank');
@@ -433,9 +481,10 @@
         }
 
         window.onload = () => {
-            document.getElementById('dataJogo').valueAsDate = new Date();
-            document.getElementById('dataPremio').valueAsDate = new Date();
-            filtroDataGlobal = document.getElementById('dataJogo').value;
+            const dataAtual = new Date().toISOString().split('T')[0];
+            document.getElementById('dataJogo').value = dataAtual;
+            document.getElementById('dataPremio').value = dataAtual;
+            filtroDataGlobal = dataAtual;
             updateC();
         }
     </script>
