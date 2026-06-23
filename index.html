@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="referrer" content="no-referrer" />
-    <title>Gestão Amigos FC - Cloud & Admin</title>
+    <title>Gestão Amigos FC - Secure Cloud</title>
     
+    <!-- === BIBLIOTECAS DO FIREBASE === -->
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
@@ -20,18 +21,15 @@
         
         /* Menu Lateral */
         .sidebar { width: 280px; background-color: var(--panel-bg); padding: 20px 0; box-shadow: 2px 0 5px rgba(0,0,0,0.2); display: flex; flex-direction: column; flex-shrink: 0; z-index: 10; }
-        .sidebar h2 { text-align: center; color: var(--accent); margin-bottom: 10px; font-size: 22px; }
-        
-        /* Controle de Acesso */
-        .admin-box { background-color: #1d1e2b; padding: 10px; margin: 0 15px 15px 15px; border-radius: 8px; border: 1px solid #333; text-align: center; }
-        .admin-box input { width: 80%; padding: 5px; font-size: 12px; margin-bottom: 5px; text-align: center; }
-        .badge-master { background-color: var(--admin-color); color: #000; font-size: 10px; font-weight: bold; padding: 2px 5px; border-radius: 3px; display: none; margin-top: 5px; }
+        .sidebar h2 { text-align: center; color: var(--accent); margin-bottom: 20px; font-size: 22px; }
+        .status-nuvem { text-align: center; font-size: 12px; color: #00d65f; margin-top: -10px; margin-bottom: 20px; }
 
         /* Cronômetro */
-        .cronometro-container { background-color: #1d1e2b; padding: 15px; margin: 0 15px 20px 15px; border-radius: 8px; text-align: center; border: 1px solid #2b3553; }
+        .cronometro-container { background-color: #1d1e2b; padding: 15px; margin: 0 15px 15px 15px; border-radius: 8px; text-align: center; border: 1px solid #2b3553; }
         #displayCronometro { font-size: 36px; font-weight: bold; color: #00d65f; font-family: monospace; margin-bottom: 10px; letter-spacing: 2px; }
         .cronometro-botoes { display: flex; justify-content: center; gap: 10px; }
-        .cronometro-botoes button { background-color: #2b3553; border: none; color: white; cursor: pointer; padding: 8px; border-radius: 50%; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; }
+        .cronometro-botoes button { background-color: #2b3553; border: none; color: white; font-size: 16px; cursor: pointer; padding: 8px; border-radius: 50%; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; }
+        .cronometro-botoes button:hover { background-color: var(--accent); }
         
         /* Botões do Menu */
         .menu-wrapper { display: flex; flex-direction: column; flex: 1; }
@@ -44,16 +42,20 @@
         .modulo.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        /* Formulários e Botões */
+        /* Formulários */
         .form-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 5px; color: var(--text-muted); }
         input, select { width: 100%; padding: 10px; background-color: #1d1e2b; border: 1px solid #2b3553; color: white; border-radius: 5px; box-sizing: border-box; }
         .btn-acao { background-color: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 16px; width: 100%; margin-top: 10px; font-weight: bold; }
+        .btn-sm { padding: 5px 10px; width: auto; font-size: 12px; margin-top: 0; margin-right: 5px; border-radius: 3px; cursor: pointer; border: none; }
         
-        /* Elementos que somem sem senha Master */
-        .master-only { display: none !important; }
+        /* Elementos Ocultos por Padrão (Controle de Acesso via CSS) */
+        .admin-cell { display: none; }
+        .admin-block { display: none; }
+        body.is-admin .admin-cell { display: table-cell; }
+        body.is-admin .admin-block { display: block; }
 
-        /* Placar e Log */
+        /* Placar e Súmula */
         .placar-container { display: flex; justify-content: center; align-items: center; gap: 40px; margin: 30px 0; padding: 20px; background-color: #1d1e2b; border-radius: 10px; }
         .time-placar { text-align: center; }
         .escudo { width: 100px; height: 100px; object-fit: contain; margin-bottom: 10px; }
@@ -64,35 +66,48 @@
         .btn-amarelo { background-color: #ffb236; color: #000; }
         .btn-vermelho { background-color: #fd5d93; color: #fff; }
         
+        /* Tabelas */
+        .table-responsive { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px; white-space: nowrap; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #333; }
+        th { color: var(--accent); }
+        tr:hover { background-color: #1d1e2b; }
+        .flex-row { display: flex; gap: 15px; }
+        .flex-row > div { flex: 1; }
+
         .log-container { background-color: #1d1e2b; border: 1px solid #2b3553; border-radius: 5px; max-height: 250px; overflow-y: auto; margin-top: 15px; }
         .log-item { display: flex; align-items: center; padding: 10px 15px; border-bottom: 1px solid #2b3553; }
+        .log-item:last-child { border-bottom: none; }
         
         /* Responsividade Telemóvel */
         @media (max-width: 768px) {
             body { flex-direction: column; height: auto; min-height: 100vh; overflow-y: auto; }
-            .sidebar { width: 100%; padding: 10px 0; }
-            .admin-box { display: none; } /* Admin via console ou prompt no celular */
+            .sidebar { width: 100%; padding: 10px 0 0 0; }
+            .cronometro-container { margin: 5px 15px 10px 15px; padding: 10px; }
+            #displayCronometro { font-size: 28px; }
             .menu-wrapper { flex-direction: row; overflow-x: auto; padding-bottom: 5px; }
             .menu-btn { white-space: nowrap; width: auto; flex-shrink: 0; padding: 10px 15px; border-left: none; border-bottom: 3px solid transparent; }
-            .menu-btn.active { border-bottom: 3px solid var(--accent); background-color: transparent; }
-            .main-content { padding: 15px; }
+            .menu-btn.active { border-left: none; border-bottom: 3px solid var(--accent); background-color: transparent; }
+            .btn-zerar-container { padding: 10px 15px; }
+            .main-content { padding: 15px; overflow-y: visible; }
+            .modulo { padding: 20px; }
+            .flex-row { flex-direction: column; gap: 0; }
             .placar-container { gap: 15px; padding: 15px 10px; }
             .score { font-size: 45px; }
             .escudo { width: 60px; height: 60px; }
+            .botoes-jogo { gap: 10px; }
+            .btn-acao { padding: 12px 10px; font-size: 14px; }
         }
     </style>
 </head>
 <body>
 
+    <!-- Menu Lateral -->
     <div class="sidebar">
         <h2>⚽ Amigos FC</h2>
+        <div class="status-nuvem">🟢 Sincronizado na Nuvem</div>
         
-        <div class="admin-box">
-            <label style="font-size: 10px;">ACESSO MASTER</label>
-            <input type="password" id="senhaMaster" placeholder="Senha" oninput="verificarMaster(this.value)">
-            <div id="badgeMaster" class="badge-master">MODO EDITOR ATIVO</div>
-        </div>
-        
+        <!-- Cronômetro -->
         <div class="cronometro-container">
             <div id="displayCronometro">00:00</div>
             <div class="cronometro-botoes">
@@ -108,50 +123,56 @@
             <button class="menu-btn" onclick="abrirAba('jogo')">2. Ao Vivo</button>
             <button class="menu-btn" onclick="abrirAba('resenha')">3. Resenha</button>
             <button class="menu-btn" onclick="abrirAba('dashboard')">📊 Dashboard</button>
+            <!-- Botão Admin -->
+            <button class="menu-btn" onclick="toggleAdmin()" id="btnAdmin" style="color: #ffb236; border-top: 1px solid #333; margin-top: 10px;">🔑 Ativar Admin</button>
         </div>
         
-        <div class="btn-zerar-container master-only" style="margin-top: auto; padding: 20px;">
-            <button onclick="limparBancoDados()" style="background: transparent; color: #fd5d93; border: 1px solid #fd5d93; padding: 8px; width: 100%; cursor: pointer; border-radius: 5px;">⚠️ Zerar Nuvem</button>
+        <div class="btn-zerar-container admin-block" style="margin-top: auto; padding: 20px;">
+            <button onclick="limparBancoDados()" style="background: transparent; color: #fd5d93; border: 1px solid #fd5d93; padding: 8px; width: 100%; cursor: pointer; border-radius: 5px;">⚠️ Zerar Tudo</button>
         </div>
     </div>
 
+    <!-- Área Principal -->
     <div class="main-content">
 
+        <!-- Módulo 1: Cadastro -->
         <div id="cadastro" class="modulo active">
-            <h3>Gerenciar Elenco</h3>
-            <div style="background: #1d1e2b; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-                <div class="flex-row">
-                    <div class="form-group">
-                        <label>Nome do Jogador</label>
-                        <input type="text" id="cadNome" placeholder="Ex: Thiago">
-                    </div>
-                    <div class="form-group">
-                        <label>Posição</label>
-                        <select id="cadPosicao">
-                            <option value="GOL">Goleiro (GOL)</option>
-                            <option value="ZAG">Zagueiro (ZAG)</option>
-                            <option value="LAT">Lateral (LAT)</option>
-                            <option value="VOL">Volante (VOL)</option>
-                            <option value="MEI">Meio-Campo (MEI)</option>
-                            <option value="ATA">Atacante (ATA)</option>
-                        </select>
-                    </div>
+            <h3>Cadastrar / Editar Atleta</h3>
+            <div class="flex-row">
+                <div class="form-group">
+                    <label>Nome do Jogador</label>
+                    <input type="text" id="cadNome" placeholder="Ex: Thiago">
                 </div>
-                <button id="btnSalvarAtleta" class="btn-acao" onclick="salvarAtleta()">Registrar Atleta</button>
+                <div class="form-group">
+                    <label>Posição</label>
+                    <select id="cadPosicao">
+                        <option value="GOL">Goleiro (GOL)</option>
+                        <option value="ZAG">Zagueiro (ZAG)</option>
+                        <option value="LAT">Lateral (LAT)</option>
+                        <option value="VOL">Volante (VOL)</option>
+                        <option value="MEI">Meio-Campo (MEI)</option>
+                        <option value="ATA">Atacante (ATA)</option>
+                    </select>
+                </div>
             </div>
+            <button id="btnSalvarAtleta" class="btn-acao" onclick="salvarAtleta()">Registrar Atleta</button>
 
-            <h3>Elenco Cadastrado</h3>
-            <div style="overflow-x: auto;">
+            <h3 style="margin-top: 40px;">Elenco Cadastrado</h3>
+            <div class="table-responsive">
                 <table>
-                    <thead><tr><th>Nome</th><th>Posição</th><th class="master-only">Ações</th></tr></thead>
+                    <thead><tr><th>Nome</th><th>Posição</th><th class="admin-cell">Ações</th></tr></thead>
                     <tbody id="listaAtletas"></tbody>
                 </table>
             </div>
         </div>
 
+        <!-- Módulo 2: Jogo Ao Vivo -->
         <div id="jogo" class="modulo">
-            <h3>Painel da Partida</h3>
-            <input type="date" id="dataJogo" onchange="filtroDataGlobal = this.value; refreshTelas();">
+            <h3>Painel da Partida - Tempo Real</h3>
+            <div class="form-group">
+                <label>Data da Partida:</label>
+                <input type="date" id="dataJogo" onchange="filtroDataGlobal = this.value; refreshTelas();">
+            </div>
             
             <div class="placar-container">
                 <div class="time-placar">
@@ -166,7 +187,7 @@
             </div>
 
             <div class="flex-row">
-                <div class="form-group"><label>Time:</label><select id="timeAcao"><option>Real Madrid</option><option>Milan</option></select></div>
+                <div class="form-group"><label>Time da Ação:</label><select id="timeAcao"><option>Real Madrid</option><option>Milan</option></select></div>
                 <div class="form-group"><label>Jogador:</label><select id="jogadorAcao" class="select-jogadores"></select></div>
             </div>
 
@@ -177,13 +198,17 @@
                 <button class="btn-acao btn-vermelho" onclick="registrarScout('Vermelho')">🟥 VERMELHO</button>
             </div>
 
-            <h3 style="margin-top:30px">📜 Súmula</h3>
+            <h3 style="margin-top: 40px;">📜 Súmula da Partida</h3>
             <div class="log-container" id="logPartida"></div>
         </div>
 
+        <!-- Módulo 3: Premiações -->
         <div id="resenha" class="modulo">
-            <h3>Votação da Resenha</h3>
-            <input type="date" id="dataPremio">
+            <h3>Resenha Pós-Jogo</h3>
+            <div class="form-group">
+                <label>Data da Partida:</label>
+                <input type="date" id="dataPremio">
+            </div>
             <div class="flex-row">
                 <div class="form-group"><label>🏆 Craque</label><select id="premioCraque" class="select-jogadores"></select></div>
                 <div class="form-group"><label>🧱 Paredão</label><select id="premioParedao" class="select-jogadores"></select></div>
@@ -192,22 +217,30 @@
                 <div class="form-group"><label>🛡️ Xerifão</label><select id="premioXerifao" class="select-jogadores"></select></div>
                 <div class="form-group"><label>🎈 Bola Murcha</label><select id="premioBolaMurcha" class="select-jogadores"></select></div>
             </div>
-            <button class="btn-acao" onclick="salvarPremiacao()">Salvar Resenha</button>
+            <button class="btn-acao" onclick="salvarPremiacao()">Salvar Histórico da Resenha</button>
         </div>
 
+        <!-- Módulo 4: Dashboard -->
         <div id="dashboard" class="modulo">
             <h3>📈 Artilharia Geral</h3>
-            <table><thead><tr><th>Jogador</th><th>Gols</th><th>Assists</th></tr></thead><tbody id="tabelaArtilharia"></tbody></table>
-            <h3 style="margin-top:40px">🏅 Galeria de Prêmios</h3>
-            <div style="overflow-x:auto">
-                <table><thead><tr><th>Data</th><th>Craque</th><th>Xerifão</th><th>Paredão</th><th class="master-only">Ações</th></tr></thead><tbody id="tabelaPremiacoes"></tbody></table>
+            <div class="table-responsive">
+                <table><thead><tr><th>Jogador</th><th>Gols ⚽</th><th>Assistências 👟</th></tr></thead><tbody id="tabelaArtilharia"></tbody></table>
+            </div>
+
+            <h3 style="margin-top: 40px;">🏅 Últimas Premiações</h3>
+            <div class="table-responsive">
+                <table>
+                    <thead><tr><th>Data</th><th>Craque</th><th>Paredão</th><th>Xerifão</th><th>Bola Murcha</th><th class="admin-cell">Ações</th></tr></thead>
+                    <tbody id="tabelaPremiacoes"></tbody>
+                </table>
             </div>
         </div>
 
     </div>
 
+    <!-- === JAVASCRIPT: MOTOR E SEGURANÇA === -->
     <script>
-        // 1. CONFIGURAÇÃO FIREBASE
+        // 1. CONFIGURAÇÃO FIREBASE (Não mexer)
         const firebaseConfig = {
             apiKey: "AIzaSyBE7HbmYhdnUnbi_PvY27pBNgfiWoh4I9w",
             authDomain: "amigos-fc-gestao.firebaseapp.com",
@@ -219,22 +252,34 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // 2. SEGURANÇA MASTER
-        const SENHA_MASTER_DEFINIDA = "Starnewfour1273@"; // << ALTERE SUA SENHA AQUI
+        // 2. CONTROLE DE ACESSO (MASTER)
+        const SENHA_MASTER = "Starnewfour1273@"; // <<< Altere a senha aqui se quiser
         let isMaster = false;
 
-        function verificarMaster(senha) {
-            if (senha === SENHA_MASTER_DEFINIDA) {
-                isMaster = true;
-                document.getElementById('badgeMaster').style.display = "block";
-                document.querySelectorAll('.master-only').forEach(el => el.style.setProperty('display', 'table-cell', 'important'));
-                document.querySelector('.btn-zerar-container.master-only').style.setProperty('display', 'block', 'important');
-            } else {
+        function toggleAdmin() {
+            if (isMaster) {
                 isMaster = false;
-                document.getElementById('badgeMaster').style.display = "none";
-                document.querySelectorAll('.master-only').forEach(el => el.style.setProperty('display', 'none', 'important'));
+                document.getElementById('btnAdmin').innerText = "🔑 Ativar Admin";
+                document.body.classList.remove('is-admin');
+                alert("Modo Edição Desativado.");
+                cancelarEdicao();
+            } else {
+                let senha = prompt("ACESSO RESTRITO:\nDigite a Senha Master para habilitar edições e exclusões:");
+                if (senha === SENHA_MASTER) {
+                    isMaster = true;
+                    document.getElementById('btnAdmin').innerText = "🔓 Admin Ativo (Sair)";
+                    document.body.classList.add('is-admin');
+                    alert("Acesso Liberado! Os botões de edição agora estão visíveis.");
+                } else if (senha !== null) {
+                    alert("Senha Incorreta!");
+                }
             }
-            refreshTelas();
+        }
+
+        // Função de proteção dupla nas ações JS
+        function blockIfNotMaster() {
+            if (!isMaster) { alert("Ação bloqueada. Clique em 'Ativar Admin' e digite a senha."); return true; }
+            return false;
         }
 
         // 3. ESTADO E SINCRONIZAÇÃO
@@ -260,22 +305,22 @@
         function iniciarCronometro() { if(!cInt) cInt = setInterval(()=>{cSeg++; updateC()}, 1000); }
         function pausarCronometro() { clearInterval(cInt); cInt = null; }
         function zerarCronometro() { pausarCronometro(); cSeg = 0; updateC(); }
-        function fimCronometro() { pausarCronometro(); alert("Fim de papo! Tempo: " + document.getElementById('displayCronometro').innerText); }
+        function fimCronometro() { pausarCronometro(); alert("Apito Final! ⏱️ Tempo: " + document.getElementById('displayCronometro').innerText); }
 
-        // 5. FUNÇÕES DE TELA
+        // 5. ATUALIZAR TELA (Gera as tabelas)
         function refreshTelas() {
-            // Lista Atletas
+            // Tabela Atletas
             const list = document.getElementById('listaAtletas');
             list.innerHTML = atletasFC.map(a => `
                 <tr>
                     <td>${a.nome}</td><td>${a.posicao}</td>
-                    <td class="master-only" style="display: ${isMaster ? 'table-cell' : 'none'}">
-                        <button class="btn-sm btn-gol" onclick="editarAtleta('${a.id}')">✏️</button>
-                        <button class="btn-sm btn-vermelho" onclick="excluirDoc('atletas','${a.id}')">🗑️</button>
+                    <td class="admin-cell">
+                        <button class="btn-sm" style="background:#ffb236; color:#000;" onclick="editarAtleta('${a.id}')">✏️ Editar</button>
+                        <button class="btn-sm" style="background:#fd5d93; color:#fff;" onclick="excluirDoc('atletas','${a.id}')">🗑️</button>
                     </td>
                 </tr>`).join('');
 
-            // Selects
+            // Atualiza comboboxes
             document.querySelectorAll('.select-jogadores').forEach(sel => {
                 const val = sel.value;
                 sel.innerHTML = atletasFC.map(a => `<option value="${a.nome}">${a.nome}</option>`).join('');
@@ -285,17 +330,18 @@
             // Placar e Súmula
             const data = filtroDataGlobal || document.getElementById('dataJogo').value;
             const scoutsDia = scoutsFC.filter(s => s.data === data);
+            
             document.getElementById('placarReal').innerText = scoutsDia.filter(s => s.time === 'Real Madrid' && s.acao === 'Gol').length;
             document.getElementById('placarMilan').innerText = scoutsDia.filter(s => s.time === 'Milan' && s.acao === 'Gol').length;
             
-            document.getElementById('logPartida').innerHTML = scoutsDia.slice().reverse().map(s => `
+            document.getElementById('logPartida').innerHTML = scoutsDia.length === 0 ? `<div style="padding: 15px; text-align: center; color: #9a9a9a;">Nenhum evento registrado hoje.</div>` : scoutsDia.slice().reverse().map(s => `
                 <div class="log-item">
-                    <div style="font-size:20px; margin-right:15px">${s.acao === 'Gol' ? '⚽' : s.acao === 'Assistência' ? '👟' : s.acao === 'Amarelo' ? '🟨' : '🟥'}</div>
-                    <div style="flex:1"><b>${s.jogador}</b><br><small>${s.time}</small></div>
-                    <div class="master-only" style="display: ${isMaster ? 'block' : 'none'}"><button onclick="excluirDoc('scouts','${s.id}')" style="background:none; border:none; cursor:pointer">❌</button></div>
+                    <div style="font-size:20px; margin-right:15px; width: 30px; text-align: center;">${s.acao === 'Gol' ? '⚽' : s.acao === 'Assistência' ? '👟' : s.acao === 'Amarelo' ? '🟨' : '🟥'}</div>
+                    <div style="flex:1"><b>${s.jogador}</b><br><small style="color:#9a9a9a">${s.time}</small></div>
+                    <div class="admin-block"><button onclick="excluirDoc('scouts','${s.id}')" style="background:none; border:none; cursor:pointer; font-size:18px;" title="Excluir Evento">❌</button></div>
                 </div>`).join('');
 
-            // Dashboard
+            // Dashboard Artilharia
             const stats = {};
             scoutsFC.forEach(s => {
                 if(!stats[s.jogador]) stats[s.jogador] = {g:0, a:0};
@@ -304,32 +350,50 @@
             });
             document.getElementById('tabelaArtilharia').innerHTML = Object.entries(stats)
                 .sort((a,b) => b[1].g - a[1].g)
-                .map(([nome, d]) => `<tr><td>${nome}</td><td>${d.g}</td><td>${d.a}</td></tr>`).join('');
+                .filter(item => item[1].g > 0 || item[1].a > 0)
+                .map(([nome, d]) => `<tr><td><strong>${nome}</strong></td><td>${d.g}</td><td>${d.a}</td></tr>`).join('');
 
+            // Dashboard Prêmios
             document.getElementById('tabelaPremiacoes').innerHTML = premiacoesFC.map(p => `
                 <tr>
                     <td>${p.data.split('-').reverse().join('/')}</td>
-                    <td>${p.craque}</td><td>${p.xerifao}</td><td>${p.paredao}</td>
-                    <td class="master-only" style="display: ${isMaster ? 'table-cell' : 'none'}"><button class="btn-sm btn-vermelho" onclick="excluirDoc('premiacoes','${p.id}')">🗑️</button></td>
+                    <td>🌟 ${p.craque}</td><td>🧱 ${p.paredao}</td><td>🛡️ ${p.xerifao}</td><td>🎈 ${p.bolamurcha}</td>
+                    <td class="admin-cell"><button class="btn-sm" style="background:#fd5d93; color:#fff;" onclick="excluirDoc('premiacoes','${p.id}')">🗑️</button></td>
                 </tr>`).join('');
         }
 
-        // 6. GRAVAÇÃO
+        // 6. FUNÇÕES DE GRAVAÇÃO E ADMIN (CRUD)
         function salvarAtleta() {
             const n = document.getElementById('cadNome').value; const p = document.getElementById('cadPosicao').value;
-            if(!n) return alert("Nome vazio!");
+            if(!n) return alert("Digite o nome!");
+            
             if(atletaEditandoId) {
+                if(blockIfNotMaster()) return; // Trava dupla
+                let aAntigo = atletasFC.find(i => i.id === atletaEditandoId);
                 db.collection("atletas").doc(atletaEditandoId).update({nome:n, posicao:p});
+                
+                // Se trocou nome, atualiza histórico
+                if (aAntigo && aAntigo.nome !== n) {
+                    scoutsFC.filter(s => s.jogador === aAntigo.nome).forEach(s => db.collection("scouts").doc(s.id).update({jogador: n}));
+                    premiacoesFC.forEach(pr => {
+                        let up = {};
+                        if(pr.craque === aAntigo.nome) up.craque = n; if(pr.paredao === aAntigo.nome) up.paredao = n;
+                        if(pr.xerifao === aAntigo.nome) up.xerifao = n; if(pr.bolamurcha === aAntigo.nome) up.bolamurcha = n;
+                        if(Object.keys(up).length > 0) db.collection("premiacoes").doc(pr.id).update(up);
+                    });
+                }
                 cancelarEdicao();
+                alert("Atleta atualizado!");
             } else {
                 db.collection("atletas").add({nome:n, posicao:p, timestamp: Date.now()});
+                document.getElementById('cadNome').value = "";
+                alert("Atleta cadastrado!");
             }
-            document.getElementById('cadNome').value = "";
         }
 
         function registrarScout(acao) {
             const d = document.getElementById('dataJogo').value; const t = document.getElementById('timeAcao').value; const j = document.getElementById('jogadorAcao').value;
-            if(!j) return alert("Selecione jogador!");
+            if(!j) return alert("Selecione um jogador!");
             db.collection("scouts").add({data:d, time:t, jogador:j, acao:acao, timestamp: Date.now()});
         }
 
@@ -345,39 +409,53 @@
             alert("Resenha salva!");
         }
 
-        function excluirDoc(coll, id) { if(isMaster && confirm("Excluir item?")) db.collection(coll).doc(id).delete(); }
-        
         function editarAtleta(id) {
+            if(blockIfNotMaster()) return;
             const a = atletasFC.find(i => i.id === id);
             document.getElementById('cadNome').value = a.nome;
             document.getElementById('cadPosicao').value = a.posicao;
             atletaEditandoId = id;
-            document.getElementById('btnSalvarAtleta').innerText = "💾 Atualizar Atleta";
-            abrirAba('cadastro');
+            document.getElementById('btnSalvarAtleta').innerText = "💾 Confirmar Edição";
+            document.getElementById('btnSalvarAtleta').style.backgroundColor = "#ffb236";
+            window.scrollTo(0, 0);
         }
 
-        function cancelarEdicao() { atletaEditandoId = null; document.getElementById('btnSalvarAtleta').innerText = "Registrar Atleta"; }
+        function cancelarEdicao() { 
+            atletaEditandoId = null; 
+            document.getElementById('btnSalvarAtleta').innerText = "Registrar Atleta"; 
+            document.getElementById('btnSalvarAtleta').style.backgroundColor = "var(--accent)";
+            document.getElementById('cadNome').value = "";
+        }
+
+        function excluirDoc(coll, id) { 
+            if(blockIfNotMaster()) return;
+            if(confirm("Tem certeza que deseja EXCLUIR este registro da base de dados?")) db.collection(coll).doc(id).delete(); 
+        }
+
+        async function limparBancoDados() {
+            if(blockIfNotMaster()) return;
+            if(confirm("PERIGO: Isso vai deletar absolutamente TODOS os dados da nuvem (Atletas, Gols, Prêmios). Tem certeza?")) {
+                let sA = await db.collection("atletas").get(); sA.forEach(d => d.ref.delete());
+                let sS = await db.collection("scouts").get(); sS.forEach(d => d.ref.delete());
+                let sP = await db.collection("premiacoes").get(); sP.forEach(d => d.ref.delete());
+                alert("Sistema zerado!");
+            }
+        }
 
         function abrirAba(id) {
             document.querySelectorAll('.modulo').forEach(m => m.classList.remove('active'));
             document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             event.currentTarget.classList.add('active');
-        }
-
-        async function limparBancoDados() {
-            if(isMaster && confirm("DELETAR TUDO?")) {
-                const colunas = ['atletas', 'scouts', 'premiacoes'];
-                for(let c of colunas) {
-                    const snap = await db.collection(c).get();
-                    snap.forEach(doc => doc.ref.delete());
-                }
-            }
+            if(id !== 'cadastro') cancelarEdicao();
+            filtroDataGlobal = document.getElementById('dataJogo').value;
+            refreshTelas();
         }
 
         window.onload = () => {
             document.getElementById('dataJogo').valueAsDate = new Date();
             document.getElementById('dataPremio').valueAsDate = new Date();
+            filtroDataGlobal = document.getElementById('dataJogo').value;
             updateC();
         }
     </script>
