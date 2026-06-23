@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer" />
+    <title>Gestão do Futebol Amigos FC</title>
+    <style>
+        /* === ESTILOS VISUAIS (DARK MODE) === */
+        :root {
+            --bg-color: #1e1e2f;
+            --panel-bg: #27293d;
+            --text-main: #ffffff;
+            --text-muted: #9a9a9a;
+            --accent: #e14eca;
+            --btn-hover: #344675;
+            --milan: #ff3b3b;
+            --real: #ffffff;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Menu Lateral */
+        .sidebar {
+            width: 280px;
+            background-color: var(--panel-bg);
+            padding: 20px 0;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .sidebar h2 {
+            text-align: center;
+            color: var(--accent);
+            margin-bottom: 20px;
+            font-size: 22px;
+        }
+
+        /* Cronômetro */
+        .cronometro-container {
+            background-color: #1d1e2b;
+            padding: 15px;
+            margin: 0 15px 20px 15px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #2b3553;
+        }
+        #displayCronometro {
+            font-size: 36px;
+            font-weight: bold;
+            color: #00d65f;
+            font-family: monospace;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+        .cronometro-botoes {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        .cronometro-botoes button {
+            background-color: #2b3553;
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .cronometro-botoes button:hover { background-color: var(--accent); }
+
+        /* Botões do Menu */
+        .menu-wrapper {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .menu-btn {
+            width: 100%;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            padding: 15px 20px;
+            text-align: left;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .menu-btn:hover, .menu-btn.active {
+            background-color: var(--btn-hover);
+            color: var(--text-main);
+            border-left: 4px solid var(--accent);
+        }
+
+        /* Área Principal */
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .modulo {
+            display: none;
+            background-color: var(--panel-bg);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .modulo.active { display: block; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        h3 { border-bottom: 1px solid #333; padding-bottom: 10px; margin-top: 0; }
+
+        /* Formulários */
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; color: var(--text-muted); }
+        input, select {
+            width: 100%; padding: 10px; background-color: #1d1e2b; border: 1px solid #2b3553;
+            color: white; border-radius: 5px; box-sizing: border-box;
+        }
+
+        .btn-acao {
+            background-color: var(--accent); color: white; border: none; padding: 10px 20px;
+            border-radius: 5px; cursor: pointer; font-size: 16px; width: 100%; margin-top: 10px; font-weight: bold;
+        }
+        .btn-acao:hover { background-color: #c944b5; }
+        .btn-sm { padding: 5px 10px; width: auto; font-size: 12px; margin-top: 0; margin-right: 5px; }
+
+        /* Placar do Jogo */
+        .placar-container {
+            display: flex; justify-content: center; align-items: center; gap: 40px; margin: 30px 0;
+            padding: 20px; background-color: #1d1e2b; border-radius: 10px;
+        }
+
+        .time-placar { text-align: center; }
+        .escudo { width: 100px; height: 100px; object-fit: contain; margin-bottom: 10px; }
+        .score { font-size: 70px; font-weight: bold; }
+        
+        .botoes-jogo { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+        .btn-gol { background-color: #00d65f; color: #000; }
+        .btn-assist { background-color: #00a1ff; color: #fff; }
+        .btn-amarelo { background-color: #ffb236; color: #000; }
+        .btn-vermelho { background-color: #fd5d93; color: #fff; }
+
+        /* Tabelas */
+        .table-responsive { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px; white-space: nowrap; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #333; }
+        th { color: var(--accent); }
+        tr:hover { background-color: #1d1e2b; }
+
+        .flex-row { display: flex; gap: 15px; }
+        .flex-row > div { flex: 1; }
+
+        /* Súmula do Jogo */
+        .log-container {
+            background-color: #1d1e2b; border: 1px solid #2b3553; border-radius: 5px;
+            max-height: 250px; overflow-y: auto; margin-top: 15px;
+        }
+        .log-item { display: flex; align-items: center; padding: 10px 15px; border-bottom: 1px solid #2b3553; }
+        .log-item:last-child { border-bottom: none; }
+        .log-icon { font-size: 20px; margin-right: 15px; width: 30px; text-align: center; }
+        .log-detalhe { flex: 1; }
+        .log-nome { font-weight: bold; font-size: 16px; }
+        .log-time { font-size: 12px; color: var(--text-muted); }
+        .log-acao { font-size: 14px; color: var(--text-muted); text-transform: uppercase; font-weight: bold; }
+
+        /* === RESPONSIVIDADE PARA TELEMÓVEL === */
+        @media (max-width: 768px) {
+            body { flex-direction: column; height: auto; min-height: 100vh; overflow-y: auto; }
+            
+            .sidebar { width: 100%; padding: 10px 0 0 0; }
+            .sidebar h2 { margin-bottom: 10px; font-size: 20px; }
+            .cronometro-container { margin: 5px 15px 10px 15px; padding: 10px; }
+            #displayCronometro { font-size: 28px; }
+            
+            /* Transforma o menu numa barra que desliza horizontalmente */
+            .menu-wrapper { flex-direction: row; overflow-x: auto; padding-bottom: 5px; }
+            .menu-btn { white-space: nowrap; width: auto; flex-shrink: 0; padding: 10px 15px; border-left: none; border-bottom: 3px solid transparent; }
+            .menu-btn.active { border-left: none; border-bottom: 3px solid var(--accent); background-color: transparent; }
+            .btn-zerar-container { padding: 10px 15px; }
+            
+            .main-content { padding: 15px; overflow-y: visible; }
+            .modulo { padding: 20px; }
+            
+            .flex-row { flex-direction: column; gap: 0; }
+            .placar-container { gap: 15px; padding: 15px 10px; }
+            .score { font-size: 45px; }
+            .escudo { width: 60px; height: 60px; }
+            
+            .botoes-jogo { gap: 10px; }
+            .btn-acao { padding: 12px 10px; font-size: 14px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Menu Lateral / Topo no Telemóvel -->
+    <div class="sidebar">
+        <h2>⚽ Amigos FC</h2>
+        
+        <!-- Cronômetro Integrado -->
+        <div class="cronometro-container">
+            <div id="displayCronometro">00:00</div>
+            <div class="cronometro-botoes">
+                <button onclick="iniciarCronometro()" title="Iniciar">▶️</button>
+                <button onclick="pausarCronometro()" title="Pausar">⏸️</button>
+                <button onclick="zerarCronometro()" title="Zerar">🔄</button>
+                <button onclick="fimCronometro()" title="Fim de Jogo">⏹️</button>
+            </div>
+        </div>
+
+        <div class="menu-wrapper">
+            <button class="menu-btn active" onclick="abrirAba('cadastro')">1. Atletas</button>
+            <button class="menu-btn" onclick="abrirAba('jogo')">2. Ao Vivo</button>
+            <button class="menu-btn" onclick="abrirAba('resenha')">3. Resenha</button>
+            <button class="menu-btn" onclick="abrirAba('dashboard')">📊 Dashboard</button>
+        </div>
+        
+        <div class="btn-zerar-container" style="margin-top: auto; padding: 20px;">
+            <button onclick="limparBancoDados()" style="background: transparent; color: #fd5d93; border: 1px solid #fd5d93; padding: 8px; width: 100%; cursor: pointer; border-radius: 5px;">⚠️ Zerar Sistema</button>
+        </div>
+    </div>
+
+    <!-- Área Principal -->
+    <div class="main-content">
+
+        <!-- Módulo 1: Cadastro -->
+        <div id="cadastro" class="modulo active">
+            <h3>Cadastrar / Editar Atleta</h3>
+            <div class="flex-row">
+                <div class="form-group">
+                    <label>Nome do Jogador</label>
+                    <input type="text" id="cadNome" placeholder="Ex: Thiago">
+                </div>
+                <div class="form-group">
+                    <label>Posição</label>
+                    <select id="cadPosicao">
+                        <option value="GOL">Goleiro (GOL)</option>
+                        <option value="ZAG">Zagueiro (ZAG)</option>
+                        <option value="LAT">Lateral (LAT)</option>
+                        <option value="VOL">Volante (VOL)</option>
+                        <option value="MEI">Meio-Campo (MEI)</option>
+                        <option value="ATA">Atacante (ATA)</option>
+                    </select>
+                </div>
+            </div>
+            <button id="btnSalvarAtleta" class="btn-acao" onclick="salvarAtleta()">Registrar Atleta</button>
+
+            <h3 style="margin-top: 40px;">Elenco Cadastrado</h3>
+            <div class="table-responsive">
+                <table>
+                    <thead><tr><th>Nome</th><th>Posição</th><th>Ações</th></tr></thead>
+                    <tbody id="listaAtletas"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Módulo 2: Jogo Ao Vivo -->
+        <div id="jogo" class="modulo">
+            <h3>Painel da Partida - Tempo Real</h3>
+            <div class="form-group">
+                <label>Data da Partida:</label>
+                <input type="date" id="dataJogo" onchange="atualizarPlacar(this.value); atualizarLogPartida(this.value);">
+            </div>
+            
+            <div class="placar-container">
+                <div class="time-placar">
+                    <img src="https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg" class="escudo" alt="Real Madrid">
+                    <div class="score" id="placarReal">0</div>
+                </div>
+                <div class="score" style="color: #555;">X</div>
+                <div class="time-placar">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/d/d0/Logo_of_AC_Milan.svg" class="escudo" alt="Milan">
+                    <div class="score" id="placarMilan">0</div>
+                </div>
+            </div>
+
+            <div class="flex-row">
+                <div class="form-group">
+                    <label>Time da Ação:</label>
+                    <select id="timeAcao">
+                        <option value="Real Madrid">Real Madrid</option>
+                        <option value="Milan">Milan</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Jogador:</label>
+                    <select id="jogadorAcao" class="select-jogadores"></select>
+                </div>
+            </div>
+
+            <div class="botoes-jogo">
+                <button class="btn-acao btn-gol" onclick="registrarScout('Gol')">⚽ GOL</button>
+                <button class="btn-acao btn-assist" onclick="registrarScout('Assistência')">👟 ASSISTÊNCIA</button>
+                <button class="btn-acao btn-amarelo" onclick="registrarScout('Amarelo')">🟨 AMARELO</button>
+                <button class="btn-acao btn-vermelho" onclick="registrarScout('Vermelho')">🟥 VERMELHO</button>
+            </div>
+
+            <h3 style="margin-top: 40px; font-size: 18px; color: var(--accent);">📜 Súmula da Partida</h3>
+            <div class="log-container" id="logPartida"></div>
+        </div>
+
+        <!-- Módulo 3: Premiações -->
+        <div id="resenha" class="modulo">
+            <h3>Resenha Pós-Jogo</h3>
+            <div class="form-group">
+                <label>Data da Partida:</label>
+                <input type="date" id="dataPremio">
+            </div>
+            <div class="flex-row">
+                <div class="form-group"><label>🏆 Craque</label><select id="premioCraque" class="select-jogadores"></select></div>
+                <div class="form-group"><label>🧱 Paredão</label><select id="premioParedao" class="select-jogadores"></select></div>
+            </div>
+            <div class="flex-row">
+                <!-- Pereba Removido e Bola Murcha subiu para compor a linha -->
+                <div class="form-group"><label>🛡️ Xerifão</label><select id="premioXerifao" class="select-jogadores"></select></div>
+                <div class="form-group"><label>🎈 Bola Murcha</label><select id="premioBolaMurcha" class="select-jogadores"></select></div>
+            </div>
+            <button class="btn-acao" onclick="salvarPremiacao()">Salvar Histórico da Resenha</button>
+        </div>
+
+        <!-- Módulo 4: Dashboard & Histórico -->
+        <div id="dashboard" class="modulo">
+            <h3>📈 Artilharia Geral (Histórico)</h3>
+            <div class="table-responsive">
+                <table>
+                    <thead><tr><th>Jogador</th><th>Gols ⚽</th><th>Assistências 👟</th></tr></thead>
+                    <tbody id="tabelaArtilharia"></tbody>
+                </table>
+            </div>
+
+            <h3 style="margin-top: 40px;">🏅 Últimas Premiações</h3>
+            <div class="table-responsive">
+                <table>
+                    <!-- Cabeçalho ajustado sem o Pereba -->
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Craque</th>
+                            <th>Paredão</th>
+                            <th>Xerifão</th>
+                            <th>Bola Murcha</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaPremiacoes"></tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- === JAVASCRIPT: O MOTOR DO SISTEMA === -->
+    <script>
+        function lerBD(chave) { return JSON.parse(localStorage.getItem(chave)) || []; }
+        function salvarBD(chave, dados) { localStorage.setItem(chave, JSON.stringify(dados)); }
+
+        let atletaEditandoIndex = -1;
+
+        // --- LÓGICA DO CRONÔMETRO ---
+        let cronometroInterval = null;
+        let cronometroSegundos = 0;
+
+        function atualizarDisplayCronometro() {
+            let minutos = Math.floor(cronometroSegundos / 60).toString().padStart(2, '0');
+            let segundos = (cronometroSegundos % 60).toString().padStart(2, '0');
+            document.getElementById('displayCronometro').innerText = `${minutos}:${segundos}`;
+        }
+
+        function iniciarCronometro() {
+            if (!cronometroInterval) {
+                cronometroInterval = setInterval(() => {
+                    cronometroSegundos++;
+                    atualizarDisplayCronometro();
+                }, 1000);
+            }
+        }
+
+        function pausarCronometro() {
+            clearInterval(cronometroInterval);
+            cronometroInterval = null;
+        }
+
+        function zerarCronometro() {
+            pausarCronometro();
+            cronometroSegundos = 0;
+            atualizarDisplayCronometro();
+        }
+
+        function fimCronometro() {
+            pausarCronometro();
+            let tempoFinal = document.getElementById('displayCronometro').innerText;
+            alert(`Apito Final! ⏱️ Tempo de bola rolando: ${tempoFinal}`);
+            cronometroSegundos = 0;
+            atualizarDisplayCronometro();
+        }
+
+        // --- INICIALIZAÇÃO ---
+        window.onload = function() {
+            document.getElementById('dataJogo').valueAsDate = new Date();
+            document.getElementById('dataPremio').valueAsDate = new Date();
+            atualizarTelas();
+            atualizarDisplayCronometro();
+        }
+
+        function abrirAba(idAba) {
+            document.querySelectorAll('.modulo').forEach(mod => mod.classList.remove('active'));
+            document.querySelectorAll('.menu-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(idAba).classList.add('active');
+            event.target.classList.add('active');
+            
+            if(idAba !== 'cadastro') cancelarEdicao();
+            
+            atualizarTelas();
+        }
+
+        function salvarAtleta() {
+            let nome = document.getElementById('cadNome').value;
+            let posicao = document.getElementById('cadPosicao').value;
+            if(!nome) return alert("Digite o nome do atleta!");
+
+            let atletas = lerBD('atletasFC');
+
+            if (atletaEditandoIndex > -1) {
+                let nomeAntigo = atletas[atletaEditandoIndex].nome;
+                atletas[atletaEditandoIndex] = { nome: nome, posicao: posicao };
+                
+                let scouts = lerBD('scoutsFC');
+                scouts.forEach(s => { if(s.jogador === nomeAntigo) s.jogador = nome; });
+                salvarBD('scoutsFC', scouts);
+
+                let premiacoes = lerBD('premiacoesFC');
+                premiacoes.forEach(p => {
+                    if(p.craque === nomeAntigo) p.craque = nome;
+                    if(p.paredao === nomeAntigo) p.paredao = nome;
+                    if(p.xerifao === nomeAntigo) p.xerifao = nome;
+                    if(p.bolamurcha === nomeAntigo) p.bolamurcha = nome;
+                });
+                salvarBD('premiacoesFC', premiacoes);
+
+                alert("Dados atualizados com sucesso!");
+                cancelarEdicao();
+            } else {
+                atletas.push({ nome: nome, posicao: posicao });
+                alert("Atleta cadastrado!");
+            }
+
+            salvarBD('atletasFC', atletas);
+            document.getElementById('cadNome').value = "";
+            atualizarTelas();
+        }
+
+        function editarAtleta(index) {
+            let atletas = lerBD('atletasFC');
+            let atleta = atletas[index];
+
+            document.getElementById('cadNome').value = atleta.nome;
+            document.getElementById('cadPosicao').value = atleta.posicao;
+
+            atletaEditandoIndex = index;
+            document.getElementById('btnSalvarAtleta').innerText = "💾 Atualizar Dados";
+            document.getElementById('btnSalvarAtleta').style.backgroundColor = "#ffb236";
+            document.getElementById('cadNome').focus();
+            
+            window.scrollTo(0, 0); // Sobe a tela no telemóvel para facilitar a edição
+        }
+
+        function cancelarEdicao() {
+            atletaEditandoIndex = -1;
+            document.getElementById('btnSalvarAtleta').innerText = "Registrar Atleta";
+            document.getElementById('btnSalvarAtleta').style.backgroundColor = "var(--accent)";
+            document.getElementById('cadNome').value = "";
+        }
+
+        function excluirAtleta(index) {
+            if(confirm("Deseja excluir este atleta? O histórico de gols será mantido.")) {
+                let atletas = lerBD('atletasFC');
+                atletas.splice(index, 1);
+                salvarBD('atletasFC', atletas);
+                atualizarTelas();
+            }
+        }
+
+        function registrarScout(acao) {
+            let data = document.getElementById('dataJogo').value;
+            let time = document.getElementById('timeAcao').value;
+            let jogador = document.getElementById('jogadorAcao').value;
+            
+            if(!jogador) return alert("Selecione um jogador primeiro!");
+
+            let scouts = lerBD('scoutsFC');
+            scouts.push({ data: data, time: time, jogador: jogador, acao: acao });
+            salvarBD('scoutsFC', scouts);
+            
+            atualizarPlacar(data);
+            atualizarLogPartida(data); 
+        }
+
+        function atualizarLogPartida(dataFiltro) {
+            let scouts = lerBD('scoutsFC');
+            let logHtml = document.getElementById('logPartida');
+            logHtml.innerHTML = ""; 
+
+            let scoutsPartida = scouts.filter(s => s.data === dataFiltro).reverse();
+
+            if (scoutsPartida.length === 0) {
+                logHtml.innerHTML = `<div style="padding: 20px; text-align: center; color: #9a9a9a;">Nenhum evento registrado hoje.</div>`;
+                return;
+            }
+
+            scoutsPartida.forEach(s => {
+                let icone = ""; let corAcao = "";
+                if (s.acao === 'Gol') { icone = "⚽"; corAcao = "#00d65f"; }
+                if (s.acao === 'Assistência') { icone = "👟"; corAcao = "#00a1ff"; }
+                if (s.acao === 'Amarelo') { icone = "🟨"; corAcao = "#ffb236"; }
+                if (s.acao === 'Vermelho') { icone = "🟥"; corAcao = "#fd5d93"; }
+
+                logHtml.innerHTML += `
+                    <div class="log-item">
+                        <div class="log-icon">${icone}</div>
+                        <div class="log-detalhe">
+                            <div class="log-nome">${s.jogador}</div>
+                            <div class="log-time">${s.time}</div>
+                        </div>
+                        <div class="log-acao" style="color: ${corAcao};">${s.acao}</div>
+                    </div>
+                `;
+            });
+        }
+
+        function salvarPremiacao() {
+            let data = document.getElementById('dataPremio').value;
+            // Objeto sem a propriedade Pereba
+            let premio = {
+                data: data,
+                craque: document.getElementById('premioCraque').value,
+                paredao: document.getElementById('premioParedao').value,
+                xerifao: document.getElementById('premioXerifao').value,
+                bolamurcha: document.getElementById('premioBolaMurcha').value
+            };
+
+            let premiacoes = lerBD('premiacoesFC');
+            premiacoes.push(premio);
+            salvarBD('premiacoesFC', premiacoes);
+            alert("Resenha salva com sucesso!");
+            atualizarTelas();
+        }
+
+        function atualizarTelas() {
+            let atletas = lerBD('atletasFC');
+            
+            let lista = document.getElementById('listaAtletas');
+            lista.innerHTML = "";
+            atletas.forEach((a, index) => {
+                lista.innerHTML += `<tr>
+                    <td>${a.nome}</td>
+                    <td>${a.posicao}</td>
+                    <td>
+                        <button class="btn-acao btn-amarelo btn-sm" onclick="editarAtleta(${index})">✏️ Editar</button>
+                        <button class="btn-acao btn-vermelho btn-sm" onclick="excluirAtleta(${index})">🗑️</button>
+                    </td>
+                </tr>`;
+            });
+
+            let selects = document.querySelectorAll('.select-jogadores');
+            selects.forEach(select => {
+                let valorAntigo = select.value;
+                select.innerHTML = "";
+                atletas.forEach(a => {
+                    select.innerHTML += `<option value="${a.nome}">${a.nome}</option>`;
+                });
+                if(valorAntigo) select.value = valorAntigo;
+            });
+
+            let dataAtual = document.getElementById('dataJogo').value;
+            atualizarPlacar(dataAtual);
+            atualizarLogPartida(dataAtual); 
+            gerarDashboard();
+        }
+
+        function atualizarPlacar(dataFiltro) {
+            let scouts = lerBD('scoutsFC');
+            let golsReal = 0; let golsMilan = 0;
+            
+            scouts.forEach(s => {
+                if(s.data === dataFiltro && s.acao === 'Gol') {
+                    if(s.time === 'Real Madrid') golsReal++;
+                    if(s.time === 'Milan') golsMilan++;
+                }
+            });
+
+            document.getElementById('placarReal').innerText = golsReal;
+            document.getElementById('placarMilan').innerText = golsMilan;
+        }
+
+        function gerarDashboard() {
+            let scouts = lerBD('scoutsFC');
+            let premiacoes = lerBD('premiacoesFC');
+            
+            let estatisticas = {};
+            scouts.forEach(s => {
+                if(!estatisticas[s.jogador]) estatisticas[s.jogador] = { gols: 0, assists: 0 };
+                if(s.acao === 'Gol') estatisticas[s.jogador].gols++;
+                if(s.acao === 'Assistência') estatisticas[s.jogador].assists++;
+            });
+
+            let ranking = Object.keys(estatisticas).map(nome => ({
+                nome: nome,
+                gols: estatisticas[nome].gols,
+                assists: estatisticas[nome].assists
+            })).sort((a, b) => b.gols - a.gols);
+
+            let tabArtilharia = document.getElementById('tabelaArtilharia');
+            tabArtilharia.innerHTML = "";
+            ranking.forEach(r => {
+                if(r.gols > 0 || r.assists > 0) {
+                    tabArtilharia.innerHTML += `<tr><td><strong>${r.nome}</strong></td><td>${r.gols}</td><td>${r.assists}</td></tr>`;
+                }
+            });
+
+            let tabPremios = document.getElementById('tabelaPremiacoes');
+            tabPremios.innerHTML = "";
+            premiacoes.slice().reverse().forEach(p => {
+                let dataFormatada = p.data.split('-').reverse().join('/');
+                // Inserindo os dados sem o Pereba
+                tabPremios.innerHTML += `<tr>
+                    <td>${dataFormatada}</td>
+                    <td>🌟 ${p.craque}</td>
+                    <td>🧱 ${p.paredao}</td>
+                    <td>🛡️ ${p.xerifao}</td>
+                    <td>🎈 ${p.bolamurcha}</td>
+                </tr>`;
+            });
+        }
+
+        function limparBancoDados() {
+            if(confirm("ATENÇÃO: Vai apagar TODOS os jogadores e históricos. Tem a certeza?")) {
+                localStorage.clear();
+                alert("Sistema zerado!");
+                atualizarTelas();
+                document.getElementById('placarReal').innerText = "0";
+                document.getElementById('placarMilan').innerText = "0";
+                document.getElementById('logPartida').innerHTML = "";
+            }
+        }
+    </script>
+</body>
+</html>
