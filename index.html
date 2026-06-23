@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="referrer" content="no-referrer" />
-    <title>Gestão do Futebol Amigos FC (Cloud)</title>
+    <title>Gestão Amigos FC - Cloud & Admin</title>
     
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -14,20 +14,24 @@
         :root {
             --bg-color: #1e1e2f; --panel-bg: #27293d; --text-main: #ffffff;
             --text-muted: #9a9a9a; --accent: #e14eca; --btn-hover: #344675;
-            --milan: #ff3b3b; --real: #ffffff;
+            --milan: #ff3b3b; --real: #ffffff; --admin-color: #ffb236;
         }
         body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-color); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
         
         /* Menu Lateral */
         .sidebar { width: 280px; background-color: var(--panel-bg); padding: 20px 0; box-shadow: 2px 0 5px rgba(0,0,0,0.2); display: flex; flex-direction: column; flex-shrink: 0; z-index: 10; }
-        .sidebar h2 { text-align: center; color: var(--accent); margin-bottom: 20px; font-size: 22px; }
+        .sidebar h2 { text-align: center; color: var(--accent); margin-bottom: 10px; font-size: 22px; }
         
+        /* Controle de Acesso */
+        .admin-box { background-color: #1d1e2b; padding: 10px; margin: 0 15px 15px 15px; border-radius: 8px; border: 1px solid #333; text-align: center; }
+        .admin-box input { width: 80%; padding: 5px; font-size: 12px; margin-bottom: 5px; text-align: center; }
+        .badge-master { background-color: var(--admin-color); color: #000; font-size: 10px; font-weight: bold; padding: 2px 5px; border-radius: 3px; display: none; margin-top: 5px; }
+
         /* Cronômetro */
         .cronometro-container { background-color: #1d1e2b; padding: 15px; margin: 0 15px 20px 15px; border-radius: 8px; text-align: center; border: 1px solid #2b3553; }
         #displayCronometro { font-size: 36px; font-weight: bold; color: #00d65f; font-family: monospace; margin-bottom: 10px; letter-spacing: 2px; }
         .cronometro-botoes { display: flex; justify-content: center; gap: 10px; }
-        .cronometro-botoes button { background-color: #2b3553; border: none; color: white; font-size: 16px; cursor: pointer; padding: 8px; border-radius: 50%; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; }
-        .cronometro-botoes button:hover { background-color: var(--accent); }
+        .cronometro-botoes button { background-color: #2b3553; border: none; color: white; cursor: pointer; padding: 8px; border-radius: 50%; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; }
         
         /* Botões do Menu */
         .menu-wrapper { display: flex; flex-direction: column; flex: 1; }
@@ -39,17 +43,17 @@
         .modulo { display: none; background-color: var(--panel-bg); padding: 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); animation: fadeIn 0.3s ease-in-out; }
         .modulo.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        h3 { border-bottom: 1px solid #333; padding-bottom: 10px; margin-top: 0; }
         
-        /* Formulários */
+        /* Formulários e Botões */
         .form-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 5px; color: var(--text-muted); }
         input, select { width: 100%; padding: 10px; background-color: #1d1e2b; border: 1px solid #2b3553; color: white; border-radius: 5px; box-sizing: border-box; }
         .btn-acao { background-color: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 16px; width: 100%; margin-top: 10px; font-weight: bold; }
-        .btn-acao:hover { background-color: #c944b5; }
-        .btn-sm { padding: 5px 10px; width: auto; font-size: 12px; margin-top: 0; margin-right: 5px; }
         
-        /* Placar do Jogo */
+        /* Elementos que somem sem senha Master */
+        .master-only { display: none !important; }
+
+        /* Placar e Log */
         .placar-container { display: flex; justify-content: center; align-items: center; gap: 40px; margin: 30px 0; padding: 20px; background-color: #1d1e2b; border-radius: 10px; }
         .time-placar { text-align: center; }
         .escudo { width: 100px; height: 100px; object-fit: contain; margin-bottom: 10px; }
@@ -60,46 +64,21 @@
         .btn-amarelo { background-color: #ffb236; color: #000; }
         .btn-vermelho { background-color: #fd5d93; color: #fff; }
         
-        /* Tabelas e Log */
-        .table-responsive { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px; white-space: nowrap; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #333; }
-        th { color: var(--accent); }
-        tr:hover { background-color: #1d1e2b; }
-        .flex-row { display: flex; gap: 15px; }
-        .flex-row > div { flex: 1; }
-        
         .log-container { background-color: #1d1e2b; border: 1px solid #2b3553; border-radius: 5px; max-height: 250px; overflow-y: auto; margin-top: 15px; }
         .log-item { display: flex; align-items: center; padding: 10px 15px; border-bottom: 1px solid #2b3553; }
-        .log-item:last-child { border-bottom: none; }
-        .log-icon { font-size: 20px; margin-right: 15px; width: 30px; text-align: center; }
-        .log-detalhe { flex: 1; }
-        .log-nome { font-weight: bold; font-size: 16px; }
-        .log-time { font-size: 12px; color: var(--text-muted); }
-        .log-acao { font-size: 14px; color: var(--text-muted); text-transform: uppercase; font-weight: bold; }
-
-        /* Sinalizador de Online */
-        .status-nuvem { text-align: center; font-size: 12px; color: #00d65f; margin-top: 10px; }
-
-        /* Responsividade */
+        
+        /* Responsividade Telemóvel */
         @media (max-width: 768px) {
             body { flex-direction: column; height: auto; min-height: 100vh; overflow-y: auto; }
-            .sidebar { width: 100%; padding: 10px 0 0 0; }
-            .sidebar h2 { margin-bottom: 10px; font-size: 20px; }
-            .cronometro-container { margin: 5px 15px 10px 15px; padding: 10px; }
-            #displayCronometro { font-size: 28px; }
+            .sidebar { width: 100%; padding: 10px 0; }
+            .admin-box { display: none; } /* Admin via console ou prompt no celular */
             .menu-wrapper { flex-direction: row; overflow-x: auto; padding-bottom: 5px; }
             .menu-btn { white-space: nowrap; width: auto; flex-shrink: 0; padding: 10px 15px; border-left: none; border-bottom: 3px solid transparent; }
-            .menu-btn.active { border-left: none; border-bottom: 3px solid var(--accent); background-color: transparent; }
-            .btn-zerar-container { padding: 10px 15px; }
-            .main-content { padding: 15px; overflow-y: visible; }
-            .modulo { padding: 20px; }
-            .flex-row { flex-direction: column; gap: 0; }
+            .menu-btn.active { border-bottom: 3px solid var(--accent); background-color: transparent; }
+            .main-content { padding: 15px; }
             .placar-container { gap: 15px; padding: 15px 10px; }
             .score { font-size: 45px; }
             .escudo { width: 60px; height: 60px; }
-            .botoes-jogo { gap: 10px; }
-            .btn-acao { padding: 12px 10px; font-size: 14px; }
         }
     </style>
 </head>
@@ -107,15 +86,20 @@
 
     <div class="sidebar">
         <h2>⚽ Amigos FC</h2>
-        <div class="status-nuvem">🟢 Sincronizado na Nuvem</div>
+        
+        <div class="admin-box">
+            <label style="font-size: 10px;">ACESSO MASTER</label>
+            <input type="password" id="senhaMaster" placeholder="Senha" oninput="verificarMaster(this.value)">
+            <div id="badgeMaster" class="badge-master">MODO EDITOR ATIVO</div>
+        </div>
         
         <div class="cronometro-container">
             <div id="displayCronometro">00:00</div>
             <div class="cronometro-botoes">
-                <button onclick="iniciarCronometro()" title="Iniciar">▶️</button>
-                <button onclick="pausarCronometro()" title="Pausar">⏸️</button>
-                <button onclick="zerarCronometro()" title="Zerar">🔄</button>
-                <button onclick="fimCronometro()" title="Fim de Jogo">⏹️</button>
+                <button onclick="iniciarCronometro()">▶️</button>
+                <button onclick="pausarCronometro()">⏸️</button>
+                <button onclick="zerarCronometro()">🔄</button>
+                <button onclick="fimCronometro()">⏹️</button>
             </div>
         </div>
 
@@ -126,7 +110,7 @@
             <button class="menu-btn" onclick="abrirAba('dashboard')">📊 Dashboard</button>
         </div>
         
-        <div class="btn-zerar-container" style="margin-top: auto; padding: 20px;">
+        <div class="btn-zerar-container master-only" style="margin-top: auto; padding: 20px;">
             <button onclick="limparBancoDados()" style="background: transparent; color: #fd5d93; border: 1px solid #fd5d93; padding: 8px; width: 100%; cursor: pointer; border-radius: 5px;">⚠️ Zerar Nuvem</button>
         </div>
     </div>
@@ -134,85 +118,72 @@
     <div class="main-content">
 
         <div id="cadastro" class="modulo active">
-            <h3>Cadastrar / Editar Atleta</h3>
-            <div class="flex-row">
-                <div class="form-group">
-                    <label>Nome do Jogador</label>
-                    <input type="text" id="cadNome" placeholder="Ex: Thiago">
+            <h3>Gerenciar Elenco</h3>
+            <div style="background: #1d1e2b; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                <div class="flex-row">
+                    <div class="form-group">
+                        <label>Nome do Jogador</label>
+                        <input type="text" id="cadNome" placeholder="Ex: Thiago">
+                    </div>
+                    <div class="form-group">
+                        <label>Posição</label>
+                        <select id="cadPosicao">
+                            <option value="GOL">Goleiro (GOL)</option>
+                            <option value="ZAG">Zagueiro (ZAG)</option>
+                            <option value="LAT">Lateral (LAT)</option>
+                            <option value="VOL">Volante (VOL)</option>
+                            <option value="MEI">Meio-Campo (MEI)</option>
+                            <option value="ATA">Atacante (ATA)</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>Posição</label>
-                    <select id="cadPosicao">
-                        <option value="GOL">Goleiro (GOL)</option>
-                        <option value="ZAG">Zagueiro (ZAG)</option>
-                        <option value="LAT">Lateral (LAT)</option>
-                        <option value="VOL">Volante (VOL)</option>
-                        <option value="MEI">Meio-Campo (MEI)</option>
-                        <option value="ATA">Atacante (ATA)</option>
-                    </select>
-                </div>
+                <button id="btnSalvarAtleta" class="btn-acao" onclick="salvarAtleta()">Registrar Atleta</button>
             </div>
-            <button id="btnSalvarAtleta" class="btn-acao" onclick="salvarAtleta()">Registrar na Nuvem</button>
 
-            <h3 style="margin-top: 40px;">Elenco Cadastrado</h3>
-            <div class="table-responsive">
+            <h3>Elenco Cadastrado</h3>
+            <div style="overflow-x: auto;">
                 <table>
-                    <thead><tr><th>Nome</th><th>Posição</th><th>Ações</th></tr></thead>
+                    <thead><tr><th>Nome</th><th>Posição</th><th class="master-only">Ações</th></tr></thead>
                     <tbody id="listaAtletas"></tbody>
                 </table>
             </div>
         </div>
 
         <div id="jogo" class="modulo">
-            <h3>Painel da Partida - Tempo Real</h3>
-            <div class="form-group">
-                <label>Data da Partida:</label>
-                <input type="date" id="dataJogo" onchange="atualizarPlacar(this.value); atualizarLogPartida(this.value);">
-            </div>
+            <h3>Painel da Partida</h3>
+            <input type="date" id="dataJogo" onchange="filtroDataGlobal = this.value; refreshTelas();">
             
             <div class="placar-container">
                 <div class="time-placar">
-                    <img src="https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg" class="escudo" alt="Real Madrid">
+                    <img src="https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg" class="escudo">
                     <div class="score" id="placarReal">0</div>
                 </div>
                 <div class="score" style="color: #555;">X</div>
                 <div class="time-placar">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/d/d0/Logo_of_AC_Milan.svg" class="escudo" alt="Milan">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/d/d0/Logo_of_AC_Milan.svg" class="escudo">
                     <div class="score" id="placarMilan">0</div>
                 </div>
             </div>
 
             <div class="flex-row">
-                <div class="form-group">
-                    <label>Time da Ação:</label>
-                    <select id="timeAcao">
-                        <option value="Real Madrid">Real Madrid</option>
-                        <option value="Milan">Milan</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Jogador:</label>
-                    <select id="jogadorAcao" class="select-jogadores"></select>
-                </div>
+                <div class="form-group"><label>Time:</label><select id="timeAcao"><option>Real Madrid</option><option>Milan</option></select></div>
+                <div class="form-group"><label>Jogador:</label><select id="jogadorAcao" class="select-jogadores"></select></div>
             </div>
 
             <div class="botoes-jogo">
                 <button class="btn-acao btn-gol" onclick="registrarScout('Gol')">⚽ GOL</button>
-                <button class="btn-acao btn-assist" onclick="registrarScout('Assistência')">👟 ASSISTÊNCIA</button>
+                <button class="btn-acao btn-assist" onclick="registrarScout('Assistência')">👟 ASSIST</button>
                 <button class="btn-acao btn-amarelo" onclick="registrarScout('Amarelo')">🟨 AMARELO</button>
                 <button class="btn-acao btn-vermelho" onclick="registrarScout('Vermelho')">🟥 VERMELHO</button>
             </div>
 
-            <h3 style="margin-top: 40px; font-size: 18px; color: var(--accent);">📜 Súmula da Partida</h3>
+            <h3 style="margin-top:30px">📜 Súmula</h3>
             <div class="log-container" id="logPartida"></div>
         </div>
 
         <div id="resenha" class="modulo">
-            <h3>Resenha Pós-Jogo</h3>
-            <div class="form-group">
-                <label>Data da Partida:</label>
-                <input type="date" id="dataPremio">
-            </div>
+            <h3>Votação da Resenha</h3>
+            <input type="date" id="dataPremio">
             <div class="flex-row">
                 <div class="form-group"><label>🏆 Craque</label><select id="premioCraque" class="select-jogadores"></select></div>
                 <div class="form-group"><label>🧱 Paredão</label><select id="premioParedao" class="select-jogadores"></select></div>
@@ -221,31 +192,22 @@
                 <div class="form-group"><label>🛡️ Xerifão</label><select id="premioXerifao" class="select-jogadores"></select></div>
                 <div class="form-group"><label>🎈 Bola Murcha</label><select id="premioBolaMurcha" class="select-jogadores"></select></div>
             </div>
-            <button class="btn-acao" onclick="salvarPremiacao()">Salvar Histórico na Nuvem</button>
+            <button class="btn-acao" onclick="salvarPremiacao()">Salvar Resenha</button>
         </div>
 
         <div id="dashboard" class="modulo">
-            <h3>📈 Artilharia Geral (Histórico)</h3>
-            <div class="table-responsive">
-                <table>
-                    <thead><tr><th>Jogador</th><th>Gols ⚽</th><th>Assistências 👟</th></tr></thead>
-                    <tbody id="tabelaArtilharia"></tbody>
-                </table>
-            </div>
-
-            <h3 style="margin-top: 40px;">🏅 Últimas Premiações</h3>
-            <div class="table-responsive">
-                <table>
-                    <thead><tr><th>Data</th><th>Craque</th><th>Paredão</th><th>Xerifão</th><th>Bola Murcha</th></tr></thead>
-                    <tbody id="tabelaPremiacoes"></tbody>
-                </table>
+            <h3>📈 Artilharia Geral</h3>
+            <table><thead><tr><th>Jogador</th><th>Gols</th><th>Assists</th></tr></thead><tbody id="tabelaArtilharia"></tbody></table>
+            <h3 style="margin-top:40px">🏅 Galeria de Prêmios</h3>
+            <div style="overflow-x:auto">
+                <table><thead><tr><th>Data</th><th>Craque</th><th>Xerifão</th><th>Paredão</th><th class="master-only">Ações</th></tr></thead><tbody id="tabelaPremiacoes"></tbody></table>
             </div>
         </div>
 
     </div>
 
     <script>
-        // 1. CONFIGURAÇÃO DO FIREBASE (Suas chaves)
+        // 1. CONFIGURAÇÃO FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyBE7HbmYhdnUnbi_PvY27pBNgfiWoh4I9w",
             authDomain: "amigos-fc-gestao.firebaseapp.com",
@@ -254,273 +216,169 @@
             messagingSenderId: "465771604888",
             appId: "1:465771604888:web:6aaaf3b1cd92a5224799ed"
         };
-
-        // Inicializa Banco de Dados
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // Arrays Globais que vão receber os dados da Nuvem
-        let atletasFC = [];
-        let scoutsFC = [];
-        let premiacoesFC = [];
-        let atletaEditandoId = null;
+        // 2. SEGURANÇA MASTER
+        const SENHA_MASTER_DEFINIDA = "Starnewfour1273@"; // << ALTERE SUA SENHA AQUI
+        let isMaster = false;
 
-        // 2. LISTENERS EM TEMPO REAL (A mágica da sincronização)
-        db.collection("atletas").onSnapshot((snapshot) => {
-            atletasFC = [];
-            snapshot.forEach(doc => {
-                let obj = doc.data();
-                obj.id = doc.id; // Guarda a ID única do banco
-                atletasFC.push(obj);
-            });
-            atualizarTelas(); 
-        });
-
-        db.collection("scouts").onSnapshot((snapshot) => {
-            scoutsFC = [];
-            snapshot.forEach(doc => scoutsFC.push(doc.data()));
-            scoutsFC.sort((a, b) => a.timestamp - b.timestamp); // Ordena do mais antigo para o mais novo
-            
-            let dataAtual = document.getElementById('dataJogo').value;
-            if(dataAtual) {
-                atualizarPlacar(dataAtual);
-                atualizarLogPartida(dataAtual);
+        function verificarMaster(senha) {
+            if (senha === SENHA_MASTER_DEFINIDA) {
+                isMaster = true;
+                document.getElementById('badgeMaster').style.display = "block";
+                document.querySelectorAll('.master-only').forEach(el => el.style.setProperty('display', 'table-cell', 'important'));
+                document.querySelector('.btn-zerar-container.master-only').style.setProperty('display', 'block', 'important');
+            } else {
+                isMaster = false;
+                document.getElementById('badgeMaster').style.display = "none";
+                document.querySelectorAll('.master-only').forEach(el => el.style.setProperty('display', 'none', 'important'));
             }
-            gerarDashboard();
+            refreshTelas();
+        }
+
+        // 3. ESTADO E SINCRONIZAÇÃO
+        let atletasFC = []; let scoutsFC = []; let premiacoesFC = [];
+        let atletaEditandoId = null; let filtroDataGlobal = "";
+
+        db.collection("atletas").onSnapshot(snap => {
+            atletasFC = snap.docs.map(doc => ({id: doc.id, ...doc.data()}));
+            refreshTelas();
+        });
+        db.collection("scouts").onSnapshot(snap => {
+            scoutsFC = snap.docs.map(doc => ({id: doc.id, ...doc.data()})).sort((a,b) => a.timestamp - b.timestamp);
+            refreshTelas();
+        });
+        db.collection("premiacoes").onSnapshot(snap => {
+            premiacoesFC = snap.docs.map(doc => ({id: doc.id, ...doc.data()})).sort((a,b) => b.timestamp - a.timestamp);
+            refreshTelas();
         });
 
-        db.collection("premiacoes").onSnapshot((snapshot) => {
-            premiacoesFC = [];
-            snapshot.forEach(doc => premiacoesFC.push(doc.data()));
-            premiacoesFC.sort((a, b) => a.timestamp - b.timestamp);
-            gerarDashboard();
-        });
+        // 4. CRONÔMETRO
+        let cInt = null; let cSeg = 0;
+        function updateC() { let m = Math.floor(cSeg/60).toString().padStart(2,'0'); let s = (cSeg%60).toString().padStart(2,'0'); document.getElementById('displayCronometro').innerText = `${m}:${s}`; }
+        function iniciarCronometro() { if(!cInt) cInt = setInterval(()=>{cSeg++; updateC()}, 1000); }
+        function pausarCronometro() { clearInterval(cInt); cInt = null; }
+        function zerarCronometro() { pausarCronometro(); cSeg = 0; updateC(); }
+        function fimCronometro() { pausarCronometro(); alert("Fim de papo! Tempo: " + document.getElementById('displayCronometro').innerText); }
 
-        // --- LÓGICA DO CRONÔMETRO (Mantida igual, pois é local) ---
-        let cronometroInterval = null;
-        let cronometroSegundos = 0;
+        // 5. FUNÇÕES DE TELA
+        function refreshTelas() {
+            // Lista Atletas
+            const list = document.getElementById('listaAtletas');
+            list.innerHTML = atletasFC.map(a => `
+                <tr>
+                    <td>${a.nome}</td><td>${a.posicao}</td>
+                    <td class="master-only" style="display: ${isMaster ? 'table-cell' : 'none'}">
+                        <button class="btn-sm btn-gol" onclick="editarAtleta('${a.id}')">✏️</button>
+                        <button class="btn-sm btn-vermelho" onclick="excluirDoc('atletas','${a.id}')">🗑️</button>
+                    </td>
+                </tr>`).join('');
 
-        function atualizarDisplayCronometro() {
-            let minutos = Math.floor(cronometroSegundos / 60).toString().padStart(2, '0');
-            let segundos = (cronometroSegundos % 60).toString().padStart(2, '0');
-            document.getElementById('displayCronometro').innerText = `${minutos}:${segundos}`;
+            // Selects
+            document.querySelectorAll('.select-jogadores').forEach(sel => {
+                const val = sel.value;
+                sel.innerHTML = atletasFC.map(a => `<option value="${a.nome}">${a.nome}</option>`).join('');
+                if(val) sel.value = val;
+            });
+
+            // Placar e Súmula
+            const data = filtroDataGlobal || document.getElementById('dataJogo').value;
+            const scoutsDia = scoutsFC.filter(s => s.data === data);
+            document.getElementById('placarReal').innerText = scoutsDia.filter(s => s.time === 'Real Madrid' && s.acao === 'Gol').length;
+            document.getElementById('placarMilan').innerText = scoutsDia.filter(s => s.time === 'Milan' && s.acao === 'Gol').length;
+            
+            document.getElementById('logPartida').innerHTML = scoutsDia.slice().reverse().map(s => `
+                <div class="log-item">
+                    <div style="font-size:20px; margin-right:15px">${s.acao === 'Gol' ? '⚽' : s.acao === 'Assistência' ? '👟' : s.acao === 'Amarelo' ? '🟨' : '🟥'}</div>
+                    <div style="flex:1"><b>${s.jogador}</b><br><small>${s.time}</small></div>
+                    <div class="master-only" style="display: ${isMaster ? 'block' : 'none'}"><button onclick="excluirDoc('scouts','${s.id}')" style="background:none; border:none; cursor:pointer">❌</button></div>
+                </div>`).join('');
+
+            // Dashboard
+            const stats = {};
+            scoutsFC.forEach(s => {
+                if(!stats[s.jogador]) stats[s.jogador] = {g:0, a:0};
+                if(s.acao === 'Gol') stats[s.jogador].g++;
+                if(s.acao === 'Assistência') stats[s.jogador].a++;
+            });
+            document.getElementById('tabelaArtilharia').innerHTML = Object.entries(stats)
+                .sort((a,b) => b[1].g - a[1].g)
+                .map(([nome, d]) => `<tr><td>${nome}</td><td>${d.g}</td><td>${d.a}</td></tr>`).join('');
+
+            document.getElementById('tabelaPremiacoes').innerHTML = premiacoesFC.map(p => `
+                <tr>
+                    <td>${p.data.split('-').reverse().join('/')}</td>
+                    <td>${p.craque}</td><td>${p.xerifao}</td><td>${p.paredao}</td>
+                    <td class="master-only" style="display: ${isMaster ? 'table-cell' : 'none'}"><button class="btn-sm btn-vermelho" onclick="excluirDoc('premiacoes','${p.id}')">🗑️</button></td>
+                </tr>`).join('');
         }
-        function iniciarCronometro() { if (!cronometroInterval) cronometroInterval = setInterval(() => { cronometroSegundos++; atualizarDisplayCronometro(); }, 1000); }
-        function pausarCronometro() { clearInterval(cronometroInterval); cronometroInterval = null; }
-        function zerarCronometro() { pausarCronometro(); cronometroSegundos = 0; atualizarDisplayCronometro(); }
-        function fimCronometro() { pausarCronometro(); alert(`Apito Final! ⏱️ Tempo: ${document.getElementById('displayCronometro').innerText}`); cronometroSegundos = 0; atualizarDisplayCronometro(); }
 
-        // --- INICIALIZAÇÃO DA PÁGINA ---
-        window.onload = function() {
-            document.getElementById('dataJogo').valueAsDate = new Date();
-            document.getElementById('dataPremio').valueAsDate = new Date();
-            atualizarDisplayCronometro();
-        }
-
-        function abrirAba(idAba) {
-            document.querySelectorAll('.modulo').forEach(mod => mod.classList.remove('active'));
-            document.querySelectorAll('.menu-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById(idAba).classList.add('active');
-            event.target.classList.add('active');
-            if(idAba !== 'cadastro') cancelarEdicao();
-        }
-
-        // --- MÓDULOS DE GRAVAÇÃO NA NUVEM (CRUD) ---
+        // 6. GRAVAÇÃO
         function salvarAtleta() {
-            let nome = document.getElementById('cadNome').value;
-            let posicao = document.getElementById('cadPosicao').value;
-            if(!nome) return alert("Digite o nome do atleta!");
-
-            if (atletaEditandoId) {
-                // Modo Edição
-                let atletaAntigo = atletasFC.find(a => a.id === atletaEditandoId);
-                
-                // Atualiza o documento dele
-                db.collection("atletas").doc(atletaEditandoId).update({ nome: nome, posicao: posicao });
-
-                // Se trocou de nome, atualiza os gols antigos para não perder a artilharia
-                if (atletaAntigo && atletaAntigo.nome !== nome) {
-                    db.collection("scouts").where("jogador", "==", atletaAntigo.nome).get().then(snap => {
-                        snap.forEach(doc => doc.ref.update({ jogador: nome }));
-                    });
-                    
-                    db.collection("premiacoes").get().then(snap => {
-                        snap.forEach(doc => {
-                            let p = doc.data();
-                            let updates = {};
-                            if(p.craque === atletaAntigo.nome) updates.craque = nome;
-                            if(p.paredao === atletaAntigo.nome) updates.paredao = nome;
-                            if(p.xerifao === atletaAntigo.nome) updates.xerifao = nome;
-                            if(p.bolamurcha === atletaAntigo.nome) updates.bolamurcha = nome;
-                            if(Object.keys(updates).length > 0) doc.ref.update(updates);
-                        });
-                    });
-                }
+            const n = document.getElementById('cadNome').value; const p = document.getElementById('cadPosicao').value;
+            if(!n) return alert("Nome vazio!");
+            if(atletaEditandoId) {
+                db.collection("atletas").doc(atletaEditandoId).update({nome:n, posicao:p});
                 cancelarEdicao();
             } else {
-                // Modo Novo Cadastro
-                db.collection("atletas").add({ nome: nome, posicao: posicao, timestamp: Date.now() });
-                document.getElementById('cadNome').value = "";
+                db.collection("atletas").add({nome:n, posicao:p, timestamp: Date.now()});
             }
-        }
-
-        function editarAtleta(id) {
-            let atleta = atletasFC.find(a => a.id === id);
-            if(!atleta) return;
-            document.getElementById('cadNome').value = atleta.nome;
-            document.getElementById('cadPosicao').value = atleta.posicao;
-            atletaEditandoId = id;
-            document.getElementById('btnSalvarAtleta').innerText = "💾 Atualizar na Nuvem";
-            document.getElementById('btnSalvarAtleta').style.backgroundColor = "#ffb236";
-            document.getElementById('cadNome').focus();
-            window.scrollTo(0, 0);
-        }
-
-        function cancelarEdicao() {
-            atletaEditandoId = null;
-            document.getElementById('btnSalvarAtleta').innerText = "Registrar na Nuvem";
-            document.getElementById('btnSalvarAtleta').style.backgroundColor = "var(--accent)";
             document.getElementById('cadNome').value = "";
         }
 
-        function excluirAtleta(id) {
-            if(confirm("Deseja excluir este atleta da nuvem? O histórico de gols será mantido.")) {
-                db.collection("atletas").doc(id).delete();
-            }
-        }
-
         function registrarScout(acao) {
-            let data = document.getElementById('dataJogo').value;
-            let time = document.getElementById('timeAcao').value;
-            let jogador = document.getElementById('jogadorAcao').value;
-            if(!jogador) return alert("Selecione um jogador primeiro!");
-
-            db.collection("scouts").add({
-                data: data, time: time, jogador: jogador, acao: acao, timestamp: Date.now()
-            });
-            // Não precisa chamar função de atualizar. O onSnapshot vai fazer isso sozinho!
+            const d = document.getElementById('dataJogo').value; const t = document.getElementById('timeAcao').value; const j = document.getElementById('jogadorAcao').value;
+            if(!j) return alert("Selecione jogador!");
+            db.collection("scouts").add({data:d, time:t, jogador:j, acao:acao, timestamp: Date.now()});
         }
 
         function salvarPremiacao() {
-            let data = document.getElementById('dataPremio').value;
-            let premio = {
-                data: data,
+            const d = document.getElementById('dataPremio').value;
+            db.collection("premiacoes").add({
+                data:d, timestamp: Date.now(),
                 craque: document.getElementById('premioCraque').value,
                 paredao: document.getElementById('premioParedao').value,
                 xerifao: document.getElementById('premioXerifao').value,
-                bolamurcha: document.getElementById('premioBolaMurcha').value,
-                timestamp: Date.now()
-            };
-            db.collection("premiacoes").add(premio);
-            alert("Resenha salva na nuvem!");
+                bolamurcha: document.getElementById('premioBolaMurcha').value
+            });
+            alert("Resenha salva!");
+        }
+
+        function excluirDoc(coll, id) { if(isMaster && confirm("Excluir item?")) db.collection(coll).doc(id).delete(); }
+        
+        function editarAtleta(id) {
+            const a = atletasFC.find(i => i.id === id);
+            document.getElementById('cadNome').value = a.nome;
+            document.getElementById('cadPosicao').value = a.posicao;
+            atletaEditandoId = id;
+            document.getElementById('btnSalvarAtleta').innerText = "💾 Atualizar Atleta";
+            abrirAba('cadastro');
+        }
+
+        function cancelarEdicao() { atletaEditandoId = null; document.getElementById('btnSalvarAtleta').innerText = "Registrar Atleta"; }
+
+        function abrirAba(id) {
+            document.querySelectorAll('.modulo').forEach(m => m.classList.remove('active'));
+            document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            event.currentTarget.classList.add('active');
         }
 
         async function limparBancoDados() {
-            if(confirm("ATENÇÃO MÁXIMA: Isso vai apagar TODOS os dados da NUVEM para todo mundo. Tem a certeza absoluta?")) {
-                let snapAtletas = await db.collection("atletas").get();
-                snapAtletas.forEach(doc => doc.ref.delete());
-
-                let snapScouts = await db.collection("scouts").get();
-                snapScouts.forEach(doc => doc.ref.delete());
-
-                let snapPremios = await db.collection("premiacoes").get();
-                snapPremios.forEach(doc => doc.ref.delete());
-
-                alert("Sistema zerado com sucesso.");
+            if(isMaster && confirm("DELETAR TUDO?")) {
+                const colunas = ['atletas', 'scouts', 'premiacoes'];
+                for(let c of colunas) {
+                    const snap = await db.collection(c).get();
+                    snap.forEach(doc => doc.ref.delete());
+                }
             }
         }
 
-        // --- ATUALIZAÇÕES VISUAIS DA TELA ---
-        function atualizarTelas() {
-            // Tabela de Cadastro
-            let lista = document.getElementById('listaAtletas');
-            lista.innerHTML = "";
-            atletasFC.forEach(a => {
-                lista.innerHTML += `<tr>
-                    <td>${a.nome}</td><td>${a.posicao}</td>
-                    <td>
-                        <button class="btn-acao btn-amarelo btn-sm" onclick="editarAtleta('${a.id}')">✏️ Editar</button>
-                        <button class="btn-acao btn-vermelho btn-sm" onclick="excluirAtleta('${a.id}')">🗑️</button>
-                    </td>
-                </tr>`;
-            });
-
-            // Selects de Jogadores
-            let selects = document.querySelectorAll('.select-jogadores');
-            selects.forEach(select => {
-                let valorAntigo = select.value;
-                select.innerHTML = "";
-                atletasFC.forEach(a => { select.innerHTML += `<option value="${a.nome}">${a.nome}</option>`; });
-                if(valorAntigo) select.value = valorAntigo;
-            });
-        }
-
-        function atualizarPlacar(dataFiltro) {
-            let golsReal = 0; let golsMilan = 0;
-            scoutsFC.forEach(s => {
-                if(s.data === dataFiltro && s.acao === 'Gol') {
-                    if(s.time === 'Real Madrid') golsReal++;
-                    if(s.time === 'Milan') golsMilan++;
-                }
-            });
-            document.getElementById('placarReal').innerText = golsReal;
-            document.getElementById('placarMilan').innerText = golsMilan;
-        }
-
-        function atualizarLogPartida(dataFiltro) {
-            let logHtml = document.getElementById('logPartida');
-            logHtml.innerHTML = ""; 
-            let scoutsPartida = scoutsFC.filter(s => s.data === dataFiltro).reverse();
-
-            if (scoutsPartida.length === 0) {
-                logHtml.innerHTML = `<div style="padding: 20px; text-align: center; color: #9a9a9a;">Nenhum evento registrado hoje.</div>`;
-                return;
-            }
-
-            scoutsPartida.forEach(s => {
-                let icone = ""; let corAcao = "";
-                if (s.acao === 'Gol') { icone = "⚽"; corAcao = "#00d65f"; }
-                if (s.acao === 'Assistência') { icone = "👟"; corAcao = "#00a1ff"; }
-                if (s.acao === 'Amarelo') { icone = "🟨"; corAcao = "#ffb236"; }
-                if (s.acao === 'Vermelho') { icone = "🟥"; corAcao = "#fd5d93"; }
-
-                logHtml.innerHTML += `
-                    <div class="log-item">
-                        <div class="log-icon">${icone}</div>
-                        <div class="log-detalhe">
-                            <div class="log-nome">${s.jogador}</div><div class="log-time">${s.time}</div>
-                        </div>
-                        <div class="log-acao" style="color: ${corAcao};">${s.acao}</div>
-                    </div>`;
-            });
-        }
-
-        function gerarDashboard() {
-            let estatisticas = {};
-            scoutsFC.forEach(s => {
-                if(!estatisticas[s.jogador]) estatisticas[s.jogador] = { gols: 0, assists: 0 };
-                if(s.acao === 'Gol') estatisticas[s.jogador].gols++;
-                if(s.acao === 'Assistência') estatisticas[s.jogador].assists++;
-            });
-
-            let ranking = Object.keys(estatisticas).map(nome => ({
-                nome: nome, gols: estatisticas[nome].gols, assists: estatisticas[nome].assists
-            })).sort((a, b) => b.gols - a.gols);
-
-            let tabArtilharia = document.getElementById('tabelaArtilharia');
-            tabArtilharia.innerHTML = "";
-            ranking.forEach(r => {
-                if(r.gols > 0 || r.assists > 0) {
-                    tabArtilharia.innerHTML += `<tr><td><strong>${r.nome}</strong></td><td>${r.gols}</td><td>${r.assists}</td></tr>`;
-                }
-            });
-
-            let tabPremios = document.getElementById('tabelaPremiacoes');
-            tabPremios.innerHTML = "";
-            premiacoesFC.slice().reverse().forEach(p => {
-                let dataFormatada = p.data.split('-').reverse().join('/');
-                tabPremios.innerHTML += `<tr><td>${dataFormatada}</td><td>🌟 ${p.craque}</td><td>🧱 ${p.paredao}</td><td>🛡️ ${p.xerifao}</td><td>🎈 ${p.bolamurcha}</td></tr>`;
-            });
+        window.onload = () => {
+            document.getElementById('dataJogo').valueAsDate = new Date();
+            document.getElementById('dataPremio').valueAsDate = new Date();
+            updateC();
         }
     </script>
 </body>
