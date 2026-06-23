@@ -487,4 +487,79 @@
 
         function cancelarEdicaoAtleta() { atletaEditandoId = null; document.getElementById('btnSalvarAtleta').innerText = "Registrar Atleta"; document.getElementById('btnSalvarAtleta').style.backgroundColor = "var(--accent)"; document.getElementById('cadNome').value = ""; }
         function cancelarEdicaoScout() { scoutEditandoId = null; document.getElementById('painelEdicaoScout').style.display = 'none'; }
-        function cancelarEdicaoPremio() { premioEditandoId = null; document.getElementById('btnSalvarResenha').innerText = "Salvar Histórico da Resenha"; document.getElementById('
+        function cancelarEdicaoPremio() { premioEditandoId = null; document.getElementById('btnSalvarResenha').innerText = "Salvar Histórico da Resenha"; document.getElementById('btnSalvarResenha').style.backgroundColor = "var(--accent)"; }
+        
+        function excluirDoc(coll, id) { if(blockIfNotMaster()) return; if(confirm("Excluir registro permanentemente?")) db.collection(coll).doc(id).delete(); }
+        async function limparBancoDados() { if(blockIfNotMaster()) return; if(confirm("PERIGO: Deletar TUDO?")) { let sA = await db.collection("atletas").get(); sA.forEach(d => d.ref.delete()); let sS = await db.collection("scouts").get(); sS.forEach(d => d.ref.delete()); let sP = await db.collection("premiacoes").get(); sP.forEach(d => d.ref.delete()); alert("Sistema zerado!"); } }
+
+        function abrirAba(id) {
+            document.querySelectorAll('.modulo').forEach(m => m.classList.remove('active')); document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(id).classList.add('active'); event.currentTarget.classList.add('active');
+            if(id !== 'cadastro') cancelarEdicaoAtleta(); if(id !== 'jogo') cancelarEdicaoScout(); if(id !== 'resenha') cancelarEdicaoPremio();
+            filtroDataGlobal = document.getElementById('dataJogo').value; refreshTelas();
+        }
+
+        // --- WHATSAPP ---
+        function compartilharJogo() {
+            const data = document.getElementById('dataJogo').value;
+            if (!data) return alert("Selecione uma data!");
+            const scoutsDia = scoutsFC.filter(s => s.data === data);
+            const golsR = scoutsDia.filter(s => s.time === 'Real Madrid' && s.acao === 'Gol').length;
+            const golsM = scoutsDia.filter(s => s.time === 'Milan' && s.acao === 'Gol').length;
+            
+            const times = ['Real Madrid', 'Milan'];
+            let stats = { 'Real Madrid': { gols: {}, assists: {} }, 'Milan': { gols: {}, assists: {} } };
+            scoutsDia.forEach(s => {
+                if (s.acao === 'Gol') stats[s.time].gols[s.jogador] = (stats[s.time].gols[s.jogador] || 0) + 1;
+                if (s.acao === 'Assistência') stats[s.time].assists[s.jogador] = (stats[s.time].assists[s.jogador] || 0) + 1;
+            });
+
+            let txt = `⚽ *RESUMO DA PARTIDA* ⚽\n📅 Data: ${data.split('-').reverse().join('/')}\n\n`;
+            txt += `🏆 *Real Madrid ${golsR} x ${golsM} Milan*\n\n`;
+
+            times.forEach(t => {
+                const gols = stats[t].gols; const assists = stats[t].assists;
+                if(Object.keys(gols).length > 0 || Object.keys(assists).length > 0) {
+                    txt += `🛡️ *${t.toUpperCase()}*\n`;
+                    if(Object.keys(gols).length > 0) { txt += `*⚽ Gols:*\n`; Object.entries(gols).sort((a,b)=>b[1]-a[1]).forEach(([j,q]) => txt += `- ${j} (${q})\n`); }
+                    if(Object.keys(assists).length > 0) { txt += `*👟 Assists:*\n`; Object.entries(assists).sort((a,b)=>b[1]-a[1]).forEach(([j,q]) => txt += `- ${j} (${q})\n`); }
+                    txt += `\n`;
+                }
+            });
+
+            const premios = premiacoesFC.find(p => p.data === data);
+            if(premios) { txt += `*🏅 PREMIAÇÕES*\n🌟 Craque: ${premios.craque}\n🧱 Paredão: ${premios.paredao}\n🛡️ Xerifão: ${premios.xerifao}\n🎈 Bola Murcha: ${premios.bolamurcha}\n`; }
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(txt)}`, '_blank');
+        }
+
+        function compartirMes() {
+            const data = document.getElementById('dataJogo').value;
+            if (!data) return;
+            const mesAno = data.substring(0, 7);
+            const scoutsMes = scoutsFC.filter(s => s.data.startsWith(mesAno));
+            if (scoutsMes.length === 0) return alert("Nenhum evento neste mês!");
+
+            let artilheiros = {}; let garcons = {};
+            scoutsMes.forEach(s => {
+                if (s.acao === 'Gol') artilheiros[s.jogador] = (artilheiros[s.jogador] || 0) + 1;
+                if (s.acao === 'Assistência') garcons[s.jogador] = (garcons[s.jogador] || 0) + 1;
+            });
+
+            const [ano, mes] = mesAno.split('-');
+            let txt = `📊 *RESUMO DO MÊS - ${mes}/${ano}* 📊\n\n*⚽ Top Artilheiros:*\n`;
+            Object.entries(artilheiros).sort((a,b)=>b[1]-a[1]).slice(0, 5).forEach(([j,q], i) => txt += `${i+1}. ${j} - ${q} gols\n`);
+            txt += `\n*👟 Top Garçons:*\n`;
+            Object.entries(garcons).sort((a,b)=>b[1]-a[1]).slice(0, 5).forEach(([j,q], i) => txt += `${i+1}. ${j} - ${q} assists\n`);
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(txt)}`, '_blank');
+        }
+
+        window.onload = () => {
+            const dataAtual = new Date().toISOString().split('T')[0];
+            document.getElementById('dataJogo').value = dataAtual;
+            document.getElementById('dataPremio').value = dataAtual;
+            filtroDataGlobal = dataAtual;
+            updateC();
+        }
+    </script>
+</body>
+</html>
