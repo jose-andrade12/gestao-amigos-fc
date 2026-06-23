@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="referrer" content="no-referrer" />
-    <title>Gestão Amigos FC - Secure Cloud</title>
+    <title>Gestão Amigos FC - Cloud & WhatsApp</title>
     
     <!-- === BIBLIOTECAS DO FIREBASE === -->
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -15,7 +15,7 @@
         :root {
             --bg-color: #1e1e2f; --panel-bg: #27293d; --text-main: #ffffff;
             --text-muted: #9a9a9a; --accent: #e14eca; --btn-hover: #344675;
-            --milan: #ff3b3b; --real: #ffffff; --admin-color: #ffb236;
+            --wpp-color: #25D366; --admin-color: #ffb236;
         }
         body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-color); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
         
@@ -46,10 +46,13 @@
         .form-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 5px; color: var(--text-muted); }
         input, select { width: 100%; padding: 10px; background-color: #1d1e2b; border: 1px solid #2b3553; color: white; border-radius: 5px; box-sizing: border-box; }
+        
         .btn-acao { background-color: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 16px; width: 100%; margin-top: 10px; font-weight: bold; }
+        .btn-wpp { background-color: var(--wpp-color); color: #fff; margin-top: 20px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .btn-wpp:hover { background-color: #128C7E; }
         .btn-sm { padding: 5px 10px; width: auto; font-size: 12px; margin-top: 0; margin-right: 5px; border-radius: 3px; cursor: pointer; border: none; }
         
-        /* Elementos Ocultos por Padrão (Controle de Acesso via CSS) */
+        /* Admin */
         .admin-cell { display: none; }
         .admin-block { display: none; }
         body.is-admin .admin-cell { display: table-cell; }
@@ -79,7 +82,7 @@
         .log-item { display: flex; align-items: center; padding: 10px 15px; border-bottom: 1px solid #2b3553; }
         .log-item:last-child { border-bottom: none; }
         
-        /* Responsividade Telemóvel */
+        /* Responsividade */
         @media (max-width: 768px) {
             body { flex-direction: column; height: auto; min-height: 100vh; overflow-y: auto; }
             .sidebar { width: 100%; padding: 10px 0 0 0; }
@@ -88,7 +91,6 @@
             .menu-wrapper { flex-direction: row; overflow-x: auto; padding-bottom: 5px; }
             .menu-btn { white-space: nowrap; width: auto; flex-shrink: 0; padding: 10px 15px; border-left: none; border-bottom: 3px solid transparent; }
             .menu-btn.active { border-left: none; border-bottom: 3px solid var(--accent); background-color: transparent; }
-            .btn-zerar-container { padding: 10px 15px; }
             .main-content { padding: 15px; overflow-y: visible; }
             .modulo { padding: 20px; }
             .flex-row { flex-direction: column; gap: 0; }
@@ -123,7 +125,6 @@
             <button class="menu-btn" onclick="abrirAba('jogo')">2. Ao Vivo</button>
             <button class="menu-btn" onclick="abrirAba('resenha')">3. Resenha</button>
             <button class="menu-btn" onclick="abrirAba('dashboard')">📊 Dashboard</button>
-            <!-- Botão Admin -->
             <button class="menu-btn" onclick="toggleAdmin()" id="btnAdmin" style="color: #ffb236; border-top: 1px solid #333; margin-top: 10px;">🔑 Ativar Admin</button>
         </div>
         
@@ -168,7 +169,7 @@
 
         <!-- Módulo 2: Jogo Ao Vivo -->
         <div id="jogo" class="modulo">
-            <h3>Painel da Partida - Tempo Real</h3>
+            <h3>Painel da Partida</h3>
             <div class="form-group">
                 <label>Data da Partida:</label>
                 <input type="date" id="dataJogo" onchange="filtroDataGlobal = this.value; refreshTelas();">
@@ -198,7 +199,12 @@
                 <button class="btn-acao btn-vermelho" onclick="registrarScout('Vermelho')">🟥 VERMELHO</button>
             </div>
 
-            <h3 style="margin-top: 40px;">📜 Súmula da Partida</h3>
+            <button class="btn-acao btn-wpp" onclick="compartilharJogo()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M13.601 2.326A7.85 7.85 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.9 7.9 0 0 0 13.6 2.326zM7.994 14.521a6.6 6.6 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.56 6.56 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592m3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.73.73 0 0 0-.529.247c-.182.198-.691.677-.691 1.654s.71 1.916.81 2.049c.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232"/></svg>
+                Enviar Resumo da Partida (WhatsApp)
+            </button>
+
+            <h3 style="margin-top: 40px;">📜 Súmula</h3>
             <div class="log-container" id="logPartida"></div>
         </div>
 
@@ -222,7 +228,14 @@
 
         <!-- Módulo 4: Dashboard -->
         <div id="dashboard" class="modulo">
-            <h3>📈 Artilharia Geral</h3>
+            <div class="flex-row" style="align-items: center; margin-bottom: 20px;">
+                <h3 style="margin: 0; border: none;">📈 Artilharia Geral</h3>
+                <button class="btn-acao btn-wpp btn-sm" style="margin: 0; padding: 8px 15px;" onclick="compartilharMes()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M13.601 2.326A7.85 7.85 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.9 7.9 0 0 0 13.6 2.326zM7.994 14.521a6.6 6.6 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.56 6.56 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592m3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.73.73 0 0 0-.529.247c-.182.198-.691.677-.691 1.654s.71 1.916.81 2.049c.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232"/></svg>
+                    Resumo do Mês
+                </button>
+            </div>
+            
             <div class="table-responsive">
                 <table><thead><tr><th>Jogador</th><th>Gols ⚽</th><th>Assistências 👟</th></tr></thead><tbody id="tabelaArtilharia"></tbody></table>
             </div>
@@ -238,9 +251,8 @@
 
     </div>
 
-    <!-- === JAVASCRIPT: MOTOR E SEGURANÇA === -->
+    <!-- === JAVASCRIPT === -->
     <script>
-        // 1. CONFIGURAÇÃO FIREBASE (Não mexer)
         const firebaseConfig = {
             apiKey: "AIzaSyBE7HbmYhdnUnbi_PvY27pBNgfiWoh4I9w",
             authDomain: "amigos-fc-gestao.firebaseapp.com",
@@ -252,54 +264,31 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // 2. CONTROLE DE ACESSO (MASTER)
-        const SENHA_MASTER = "Starnewfour1273@"; // <<< Altere a senha aqui se quiser
+        const SENHA_MASTER = "Starnewfour1273@";
         let isMaster = false;
 
         function toggleAdmin() {
             if (isMaster) {
-                isMaster = false;
-                document.getElementById('btnAdmin').innerText = "🔑 Ativar Admin";
-                document.body.classList.remove('is-admin');
-                alert("Modo Edição Desativado.");
+                isMaster = false; document.getElementById('btnAdmin').innerText = "🔑 Ativar Admin";
+                document.body.classList.remove('is-admin'); alert("Modo Edição Desativado.");
                 cancelarEdicao();
             } else {
-                let senha = prompt("ACESSO RESTRITO:\nDigite a Senha Master para habilitar edições e exclusões:");
-                if (senha === SENHA_MASTER) {
-                    isMaster = true;
-                    document.getElementById('btnAdmin').innerText = "🔓 Admin Ativo (Sair)";
-                    document.body.classList.add('is-admin');
-                    alert("Acesso Liberado! Os botões de edição agora estão visíveis.");
-                } else if (senha !== null) {
-                    alert("Senha Incorreta!");
-                }
+                let s = prompt("ACESSO RESTRITO:\nDigite a Senha Master:");
+                if (s === SENHA_MASTER) {
+                    isMaster = true; document.getElementById('btnAdmin').innerText = "🔓 Admin Ativo (Sair)";
+                    document.body.classList.add('is-admin'); alert("Acesso Liberado!");
+                } else if (s !== null) { alert("Senha Incorreta!"); }
             }
         }
+        function blockIfNotMaster() { if (!isMaster) { alert("Ação bloqueada. Clique em 'Ativar Admin' e digite a senha."); return true; } return false; }
 
-        // Função de proteção dupla nas ações JS
-        function blockIfNotMaster() {
-            if (!isMaster) { alert("Ação bloqueada. Clique em 'Ativar Admin' e digite a senha."); return true; }
-            return false;
-        }
-
-        // 3. ESTADO E SINCRONIZAÇÃO
         let atletasFC = []; let scoutsFC = []; let premiacoesFC = [];
         let atletaEditandoId = null; let filtroDataGlobal = "";
 
-        db.collection("atletas").onSnapshot(snap => {
-            atletasFC = snap.docs.map(doc => ({id: doc.id, ...doc.data()}));
-            refreshTelas();
-        });
-        db.collection("scouts").onSnapshot(snap => {
-            scoutsFC = snap.docs.map(doc => ({id: doc.id, ...doc.data()})).sort((a,b) => a.timestamp - b.timestamp);
-            refreshTelas();
-        });
-        db.collection("premiacoes").onSnapshot(snap => {
-            premiacoesFC = snap.docs.map(doc => ({id: doc.id, ...doc.data()})).sort((a,b) => b.timestamp - a.timestamp);
-            refreshTelas();
-        });
+        db.collection("atletas").onSnapshot(snap => { atletasFC = snap.docs.map(doc => ({id: doc.id, ...doc.data()})); refreshTelas(); });
+        db.collection("scouts").onSnapshot(snap => { scoutsFC = snap.docs.map(doc => ({id: doc.id, ...doc.data()})).sort((a,b) => a.timestamp - b.timestamp); refreshTelas(); });
+        db.collection("premiacoes").onSnapshot(snap => { premiacoesFC = snap.docs.map(doc => ({id: doc.id, ...doc.data()})).sort((a,b) => b.timestamp - a.timestamp); refreshTelas(); });
 
-        // 4. CRONÔMETRO
         let cInt = null; let cSeg = 0;
         function updateC() { let m = Math.floor(cSeg/60).toString().padStart(2,'0'); let s = (cSeg%60).toString().padStart(2,'0'); document.getElementById('displayCronometro').innerText = `${m}:${s}`; }
         function iniciarCronometro() { if(!cInt) cInt = setInterval(()=>{cSeg++; updateC()}, 1000); }
@@ -307,27 +296,15 @@
         function zerarCronometro() { pausarCronometro(); cSeg = 0; updateC(); }
         function fimCronometro() { pausarCronometro(); alert("Apito Final! ⏱️ Tempo: " + document.getElementById('displayCronometro').innerText); }
 
-        // 5. ATUALIZAR TELA (Gera as tabelas)
         function refreshTelas() {
-            // Tabela Atletas
             const list = document.getElementById('listaAtletas');
-            list.innerHTML = atletasFC.map(a => `
-                <tr>
-                    <td>${a.nome}</td><td>${a.posicao}</td>
-                    <td class="admin-cell">
-                        <button class="btn-sm" style="background:#ffb236; color:#000;" onclick="editarAtleta('${a.id}')">✏️ Editar</button>
-                        <button class="btn-sm" style="background:#fd5d93; color:#fff;" onclick="excluirDoc('atletas','${a.id}')">🗑️</button>
-                    </td>
-                </tr>`).join('');
+            list.innerHTML = atletasFC.map(a => `<tr><td>${a.nome}</td><td>${a.posicao}</td><td class="admin-cell"><button class="btn-sm" style="background:#ffb236; color:#000;" onclick="editarAtleta('${a.id}')">✏️ Editar</button><button class="btn-sm" style="background:#fd5d93; color:#fff;" onclick="excluirDoc('atletas','${a.id}')">🗑️</button></td></tr>`).join('');
 
-            // Atualiza comboboxes
             document.querySelectorAll('.select-jogadores').forEach(sel => {
-                const val = sel.value;
-                sel.innerHTML = atletasFC.map(a => `<option value="${a.nome}">${a.nome}</option>`).join('');
+                const val = sel.value; sel.innerHTML = atletasFC.map(a => `<option value="${a.nome}">${a.nome}</option>`).join('');
                 if(val) sel.value = val;
             });
 
-            // Placar e Súmula
             const data = filtroDataGlobal || document.getElementById('dataJogo').value;
             const scoutsDia = scoutsFC.filter(s => s.data === data);
             
@@ -335,121 +312,124 @@
             document.getElementById('placarMilan').innerText = scoutsDia.filter(s => s.time === 'Milan' && s.acao === 'Gol').length;
             
             document.getElementById('logPartida').innerHTML = scoutsDia.length === 0 ? `<div style="padding: 15px; text-align: center; color: #9a9a9a;">Nenhum evento registrado hoje.</div>` : scoutsDia.slice().reverse().map(s => `
-                <div class="log-item">
-                    <div style="font-size:20px; margin-right:15px; width: 30px; text-align: center;">${s.acao === 'Gol' ? '⚽' : s.acao === 'Assistência' ? '👟' : s.acao === 'Amarelo' ? '🟨' : '🟥'}</div>
-                    <div style="flex:1"><b>${s.jogador}</b><br><small style="color:#9a9a9a">${s.time}</small></div>
-                    <div class="admin-block"><button onclick="excluirDoc('scouts','${s.id}')" style="background:none; border:none; cursor:pointer; font-size:18px;" title="Excluir Evento">❌</button></div>
-                </div>`).join('');
+                <div class="log-item"><div style="font-size:20px; margin-right:15px; width: 30px; text-align: center;">${s.acao === 'Gol' ? '⚽' : s.acao === 'Assistência' ? '👟' : s.acao === 'Amarelo' ? '🟨' : '🟥'}</div><div style="flex:1"><b>${s.jogador}</b><br><small style="color:#9a9a9a">${s.time}</small></div><div class="admin-block"><button onclick="excluirDoc('scouts','${s.id}')" style="background:none; border:none; cursor:pointer; font-size:18px;">❌</button></div></div>`).join('');
 
-            // Dashboard Artilharia
             const stats = {};
-            scoutsFC.forEach(s => {
-                if(!stats[s.jogador]) stats[s.jogador] = {g:0, a:0};
-                if(s.acao === 'Gol') stats[s.jogador].g++;
-                if(s.acao === 'Assistência') stats[s.jogador].a++;
-            });
-            document.getElementById('tabelaArtilharia').innerHTML = Object.entries(stats)
-                .sort((a,b) => b[1].g - a[1].g)
-                .filter(item => item[1].g > 0 || item[1].a > 0)
-                .map(([nome, d]) => `<tr><td><strong>${nome}</strong></td><td>${d.g}</td><td>${d.a}</td></tr>`).join('');
+            scoutsFC.forEach(s => { if(!stats[s.jogador]) stats[s.jogador] = {g:0, a:0}; if(s.acao === 'Gol') stats[s.jogador].g++; if(s.acao === 'Assistência') stats[s.jogador].a++; });
+            document.getElementById('tabelaArtilharia').innerHTML = Object.entries(stats).sort((a,b) => b[1].g - a[1].g).filter(item => item[1].g > 0 || item[1].a > 0).map(([nome, d]) => `<tr><td><strong>${nome}</strong></td><td>${d.g}</td><td>${d.a}</td></tr>`).join('');
 
-            // Dashboard Prêmios
-            document.getElementById('tabelaPremiacoes').innerHTML = premiacoesFC.map(p => `
-                <tr>
-                    <td>${p.data.split('-').reverse().join('/')}</td>
-                    <td>🌟 ${p.craque}</td><td>🧱 ${p.paredao}</td><td>🛡️ ${p.xerifao}</td><td>🎈 ${p.bolamurcha}</td>
-                    <td class="admin-cell"><button class="btn-sm" style="background:#fd5d93; color:#fff;" onclick="excluirDoc('premiacoes','${p.id}')">🗑️</button></td>
-                </tr>`).join('');
+            document.getElementById('tabelaPremiacoes').innerHTML = premiacoesFC.map(p => `<tr><td>${p.data.split('-').reverse().join('/')}</td><td>🌟 ${p.craque}</td><td>🧱 ${p.paredao}</td><td>🛡️ ${p.xerifao}</td><td>🎈 ${p.bolamurcha}</td><td class="admin-cell"><button class="btn-sm" style="background:#fd5d93; color:#fff;" onclick="excluirDoc('premiacoes','${p.id}')">🗑️</button></td></tr>`).join('');
         }
 
-        // 6. FUNÇÕES DE GRAVAÇÃO E ADMIN (CRUD)
         function salvarAtleta() {
             const n = document.getElementById('cadNome').value; const p = document.getElementById('cadPosicao').value;
             if(!n) return alert("Digite o nome!");
-            
             if(atletaEditandoId) {
-                if(blockIfNotMaster()) return; // Trava dupla
+                if(blockIfNotMaster()) return;
                 let aAntigo = atletasFC.find(i => i.id === atletaEditandoId);
                 db.collection("atletas").doc(atletaEditandoId).update({nome:n, posicao:p});
-                
-                // Se trocou nome, atualiza histórico
                 if (aAntigo && aAntigo.nome !== n) {
                     scoutsFC.filter(s => s.jogador === aAntigo.nome).forEach(s => db.collection("scouts").doc(s.id).update({jogador: n}));
-                    premiacoesFC.forEach(pr => {
-                        let up = {};
-                        if(pr.craque === aAntigo.nome) up.craque = n; if(pr.paredao === aAntigo.nome) up.paredao = n;
-                        if(pr.xerifao === aAntigo.nome) up.xerifao = n; if(pr.bolamurcha === aAntigo.nome) up.bolamurcha = n;
-                        if(Object.keys(up).length > 0) db.collection("premiacoes").doc(pr.id).update(up);
-                    });
+                    premiacoesFC.forEach(pr => { let up = {}; if(pr.craque === aAntigo.nome) up.craque = n; if(pr.paredao === aAntigo.nome) up.paredao = n; if(pr.xerifao === aAntigo.nome) up.xerifao = n; if(pr.bolamurcha === aAntigo.nome) up.bolamurcha = n; if(Object.keys(up).length > 0) db.collection("premiacoes").doc(pr.id).update(up); });
                 }
-                cancelarEdicao();
-                alert("Atleta atualizado!");
-            } else {
-                db.collection("atletas").add({nome:n, posicao:p, timestamp: Date.now()});
-                document.getElementById('cadNome').value = "";
-                alert("Atleta cadastrado!");
-            }
+                cancelarEdicao(); alert("Atleta atualizado!");
+            } else { db.collection("atletas").add({nome:n, posicao:p, timestamp: Date.now()}); document.getElementById('cadNome').value = ""; alert("Atleta cadastrado!"); }
         }
 
         function registrarScout(acao) {
             const d = document.getElementById('dataJogo').value; const t = document.getElementById('timeAcao').value; const j = document.getElementById('jogadorAcao').value;
-            if(!j) return alert("Selecione um jogador!");
-            db.collection("scouts").add({data:d, time:t, jogador:j, acao:acao, timestamp: Date.now()});
+            if(!j) return alert("Selecione um jogador!"); db.collection("scouts").add({data:d, time:t, jogador:j, acao:acao, timestamp: Date.now()});
         }
 
         function salvarPremiacao() {
             const d = document.getElementById('dataPremio').value;
-            db.collection("premiacoes").add({
-                data:d, timestamp: Date.now(),
-                craque: document.getElementById('premioCraque').value,
-                paredao: document.getElementById('premioParedao').value,
-                xerifao: document.getElementById('premioXerifao').value,
-                bolamurcha: document.getElementById('premioBolaMurcha').value
-            });
+            db.collection("premiacoes").add({ data:d, timestamp: Date.now(), craque: document.getElementById('premioCraque').value, paredao: document.getElementById('premioParedao').value, xerifao: document.getElementById('premioXerifao').value, bolamurcha: document.getElementById('premioBolaMurcha').value });
             alert("Resenha salva!");
         }
 
         function editarAtleta(id) {
-            if(blockIfNotMaster()) return;
-            const a = atletasFC.find(i => i.id === id);
-            document.getElementById('cadNome').value = a.nome;
-            document.getElementById('cadPosicao').value = a.posicao;
-            atletaEditandoId = id;
-            document.getElementById('btnSalvarAtleta').innerText = "💾 Confirmar Edição";
-            document.getElementById('btnSalvarAtleta').style.backgroundColor = "#ffb236";
-            window.scrollTo(0, 0);
+            if(blockIfNotMaster()) return; const a = atletasFC.find(i => i.id === id);
+            document.getElementById('cadNome').value = a.nome; document.getElementById('cadPosicao').value = a.posicao; atletaEditandoId = id;
+            document.getElementById('btnSalvarAtleta').innerText = "💾 Confirmar Edição"; document.getElementById('btnSalvarAtleta').style.backgroundColor = "#ffb236"; window.scrollTo(0, 0);
         }
 
-        function cancelarEdicao() { 
-            atletaEditandoId = null; 
-            document.getElementById('btnSalvarAtleta').innerText = "Registrar Atleta"; 
-            document.getElementById('btnSalvarAtleta').style.backgroundColor = "var(--accent)";
-            document.getElementById('cadNome').value = "";
-        }
-
-        function excluirDoc(coll, id) { 
-            if(blockIfNotMaster()) return;
-            if(confirm("Tem certeza que deseja EXCLUIR este registro da base de dados?")) db.collection(coll).doc(id).delete(); 
-        }
-
-        async function limparBancoDados() {
-            if(blockIfNotMaster()) return;
-            if(confirm("PERIGO: Isso vai deletar absolutamente TODOS os dados da nuvem (Atletas, Gols, Prêmios). Tem certeza?")) {
-                let sA = await db.collection("atletas").get(); sA.forEach(d => d.ref.delete());
-                let sS = await db.collection("scouts").get(); sS.forEach(d => d.ref.delete());
-                let sP = await db.collection("premiacoes").get(); sP.forEach(d => d.ref.delete());
-                alert("Sistema zerado!");
-            }
-        }
+        function cancelarEdicao() { atletaEditandoId = null; document.getElementById('btnSalvarAtleta').innerText = "Registrar Atleta"; document.getElementById('btnSalvarAtleta').style.backgroundColor = "var(--accent)"; document.getElementById('cadNome').value = ""; }
+        function excluirDoc(coll, id) { if(blockIfNotMaster()) return; if(confirm("Excluir registro permanentemente?")) db.collection(coll).doc(id).delete(); }
+        async function limparBancoDados() { if(blockIfNotMaster()) return; if(confirm("PERIGO: Deletar TUDO?")) { let sA = await db.collection("atletas").get(); sA.forEach(d => d.ref.delete()); let sS = await db.collection("scouts").get(); sS.forEach(d => d.ref.delete()); let sP = await db.collection("premiacoes").get(); sP.forEach(d => d.ref.delete()); alert("Sistema zerado!"); } }
 
         function abrirAba(id) {
-            document.querySelectorAll('.modulo').forEach(m => m.classList.remove('active'));
-            document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            event.currentTarget.classList.add('active');
-            if(id !== 'cadastro') cancelarEdicao();
-            filtroDataGlobal = document.getElementById('dataJogo').value;
-            refreshTelas();
+            document.querySelectorAll('.modulo').forEach(m => m.classList.remove('active')); document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(id).classList.add('active'); event.currentTarget.classList.add('active');
+            if(id !== 'cadastro') cancelarEdicao(); filtroDataGlobal = document.getElementById('dataJogo').value; refreshTelas();
+        }
+
+        // --- INTEGRAÇÃO WHATSAPP ---
+        function compartilharJogo() {
+            const data = document.getElementById('dataJogo').value;
+            if (!data) return alert("Selecione uma data na barra superior!");
+
+            const scoutsDia = scoutsFC.filter(s => s.data === data);
+            const golsR = scoutsDia.filter(s => s.time === 'Real Madrid' && s.acao === 'Gol').length;
+            const golsM = scoutsDia.filter(s => s.time === 'Milan' && s.acao === 'Gol').length;
+            
+            let artilheiros = {}; let garcons = {};
+            scoutsDia.forEach(s => {
+                if (s.acao === 'Gol') artilheiros[s.jogador] = (artilheiros[s.jogador] || 0) + 1;
+                if (s.acao === 'Assistência') garcons[s.jogador] = (garcons[s.jogador] || 0) + 1;
+            });
+
+            const dataBR = data.split('-').reverse().join('/');
+            let txt = `⚽ *RESUMO DA PARTIDA* ⚽\n📅 Data: ${dataBR}\n\n`;
+            txt += `🏆 *Real Madrid ${golsR} x ${golsM} Milan*\n\n`;
+
+            if(Object.keys(artilheiros).length > 0) {
+                txt += `*⚽ Gols:*\n`;
+                Object.entries(artilheiros).sort((a,b)=>b[1]-a[1]).forEach(([j,q]) => txt += `- ${j} (${q})\n`);
+                txt += `\n`;
+            }
+            if(Object.keys(garcons).length > 0) {
+                txt += `*👟 Assistências:*\n`;
+                Object.entries(garcons).sort((a,b)=>b[1]-a[1]).forEach(([j,q]) => txt += `- ${j} (${q})\n`);
+                txt += `\n`;
+            }
+
+            const premios = premiacoesFC.find(p => p.data === data);
+            if(premios) {
+                txt += `*🏅 Premiações da Resenha:*\n`;
+                txt += `🌟 Craque: ${premios.craque}\n🧱 Paredão: ${premios.paredao}\n`;
+                txt += `🛡️ Xerifão: ${premios.xerifao}\n🎈 Bola Murcha: ${premios.bolamurcha}\n`;
+            } else {
+                txt += `_(Resenha ainda não salva)_\n`;
+            }
+
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(txt)}`, '_blank');
+        }
+
+        function compartilharMes() {
+            const data = document.getElementById('dataJogo').value;
+            if (!data) return alert("Selecione uma data base no painel do jogo para referenciar o mês!");
+            
+            const mesAno = data.substring(0, 7); // YYYY-MM
+            const scoutsMes = scoutsFC.filter(s => s.data.startsWith(mesAno));
+            if (scoutsMes.length === 0) return alert("Nenhum evento registrado neste mês!");
+
+            let artilheiros = {}; let garcons = {};
+            scoutsMes.forEach(s => {
+                if (s.acao === 'Gol') artilheiros[s.jogador] = (artilheiros[s.jogador] || 0) + 1;
+                if (s.acao === 'Assistência') garcons[s.jogador] = (garcons[s.jogador] || 0) + 1;
+            });
+
+            const [ano, mes] = mesAno.split('-');
+            let txt = `📊 *RESUMO DO MÊS - ${mes}/${ano}* 📊\n\n`;
+
+            txt += `*⚽ Top Artilheiros:*\n`;
+            Object.entries(artilheiros).sort((a,b)=>b[1]-a[1]).slice(0, 5).forEach(([j,q], i) => txt += `${i+1}. ${j} - ${q} gols\n`);
+            txt += `\n`;
+
+            txt += `*👟 Top Garçons:*\n`;
+            Object.entries(garcons).sort((a,b)=>b[1]-a[1]).slice(0, 5).forEach(([j,q], i) => txt += `${i+1}. ${j} - ${q} assists\n`);
+
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(txt)}`, '_blank');
         }
 
         window.onload = () => {
