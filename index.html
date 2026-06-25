@@ -159,8 +159,16 @@
 
         <!-- MÓDULO EXCLUSIVO DO JUIZ -->
         <div id="painelJuiz" class="modulo active">
-            <h3 style="text-align: center; color: #00e5ff; margin-top: 0;">⏱️ Painel de Observabilidade do Árbitro</h3>
+            <h3 style="text-align: center; color: #00e5ff; margin-top: 0; margin-bottom: 20px;">⏱️ Painel de Observabilidade do Árbitro</h3>
             
+            <!-- SELETOR DE DATA DO JUIZ -->
+            <div class="flex-row" style="background-color: #1d1e2b; padding: 15px; border-radius: 8px; margin-bottom: 20px; align-items: center; justify-content: center; border: 1px solid #00e5ff;">
+                <div class="form-group" style="margin-bottom: 0; width: 100%; text-align: center;">
+                    <label style="color: #00e5ff; font-weight: bold; font-size: 16px;">📅 Referência da Partida (Data):</label>
+                    <input type="date" id="dataJuiz" onchange="mudarDataGlobal(this.value)" style="text-align: center; font-size: 16px; font-weight: bold;">
+                </div>
+            </div>
+
             <div class="placar-container" style="background-color: #1a1a24; border: 2px solid #333; flex-wrap: wrap;">
                 <div class="time-placar">
                     <img src="https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg" class="escudo">
@@ -471,6 +479,7 @@
             filtroDataGlobal = novaData;
             document.getElementById('dataJogo').value = novaData;
             document.getElementById('dataPremio').value = novaData;
+            document.getElementById('dataJuiz').value = novaData; // Sincroniza a data do juiz
             refreshTelas();
         }
 
@@ -551,7 +560,7 @@
             });
 
             renderListasSorteio();
-            if(modoManualAtivo) atualizarPainelManual(); // Atualiza a caixinha manual caso esteja aberta
+            if(modoManualAtivo) atualizarPainelManual(); 
             alert("Equipas sorteadas aleatoriamente! O Painel do Juiz foi atualizado.");
         }
 
@@ -561,9 +570,9 @@
             document.getElementById('painelManual').style.display = modoManualAtivo ? 'block' : 'none';
             if(modoManualAtivo) {
                 atualizarPainelManual();
-                renderListasSorteio(); // Força render com botões de excluir
+                renderListasSorteio(); 
             } else {
-                renderListasSorteio(); // Remove botões de excluir
+                renderListasSorteio(); 
             }
         }
 
@@ -587,7 +596,6 @@
         }
 
         function alocarManual(jogador, time) {
-            // Remove de qualquer lista antes de adicionar
             sorteioEquipasAtuais.real = sorteioEquipasAtuais.real.filter(j => j !== jogador);
             sorteioEquipasAtuais.milan = sorteioEquipasAtuais.milan.filter(j => j !== jogador);
 
@@ -605,7 +613,7 @@
             renderListasSorteio();
         }
 
-        // RENDER DAS LISTAS DE EQUIPES (Usado por Automático e Manual)
+        // RENDER DAS LISTAS DE EQUIPES
         function renderListasSorteio() {
             document.getElementById('sorteioReal').innerHTML = sorteioEquipasAtuais.real.map(j => `
                 <li style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
@@ -646,8 +654,14 @@
         }
 
         function registrarScoutJuiz(jogador) {
-            const dataHoje = new Date().toISOString().split('T')[0];
-            db.collection("scouts").add({data: dataHoje, time: juizTimeAtual, jogador: jogador, acao: juizAcaoAtual, timestamp: Date.now()});
+            // Pega a data selecionada no painel do juiz, se não houver pega a global
+            const dataEscolhida = document.getElementById('dataJuiz').value || filtroDataGlobal;
+            
+            if(!dataEscolhida) {
+                return alert("Por favor, verifique a data da partida no topo do Painel do Juiz!");
+            }
+
+            db.collection("scouts").add({data: dataEscolhida, time: juizTimeAtual, jogador: jogador, acao: juizAcaoAtual, timestamp: Date.now()});
             fecharModalJuiz();
         }
 
@@ -765,7 +779,7 @@
         // COMPARTILHAMENTO E GRÁFICOS
         function compartilharSorteio() {
             if(sorteioEquipasAtuais.real.length === 0 && sorteioEquipasAtuais.milan.length === 0) return alert("Realize a montagem das equipas primeiro!");
-            let txt = `⚖️ *AMIGOS FC - EQUIPAS DO DIA* ⚖️\n\n⚪ *REAL MADRID:*\n`;
+            let txt = `⚖️ *AMIGOS FC - EQUIPES DO DIA* ⚖️\n\n⚪ *REAL MADRID:*\n`;
             sorteioEquipasAtuais.real.forEach(j => txt += `- ${j}\n`);
             txt += `\n🔴 *MILAN:*\n`;
             sorteioEquipasAtuais.milan.forEach(j => txt += `- ${j}\n`);
@@ -865,9 +879,9 @@
 
         window.onload = () => {
             const dataAtual = new Date().toISOString().split('T')[0];
-            mudarDataGlobal(dataAtual);
+            mudarDataGlobal(dataAtual); // Isso agora também seta a data do juiz
             updateC();
-            abrirAba('painelJuiz'); // Inicia direto no painel do juiz
+            abrirAba('painelJuiz'); 
         }
     </script>
 </body>
