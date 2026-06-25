@@ -72,9 +72,6 @@
         .btn-amarelo { background-color: #ffb236; color: #000; }
         .btn-vermelho { background-color: #fd5d93; color: #fff; }
         
-        /* Painel Edição de Scout */
-        #painelEdicaoScout { display: none; background-color: #ffb236; color: #000; padding: 15px; border-radius: 8px; margin-top: 15px; text-align: center; border: 2px dashed #000; }
-        
         /* Grades do Sorteio */
         .grid-sorteio { display: flex; gap: 20px; margin-top: 25px; }
         .presenca-item { display: flex; justify-content: space-between; align-items: center; background: #27293d; padding: 10px; border-radius: 5px; border: 1px solid #2b3553;}
@@ -157,11 +154,9 @@
 
     <div class="main-content">
 
-        <!-- MÓDULO EXCLUSIVO DO JUIZ -->
         <div id="painelJuiz" class="modulo active">
             <h3 style="text-align: center; color: #00e5ff; margin-top: 0; margin-bottom: 20px;">⏱️ Painel de Observabilidade do Árbitro</h3>
             
-            <!-- SELETOR DE DATA DO JUIZ -->
             <div class="flex-row" style="background-color: #1d1e2b; padding: 15px; border-radius: 8px; margin-bottom: 20px; align-items: center; justify-content: center; border: 1px solid #00e5ff;">
                 <div class="form-group" style="margin-bottom: 0; width: 100%; text-align: center;">
                     <label style="color: #00e5ff; font-weight: bold; font-size: 16px;">📅 Referência da Partida (Data):</label>
@@ -177,7 +172,6 @@
                 <div style="text-align: center; flex-grow: 1;">
                     <div class="displayCronometro" id="displayCronometro2" style="font-size: 55px; margin-bottom: 10px;">00:00</div>
                     
-                    <!-- BOTÕES DO CRONÔMETRO NO JUIZ -->
                     <div class="cronometro-botoes" style="margin-bottom: 10px; max-width: 200px; margin-left: auto; margin-right: auto;">
                         <button onclick="iniciarCronometro()">▶️</button>
                         <button onclick="pausarCronometro()">⏸️</button>
@@ -195,7 +189,6 @@
             </div>
 
             <div class="painel-juiz-acoes">
-                <!-- Ações Real Madrid -->
                 <div class="time-card-juiz" style="border-top: 4px solid #ffffff;">
                     <h3 style="margin-top:0;">⚪ Real Madrid</h3>
                     <button class="btn-juiz-acao btn-gol" onclick="abrirModalJuiz('Real Madrid', 'Gol')">⚽ GOL</button>
@@ -206,7 +199,6 @@
                     </div>
                 </div>
 
-                <!-- Ações Milan -->
                 <div class="time-card-juiz" style="border-top: 4px solid #ff3b3b;">
                     <h3 style="margin-top:0;">🔴 Milan</h3>
                     <button class="btn-juiz-acao btn-gol" onclick="abrirModalJuiz('Milan', 'Gol')">⚽ GOL</button>
@@ -261,8 +253,7 @@
             </div>
 
             <div id="listaPresencaSorteio" style="margin-top: 15px; margin-bottom: 25px; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; background: #1d1e2b; padding: 15px; border-radius: 8px; border: 1px solid #2b3553;">
-                <!-- Lista gerada via JS -->
-            </div>
+                </div>
 
             <div class="flex-row" style="gap:15px; flex-wrap: wrap;">
                 <button class="btn-acao" style="background: #00a1ff; margin-top: 0; flex: 1;" onclick="executarSorteio()">🔄 Sorteio Automático</button>
@@ -272,8 +263,7 @@
             <div id="painelManual" style="display:none; background:#1a1a24; padding:15px; border-radius:8px; margin-top:15px; border: 1px dashed #e14eca;">
                 <h4 style="margin-top:0; color:var(--accent);">👇 Jogadores Disponíveis (Sem Time)</h4>
                 <div id="listaDisponiveisManual" style="display:flex; flex-wrap:wrap; gap:10px;">
-                    <!-- Jogadores disponiveis gerados via JS -->
-                </div>
+                    </div>
             </div>
 
             <button class="btn-acao btn-wpp" style="margin-top: 20px;" onclick="compartilharSorteio()">📋 Enviar Equipas Separadas (WhatsApp)</button>
@@ -291,15 +281,15 @@
         </div>
 
         <div id="jogo" class="modulo">
-            <h3>Painel Manual da Partida & Histórico</h3>
+            <h3>Consulta do Histórico da Partida</h3>
             
             <div class="flex-row" style="align-items: flex-end; background-color: #1d1e2b; padding: 15px; border-radius: 8px;">
                 <div class="form-group" style="margin-bottom: 0;">
-                    <label>Nova Partida (Data):</label>
+                    <label>Consultar Data:</label>
                     <input type="date" id="dataJogo" onchange="mudarDataGlobal(this.value)">
                 </div>
                 <div class="form-group" style="margin-bottom: 0;">
-                    <label style="color: #ffb236;">Ou carregar partida salva:</label>
+                    <label style="color: #ffb236;">Ou buscar partida salva:</label>
                     <select id="selectPartidaAnterior" onchange="if(this.value) mudarDataGlobal(this.value)">
                         <option value="">Selecione para ver o resumo...</option>
                     </select>
@@ -318,25 +308,25 @@
                 </div>
             </div>
 
-            <div class="flex-row">
-                <div class="form-group"><label>Time da Ação:</label><select id="timeAcao"><option>Real Madrid</option><option>Milan</option></select></div>
-                <div class="form-group"><label>Jogador:</label><select id="jogadorAcao" class="select-jogadores"></select></div>
+            <div id="painelEdicaoScout" style="display: none; background-color: #1d1e2b; padding: 20px; border-radius: 8px; margin-top: 15px; border: 2px dashed #ffb236;">
+                <strong style="font-size: 18px; color: #ffb236;">✏️ MODO EDIÇÃO ATIVO</strong><br>
+                <span style="font-size: 14px; color: white;">Corrija o Time ou Jogador e clique na <b>nova ação correta</b> abaixo para salvar.</span><br><br>
+                
+                <div class="flex-row">
+                    <div class="form-group"><label>Time da Ação:</label><select id="timeAcao"><option>Real Madrid</option><option>Milan</option></select></div>
+                    <div class="form-group"><label>Jogador:</label><select id="jogadorAcao" class="select-jogadores"></select></div>
+                </div>
+
+                <div class="botoes-jogo">
+                    <button class="btn-acao btn-gol" onclick="registrarScout('Gol')">⚽ GOL</button>
+                    <button class="btn-acao btn-assist" onclick="registrarScout('Assistência')">👟 ASSIST</button>
+                    <button class="btn-acao btn-amarelo" onclick="registrarScout('Amarelo')">🟨 AMARELO</button>
+                    <button class="btn-acao btn-vermelho" onclick="registrarScout('Vermelho')">🟥 VERMELHO</button>
+                </div>
+                <button onclick="cancelarEdicaoScout()" style="margin-top: 15px; background: #333; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; width: 100%;">❌ Cancelar Edição</button>
             </div>
 
-            <div id="painelEdicaoScout">
-                <strong style="font-size: 18px;">✏️ MODO EDIÇÃO ATIVO</strong><br>
-                <span style="font-size: 14px;">Altere o Time/Jogador e clique na <b>ação correta</b> abaixo para atualizar.</span><br>
-                <button onclick="cancelarEdicaoScout()" style="margin-top: 10px; background: #1d1e2b; color: white; border: none; padding: 8px 20px; border-radius: 5px; cursor: pointer;">❌ Cancelar Edição</button>
-            </div>
-
-            <div class="botoes-jogo">
-                <button class="btn-acao btn-gol" onclick="registrarScout('Gol')">⚽ GOL</button>
-                <button class="btn-acao btn-assist" onclick="registrarScout('Assistência')">👟 ASSIST</button>
-                <button class="btn-acao btn-amarelo" onclick="registrarScout('Amarelo')">🟨 AMARELO</button>
-                <button class="btn-acao btn-vermelho" onclick="registrarScout('Vermelho')">🟥 VERMELHO</button>
-            </div>
-
-            <button class="btn-acao btn-wpp" onclick="compartilharJogo()">Enviar Resumo da Partida (WhatsApp)</button>
+            <button class="btn-acao btn-wpp" onclick="compartilharJogo()" style="margin-top: 25px;">Enviar Resumo da Partida (WhatsApp)</button>
 
             <h3 style="margin-top: 40px;">📜 Súmula Geral da Partida</h3>
             <div class="log-container" id="logPartida"></div>
@@ -418,14 +408,12 @@
 
     </div>
 
-    <!-- MODAL DO JUIZ -->
     <div id="modalJuiz" class="modal-juiz">
         <div class="modal-juiz-content">
             <h2 id="modalJuizTitulo" style="margin-top: 0; color: var(--accent);">Ação</h2>
             <p id="modalJuizAcao" style="font-size: 20px; font-weight: bold; margin-bottom: 20px;"></p>
             <div id="listaJogadoresJuiz" style="max-height: 50vh; overflow-y: auto;">
-                <!-- Botões gerados via JS -->
-            </div>
+                </div>
             <button class="btn-acao" style="background: #333; margin-top: 20px;" onclick="fecharModalJuiz()">❌ Cancelar</button>
         </div>
     </div>
