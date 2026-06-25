@@ -141,9 +141,9 @@
         </div>
 
         <div class="menu-wrapper">
-            <button class="menu-btn btn-juiz" onclick="abrirAba('painelJuiz')">⏱️ Modo Juiz (Live)</button>
-            <button class="menu-btn active" onclick="abrirAba('cadastro')">1. Atletas</button>
-            <button class="menu-btn" onclick="abrirAba('sorteio')">2. Sorteio de Equipas</button>
+            <button class="menu-btn btn-juiz active" onclick="abrirAba('painelJuiz')">⏱️ Modo Juiz (Live)</button>
+            <button class="menu-btn" onclick="abrirAba('cadastro')">1. Atletas</button>
+            <button class="menu-btn" onclick="abrirAba('sorteio')">2. Montar Equipas</button>
             <button class="menu-btn" onclick="abrirAba('jogo')">3. Histórico / Lançamento Manual</button>
             <button class="menu-btn" onclick="abrirAba('resenha')">4. Resenha</button>
             <button class="menu-btn" onclick="abrirAba('dashboard')">📊 Dashboard</button>
@@ -157,16 +157,27 @@
 
     <div class="main-content">
 
-        <div id="painelJuiz" class="modulo">
+        <!-- MÓDULO EXCLUSIVO DO JUIZ -->
+        <div id="painelJuiz" class="modulo active">
             <h3 style="text-align: center; color: #00e5ff; margin-top: 0;">⏱️ Painel de Observabilidade do Árbitro</h3>
             
-            <div class="placar-container" style="background-color: #1a1a24; border: 2px solid #333;">
+            <div class="placar-container" style="background-color: #1a1a24; border: 2px solid #333; flex-wrap: wrap;">
                 <div class="time-placar">
                     <img src="https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg" class="escudo">
                     <div class="score" id="placarRealJuiz">0</div>
                 </div>
-                <div style="text-align: center;">
-                    <div class="displayCronometro" id="displayCronometro2" style="font-size: 45px; margin-bottom: 0;">00:00</div>
+                <div style="text-align: center; flex-grow: 1;">
+                    <div class="displayCronometro" id="displayCronometro2" style="font-size: 55px; margin-bottom: 10px;">00:00</div>
+                    
+                    <!-- BOTÕES DO CRONÔMETRO NO JUIZ -->
+                    <div class="cronometro-botoes" style="margin-bottom: 10px; max-width: 200px; margin-left: auto; margin-right: auto;">
+                        <button onclick="iniciarCronometro()">▶️</button>
+                        <button onclick="pausarCronometro()">⏸️</button>
+                        <button onclick="zerarCronometro()">🔄</button>
+                        <button onclick="ajustarMinutos(1)">+1m</button>
+                        <button onclick="ajustarMinutos(45)">+45m</button>
+                    </div>
+
                     <small style="color: var(--text-muted);">Tempo de Jogo</small>
                 </div>
                 <div class="time-placar">
@@ -176,6 +187,7 @@
             </div>
 
             <div class="painel-juiz-acoes">
+                <!-- Ações Real Madrid -->
                 <div class="time-card-juiz" style="border-top: 4px solid #ffffff;">
                     <h3 style="margin-top:0;">⚪ Real Madrid</h3>
                     <button class="btn-juiz-acao btn-gol" onclick="abrirModalJuiz('Real Madrid', 'Gol')">⚽ GOL</button>
@@ -186,6 +198,7 @@
                     </div>
                 </div>
 
+                <!-- Ações Milan -->
                 <div class="time-card-juiz" style="border-top: 4px solid #ff3b3b;">
                     <h3 style="margin-top:0;">🔴 Milan</h3>
                     <button class="btn-juiz-acao btn-gol" onclick="abrirModalJuiz('Milan', 'Gol')">⚽ GOL</button>
@@ -201,7 +214,7 @@
             <div class="log-container" id="logPartidaJuiz" style="max-height: 150px;"></div>
         </div>
 
-        <div id="cadastro" class="modulo active">
+        <div id="cadastro" class="modulo">
             <h3>Cadastrar / Editar Atleta</h3>
             <div class="flex-row">
                 <div class="form-group">
@@ -232,18 +245,30 @@
         </div>
 
         <div id="sorteio" class="modulo">
-            <h3>Sorteador de Equipas Automatizado</h3>
-            <span style="color: var(--text-muted); font-size: 14px;">Abaixo estão os atletas. Clique em <b>"Marcar Presença"</b> ao chegar. Uma vez marcado, apenas o Admin pode desfazer, evitando bagunça.</span>
+            <h3>Montagem de Equipas</h3>
+            <span style="color: var(--text-muted); font-size: 14px;">Abaixo estão os atletas. Clique em <b>"Marcar Presença"</b> ao chegar.</span>
             
             <div class="admin-block" style="margin-top: 15px; text-align: right;">
                 <button class="btn-acao btn-sm" style="background: #fd5d93;" onclick="limparTodasPresencas()">🧹 Limpar Todas as Presenças (Admin)</button>
             </div>
 
             <div id="listaPresencaSorteio" style="margin-top: 15px; margin-bottom: 25px; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; background: #1d1e2b; padding: 15px; border-radius: 8px; border: 1px solid #2b3553;">
-                </div>
+                <!-- Lista gerada via JS -->
+            </div>
 
-            <button class="btn-acao" style="background: #00a1ff;" onclick="executarSorteio()">🔄 Sortear Equipas Justas</button>
-            <button class="btn-acao btn-wpp" onclick="compartilharSorteio()">📋 Enviar Equipas Separadas (WhatsApp)</button>
+            <div class="flex-row" style="gap:15px; flex-wrap: wrap;">
+                <button class="btn-acao" style="background: #00a1ff; margin-top: 0; flex: 1;" onclick="executarSorteio()">🔄 Sorteio Automático</button>
+                <button class="btn-acao" style="background: #e14eca; margin-top: 0; flex: 1;" onclick="toggleModoManual()">⚙️ Escolher Manualmente</button>
+            </div>
+
+            <div id="painelManual" style="display:none; background:#1a1a24; padding:15px; border-radius:8px; margin-top:15px; border: 1px dashed #e14eca;">
+                <h4 style="margin-top:0; color:var(--accent);">👇 Jogadores Disponíveis (Sem Time)</h4>
+                <div id="listaDisponiveisManual" style="display:flex; flex-wrap:wrap; gap:10px;">
+                    <!-- Jogadores disponiveis gerados via JS -->
+                </div>
+            </div>
+
+            <button class="btn-acao btn-wpp" style="margin-top: 20px;" onclick="compartilharSorteio()">📋 Enviar Equipas Separadas (WhatsApp)</button>
 
             <div class="grid-sorteio">
                 <div style="flex: 1; background: #1d1e2b; padding: 15px; border-radius: 8px; border-left: 4px solid #ffffff;">
@@ -385,12 +410,14 @@
 
     </div>
 
+    <!-- MODAL DO JUIZ -->
     <div id="modalJuiz" class="modal-juiz">
         <div class="modal-juiz-content">
             <h2 id="modalJuizTitulo" style="margin-top: 0; color: var(--accent);">Ação</h2>
             <p id="modalJuizAcao" style="font-size: 20px; font-weight: bold; margin-bottom: 20px;"></p>
             <div id="listaJogadoresJuiz" style="max-height: 50vh; overflow-y: auto;">
-                </div>
+                <!-- Botões gerados via JS -->
+            </div>
             <button class="btn-acao" style="background: #333; margin-top: 20px;" onclick="fecharModalJuiz()">❌ Cancelar</button>
         </div>
     </div>
@@ -433,6 +460,9 @@
         let chartInstancia = null;
         let sorteioEquipasAtuais = { real: [], milan: [] };
 
+        // Variáveis Modo Manual
+        let modoManualAtivo = false;
+
         // Variáveis Modal Juiz
         let juizTimeAtual = "";
         let juizAcaoAtual = "";
@@ -447,6 +477,7 @@
         db.collection("atletas").onSnapshot(snap => { 
             atletasFC = snap.docs.map(doc => ({id: doc.id, ...doc.data()})).sort((a, b) => a.nome.localeCompare(b.nome)); 
             atualizarListaSorteio();
+            if(modoManualAtivo) atualizarPainelManual();
             refreshTelas(); 
         });
         db.collection("scouts").onSnapshot(snap => { scoutsFC = snap.docs.map(doc => ({id: doc.id, ...doc.data()})).sort((a,b) => a.timestamp - b.timestamp); refreshTelas(); });
@@ -466,15 +497,12 @@
         function zerarCronometro() { pausarCronometro(); cSeg = 0; updateC(); }
         function ajustarMinutos(minutos) { cSeg += minutos * 60; if(cSeg < 0) cSeg = 0; updateC(); }
 
-        // --- MÓDULO DE SORTEIO DE EQUIPAS (NOVO FORMATO PRESENÇA BLINDADA) ---
+        // --- MÓDULO DE MONTAGEM DE EQUIPAS ---
         function atualizarListaSorteio() {
             const container = document.getElementById('listaPresencaSorteio');
             if(!container) return;
-            
             container.innerHTML = atletasFC.map(a => {
                 let presente = a.presente === true;
-                
-                // Se está presente, mostra o badge Confirmado. Se Admin ativo, permite desmarcar.
                 if(presente) {
                     let btnDesmarcar = isMaster ? `<button onclick="marcarPresenca('${a.id}', false)" style="background:transparent; border:none; color:#fd5d93; cursor:pointer;">❌</button>` : '';
                     return `
@@ -506,11 +534,11 @@
             }
         }
 
+        // SORTEIO AUTOMÁTICO
         function executarSorteio() {
             let presentes = atletasFC.filter(a => a.presente === true).map(a => a.nome);
             if(presentes.length < 2) return alert("Ao menos 2 jogadores precisam marcar presença no campo!");
 
-            // Fisher-Yates
             for (let i = presentes.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [presentes[i], presentes[j]] = [presentes[j], presentes[i]];
@@ -522,11 +550,74 @@
                 else sorteioEquipasAtuais.milan.push(jogador);
             });
 
-            document.getElementById('sorteioReal').innerHTML = sorteioEquipasAtuais.real.map(j => `<li>${j}</li>`).join('');
-            document.getElementById('sorteioMilan').innerHTML = sorteioEquipasAtuais.milan.map(j => `<li>${j}</li>`).join('');
-            
-            // Salvar o último sorteio localmente/sessão para o Painel do Juiz
-            alert("Equipas sorteadas de forma justa! O Painel do Juiz foi atualizado.");
+            renderListasSorteio();
+            if(modoManualAtivo) atualizarPainelManual(); // Atualiza a caixinha manual caso esteja aberta
+            alert("Equipas sorteadas aleatoriamente! O Painel do Juiz foi atualizado.");
+        }
+
+        // MODO ESCOLHA MANUAL
+        function toggleModoManual() {
+            modoManualAtivo = !modoManualAtivo;
+            document.getElementById('painelManual').style.display = modoManualAtivo ? 'block' : 'none';
+            if(modoManualAtivo) {
+                atualizarPainelManual();
+                renderListasSorteio(); // Força render com botões de excluir
+            } else {
+                renderListasSorteio(); // Remove botões de excluir
+            }
+        }
+
+        function atualizarPainelManual() {
+            let presentes = atletasFC.filter(a => a.presente === true).map(a => a.nome);
+            let disponiveis = presentes.filter(j => !sorteioEquipasAtuais.real.includes(j) && !sorteioEquipasAtuais.milan.includes(j));
+
+            if(disponiveis.length === 0) {
+                document.getElementById('listaDisponiveisManual').innerHTML = `<span style="color:#9a9a9a; font-size:14px;">Todos os presentes já estão escalados.</span>`;
+            } else {
+                document.getElementById('listaDisponiveisManual').innerHTML = disponiveis.map(j => `
+                    <div style="background:#27293d; padding:8px 12px; border-radius:5px; border:1px solid #333; display:flex; align-items:center; gap:10px;">
+                        <span style="font-size:14px; font-weight:bold;">${j}</span>
+                        <div style="display:flex; gap:5px;">
+                            <button onclick="alocarManual('${j}', 'real')" style="background:#ffffff; color:#000; border:none; border-radius:3px; padding:5px 8px; cursor:pointer; font-size:12px; font-weight:bold;">⚪ Real</button>
+                            <button onclick="alocarManual('${j}', 'milan')" style="background:#ff3b3b; color:#fff; border:none; border-radius:3px; padding:5px 8px; cursor:pointer; font-size:12px; font-weight:bold;">🔴 Milan</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function alocarManual(jogador, time) {
+            // Remove de qualquer lista antes de adicionar
+            sorteioEquipasAtuais.real = sorteioEquipasAtuais.real.filter(j => j !== jogador);
+            sorteioEquipasAtuais.milan = sorteioEquipasAtuais.milan.filter(j => j !== jogador);
+
+            if(time === 'real') sorteioEquipasAtuais.real.push(jogador);
+            if(time === 'milan') sorteioEquipasAtuais.milan.push(jogador);
+
+            atualizarPainelManual();
+            renderListasSorteio();
+        }
+
+        function removerDoTimeManual(jogador) {
+            sorteioEquipasAtuais.real = sorteioEquipasAtuais.real.filter(j => j !== jogador);
+            sorteioEquipasAtuais.milan = sorteioEquipasAtuais.milan.filter(j => j !== jogador);
+            atualizarPainelManual();
+            renderListasSorteio();
+        }
+
+        // RENDER DAS LISTAS DE EQUIPES (Usado por Automático e Manual)
+        function renderListasSorteio() {
+            document.getElementById('sorteioReal').innerHTML = sorteioEquipasAtuais.real.map(j => `
+                <li style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
+                    ${j}
+                    ${modoManualAtivo ? `<button onclick="removerDoTimeManual('${j}')" style="background:transparent; color:#fd5d93; border:none; cursor:pointer; font-size:14px;" title="Remover do time">❌</button>` : ''}
+                </li>`).join('');
+                
+            document.getElementById('sorteioMilan').innerHTML = sorteioEquipasAtuais.milan.map(j => `
+                <li style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
+                    ${j}
+                    ${modoManualAtivo ? `<button onclick="removerDoTimeManual('${j}')" style="background:transparent; color:#fd5d93; border:none; cursor:pointer; font-size:14px;" title="Remover do time">❌</button>` : ''}
+                </li>`).join('');
         }
 
         // --- PAINEL DO JUIZ (POP-UP AÇÕES) ---
@@ -538,10 +629,8 @@
             let icone = acao === 'Gol' ? '⚽ GOL' : acao === 'Assistência' ? '👟 ASSISTÊNCIA' : acao === 'Amarelo' ? '🟨 AMARELO' : '🟥 VERMELHO';
             document.getElementById('modalJuizAcao').innerText = icone;
 
-            // Pega o elenco filtrado pelo Sorteio Atual (se houver), senão pega todos.
             let elencoTime = time === 'Real Madrid' ? sorteioEquipasAtuais.real : sorteioEquipasAtuais.milan;
             if(elencoTime.length === 0) {
-                // Fallback caso o juiz abra sem rodar o sorteio (pega todos do banco)
                 elencoTime = atletasFC.map(a => a.nome);
             }
 
@@ -664,7 +753,7 @@
             if(id !== 'cadastro') cancelarEdicaoAtleta(); if(id !== 'jogo') cancelarEdicaoScout(); if(id !== 'resenha') cancelarEdicaoPremio();
             filtroDataGlobal = document.getElementById('dataJogo').value; 
             
-            // Controle visual do cronômetro lateral se estiver no modo juiz
+            // Controle visual do cronômetro lateral
             if(id === 'painelJuiz' && window.innerWidth > 768) {
                 document.getElementById('sidebarCronometro').style.display = 'none';
             } else {
@@ -673,10 +762,10 @@
             refreshTelas();
         }
 
-        // COMPARTILHAMENTO E GRÁFICOS (MANTIDOS INTACTOS COMO VOCÊ DESENVOLVEU)
+        // COMPARTILHAMENTO E GRÁFICOS
         function compartilharSorteio() {
-            if(sorteioEquipasAtuais.real.length === 0 && sorteioEquipasAtuais.milan.length === 0) return alert("Realize o sorteio primeiro!");
-            let txt = `⚖️ *AMIGOS FC - EQUIPAS SORTEADAS* ⚖️\n\n⚪ *REAL MADRID:*\n`;
+            if(sorteioEquipasAtuais.real.length === 0 && sorteioEquipasAtuais.milan.length === 0) return alert("Realize a montagem das equipas primeiro!");
+            let txt = `⚖️ *AMIGOS FC - EQUIPAS DO DIA* ⚖️\n\n⚪ *REAL MADRID:*\n`;
             sorteioEquipasAtuais.real.forEach(j => txt += `- ${j}\n`);
             txt += `\n🔴 *MILAN:*\n`;
             sorteioEquipasAtuais.milan.forEach(j => txt += `- ${j}\n`);
