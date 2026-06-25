@@ -657,4 +657,129 @@
         async function limparBancoDados() { if(blockIfNotMaster()) return; if(confirm("PERIGO: Deletar tudo?")) { let sA = await db.collection("atletas").get(); sA.forEach(d => d.ref.delete()); let sS = await db.collection("scouts").get(); sS.forEach(d => d.ref.delete()); let sP = await db.collection("premiacoes").get(); sP.forEach(d => d.ref.delete()); alert("Sistema zerado!"); } }
 
         function abrirAba(id) {
-            document.querySelectorAll('.modulo').forEach(m => m.classList.remove('active'));
+            document.querySelectorAll('.modulo').forEach(m => m.classList.remove('active')); 
+            document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(id).classList.add('active'); 
+            event.currentTarget.classList.add('active');
+            if(id !== 'cadastro') cancelarEdicaoAtleta(); if(id !== 'jogo') cancelarEdicaoScout(); if(id !== 'resenha') cancelarEdicaoPremio();
+            filtroDataGlobal = document.getElementById('dataJogo').value; 
+            
+            // Controle visual do cronômetro lateral se estiver no modo juiz
+            if(id === 'painelJuiz' && window.innerWidth > 768) {
+                document.getElementById('sidebarCronometro').style.display = 'none';
+            } else {
+                document.getElementById('sidebarCronometro').style.display = 'block';
+            }
+            refreshTelas();
+        }
+
+        // COMPARTILHAMENTO E GRÁFICOS (MANTIDOS INTACTOS COMO VOCÊ DESENVOLVEU)
+        function compartilharSorteio() {
+            if(sorteioEquipasAtuais.real.length === 0 && sorteioEquipasAtuais.milan.length === 0) return alert("Realize o sorteio primeiro!");
+            let txt = `⚖️ *AMIGOS FC - EQUIPAS SORTEADAS* ⚖️\n\n⚪ *REAL MADRID:*\n`;
+            sorteioEquipasAtuais.real.forEach(j => txt += `- ${j}\n`);
+            txt += `\n🔴 *MILAN:*\n`;
+            sorteioEquipasAtuais.milan.forEach(j => txt += `- ${j}\n`);
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(txt)}`, '_blank');
+        }
+
+        function compartilharJogo() {
+            const data = document.getElementById('dataJogo').value;
+            if (!data) return alert("Selecione uma data!");
+            const scoutsDia = scoutsFC.filter(s => s.data === data);
+            const golsR = scoutsDia.filter(s => s.time === 'Real Madrid' && s.acao === 'Gol').length;
+            const golsM = scoutsDia.filter(s => s.time === 'Milan' && s.acao === 'Gol').length;
+            const times = ['Real Madrid', 'Milan'];
+            let stats = { 'Real Madrid': { gols: {}, assists: {}, amarelos: {}, vermelhos: {} }, 'Milan': { gols: {}, assists: {}, amarelos: {}, vermelhos: {} } };
+            scoutsDia.forEach(s => {
+                if (s.acao === 'Gol') stats[s.time].gols[s.jogador] = (stats[s.time].gols[s.jogador] || 0) + 1;
+                if (s.acao === 'Assistência') stats[s.time].assists[s.jogador] = (stats[s.time].assists[s.jogador] || 0) + 1;
+                if (s.acao === 'Amarelo') stats[s.time].amarelos[s.jogador] = (stats[s.time].amarelos[s.jogador] || 0) + 1;
+                if (s.acao === 'Vermelho') stats[s.time].vermelhos[s.jogador] = (stats[s.time].vermelhos[s.jogador] || 0) + 1;
+            });
+            let txt = `⚽ *RESUMO DA PARTIDA - AMIGOS FC* ⚽\n📅 Data: ${data.split('-').reverse().join('/')}\n\n🏆 *Real Madrid ${golsR} x ${golsM} Milan*\n\n`;
+            times.forEach(t => {
+                const gols = stats[t].gols; const assists = stats[t].assists; const am = stats[t].amarelos; const vm = stats[t].vermelhos;
+                if(Object.keys(gols).length > 0 || Object.keys(assists).length > 0 || Object.keys(am).length > 0 || Object.keys(vm).length > 0) {
+                    txt += `🛡️ *${t.toUpperCase()}*\n`;
+                    if(Object.keys(gols).length > 0) { txt += `*⚽ Golos:*\n`; Object.entries(gols).sort((a,b)=>b[1]-a[1]).forEach(([j,q]) => txt += `- ${j} (${q})\n`); }
+                    if(Object.keys(assists).length > 0) { txt += `*👟 Assists:*\n`; Object.entries(assists).sort((a,b)=>b[1]-a[1]).forEach(([j,q]) => txt += `- ${j} (${q})\n`); }
+                    if(Object.keys(am).length > 0) { txt += `*🟨 Amarelos:*\n`; Object.entries(am).sort((a,b)=>b[1]-a[1]).forEach(([j,q]) => txt += `- ${j} (${q})\n`); }
+                    if(Object.keys(vm).length > 0) { txt += `*🟥 Vermelhos:*\n`; Object.entries(vm).sort((a,b)=>b[1]-a[1]).forEach(([j,q]) => txt += `- ${j} (${q})\n`); }
+                    txt += `\n`;
+                }
+            });
+            const premios = premiacoesFC.find(p => p.data === data);
+            if(premios) { txt += `*🏅 PREMIAÇÕES DA RESENHA*\n🌟 Craque: ${premios.craque}\n🧱 Paredão: ${premios.paredao}\n🛡️ Xerifão: ${premios.xerifao}\n🎈 Bola Murcha: ${premios.bolamurcha}\n`; }
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(txt)}`, '_blank');
+        }
+
+        function compartilharMes() {
+            const data = document.getElementById('dataJogo').value;
+            if (!data) return;
+            const mesAno = data.substring(0, 7);
+            const scoutsMes = scoutsFC.filter(s => s.data.startsWith(mesAno));
+            if (scoutsMes.length === 0) return alert("Sem eventos neste mês!");
+            let artilheiros = {}; let garcons = {};
+            scoutsMes.forEach(s => {
+                if (s.acao === 'Gol') artilheiros[s.jogador] = (artilheiros[s.jogador] || 0) + 1;
+                if (s.acao === 'Assistência') garcons[s.jogador] = (garcons[s.jogador] || 0) + 1;
+            });
+            const [ano, mes] = mesAno.split('-');
+            let txt = `📊 *RESUMO DO MÊS - ${mes}/${ano}* 📊\n\n*⚽ Top Artilheiros:*\n`;
+            Object.entries(artilheiros).sort((a,b)=>b[1]-a[1]).slice(0, 5).forEach(([j,q], i) => txt += `${i+1}. ${j} - ${q} golos\n`);
+            txt += `\n*👟 Top Garçons:*\n`;
+            Object.entries(garcons).sort((a,b)=>b[1]-a[1]).slice(0, 5).forEach(([j,q], i) => txt += `${i+1}. ${j} - ${q} assists\n`);
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(txt)}`, '_blank');
+        }
+
+        function toggleGrafico() {
+            const container = document.getElementById('graficoContainer');
+            if(container.style.display === 'none') {
+                container.style.display = 'block'; atualizarGrafico();
+                container.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            } else { container.style.display = 'none'; }
+        }
+
+        function atualizarGrafico() {
+            const container = document.getElementById('graficoContainer');
+            if(container.style.display === 'none') return;
+            const tipo = document.getElementById('graficoTipo').value;
+            let mVal = document.getElementById('graficoMetrica').value;
+            let metrica = mVal === 'assists' ? 'Assistência' : mVal === 'amarelos' ? 'Amarelo' : mVal === 'vermelhos' ? 'Vermelho' : 'Gol';
+            let diasDeJogo = [...new Set(scoutsFC.map(s => s.data))].sort();
+            let labelsX = diasDeJogo.map(d => { let p = d.split('-'); return p[2] + '/' + p[1]; });
+            let configuracaoDatasets = [];
+            if (tipo === 'times') {
+                let dReal = diasDeJogo.map(dia => scoutsFC.filter(s => s.data === dia && s.time === 'Real Madrid' && s.acao === metrica).length);
+                let dMilan = diasDeJogo.map(dia => scoutsFC.filter(s => s.data === dia && s.time === 'Milan' && s.acao === metrica).length);
+                configuracaoDatasets.push({ label: 'Real Madrid', data: dReal, borderColor: '#ffffff', backgroundColor: 'rgba(255,255,255,0.1)', fill: true, tension: 0.3 });
+                configuracaoDatasets.push({ label: 'Milan', data: dMilan, borderColor: '#ff3b3b', backgroundColor: 'rgba(255,59,59,0.1)', fill: true, tension: 0.3 });
+            } else {
+                let stats = {};
+                scoutsFC.forEach(s => { if (s.acao === metrica) stats[s.jogador] = (stats[s.jogador] || 0) + 1; });
+                let tJogadores = Object.keys(stats).sort((a,b) => stats[b] - stats[a]);
+                const coresBase = ['#00d65f', '#00a1ff', '#ffb236', '#e14eca', '#ffffff', '#ff3b3b', '#00e5ff', '#ffea00'];
+                tJogadores.forEach((jogador, i) => {
+                    let dJogador = diasDeJogo.map(dia => scoutsFC.filter(s => s.data === dia && s.jogador === jogador && s.acao === metrica).length);
+                    let cor = i < coresBase.length ? coresBase[i] : `hsl(${(i * 65) % 360}, 85%, 60%)`;
+                    configuracaoDatasets.push({ label: jogador, data: dJogador, borderColor: cor, backgroundColor: cor, fill: false, tension: 0.3, borderWidth: 3 });
+                });
+            }
+            const ctx = document.getElementById('meuGrafico').getContext('2d');
+            if (chartInstancia) chartInstancia.destroy();
+            chartInstancia = new Chart(ctx, {
+                type: 'line', data: { labels: labelsX, datasets: configuracaoDatasets },
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { color: '#9a9a9a', stepSize: 1 }, grid: { color: '#2b3553' } }, x: { ticks: { color: '#9a9a9a' }, grid: { color: '#2b3553' } } }, plugins: { legend: { labels: { color: '#ffffff' } } } }
+            });
+        }
+
+        window.onload = () => {
+            const dataAtual = new Date().toISOString().split('T')[0];
+            mudarDataGlobal(dataAtual);
+            updateC();
+            abrirAba('painelJuiz'); // Inicia direto no painel do juiz
+        }
+    </script>
+</body>
+</html>
