@@ -75,6 +75,11 @@
         body.is-master .aviso-bloqueio-juiz { display: none !important; }
         body.is-master .aviso-bloqueio-master { display: none !important; }
 
+        /* Status Agendamento */
+        .status-agendamento { padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-size: 18px; font-weight: bold; }
+        .status-aberto { background: rgba(0, 214, 95, 0.1); color: #00d65f; border: 1px solid #00d65f; }
+        .status-fechado { background: rgba(253, 93, 147, 0.1); color: #fd5d93; border: 1px solid #fd5d93; }
+
         /* Placar e Súmula */
         .placar-container { display: flex; justify-content: center; align-items: center; gap: 40px; margin: 25px 0; padding: 20px; background-color: #1d1e2b; border-radius: 10px; }
         .time-placar { text-align: center; }
@@ -171,7 +176,6 @@
 
     <div class="main-content">
 
-        <!-- MÓDULO EXCLUSIVO DO JUIZ -->
         <div id="painelJuiz" class="modulo active">
             <h3 style="text-align: center; color: #00e5ff; margin-top: 0; margin-bottom: 20px;">⏱️ Painel de Observabilidade do Árbitro</h3>
             
@@ -179,7 +183,6 @@
                 🔒 MODO LEITURA: Efetue o Login (Juiz ou Master) para registrar eventos e controlar o tempo.
             </div>
 
-            <!-- SELETOR DE DATA DO JUIZ -->
             <div class="flex-row" style="background-color: #1d1e2b; padding: 15px; border-radius: 8px; margin-bottom: 20px; align-items: center; justify-content: center; border: 1px solid #00e5ff;">
                 <div class="form-group" style="margin-bottom: 0; width: 100%; text-align: center;">
                     <label style="color: #00e5ff; font-weight: bold; font-size: 16px;">📅 Referência da Partida (Data):</label>
@@ -195,7 +198,6 @@
                 <div style="text-align: center; flex-grow: 1;">
                     <div class="displayCronometro" id="displayCronometro2" style="font-size: 55px; margin-bottom: 10px;">00:00</div>
                     
-                    <!-- BOTÕES DO CRONÔMETRO NO JUIZ -->
                     <div class="cronometro-botoes req-juiz-flex" style="margin-bottom: 10px; max-width: 200px; margin-left: auto; margin-right: auto;">
                         <button onclick="iniciarCronometro()">▶️</button>
                         <button onclick="pausarCronometro()">⏸️</button>
@@ -213,7 +215,6 @@
             </div>
 
             <div class="painel-juiz-acoes req-juiz-grid">
-                <!-- Ações Real Madrid -->
                 <div class="time-card-juiz" style="border-top: 4px solid #ffffff;">
                     <h3 style="margin-top:0;">⚪ Real Madrid</h3>
                     <button class="btn-juiz-acao btn-gol" onclick="abrirModalJuiz('Real Madrid', 'Gol')">⚽ GOL</button>
@@ -224,7 +225,6 @@
                     </div>
                 </div>
 
-                <!-- Ações Milan -->
                 <div class="time-card-juiz" style="border-top: 4px solid #ff3b3b;">
                     <h3 style="margin-top:0;">🔴 Milan</h3>
                     <button class="btn-juiz-acao btn-gol" onclick="abrirModalJuiz('Milan', 'Gol')">⚽ GOL</button>
@@ -277,20 +277,39 @@
             </div>
         </div>
 
-        <!-- MÓDULO AGORA TOTALMENTE LIBERADO PARA OS ATLETAS -->
         <div id="sorteio" class="modulo">
-            <h3>Montagem de Equipas</h3>
-            <span style="color: var(--text-muted); font-size: 14px;">Abaixo estão os atletas disponíveis. Clique em <b>"✋ Marcar"</b> no SEU NOME ao chegar no campo.</span>
+            
+            <div class="req-master" style="background: #344675; padding: 20px; border-radius: 8px; margin-bottom: 25px; border: 2px solid #00a1ff;">
+                <h4 style="margin-top:0; color: #ffffff;">📅 Gestão de Partida (Admin)</h4>
+                <p style="font-size: 14px; margin-bottom: 15px; color: #ddd;">Selecione a data do próximo jogo. Isso irá zerar a lista atual e liberar a marcação de presença para todos até as 07:00 da data escolhida.</p>
+                <div class="flex-row" style="align-items: center;">
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <input type="date" id="dataAgendamento" style="background: #1d1e2b;">
+                    </div>
+                    <div style="flex: 1;">
+                        <button class="btn-acao" style="margin-top: 0; background: #00a1ff;" onclick="agendarPartida()">🚀 Agendar & Liberar Lista</button>
+                    </div>
+                </div>
+            </div>
+
+            <h3>Montagem de Equipas e Presença</h3>
+            
+            <div id="bannerStatus" class="status-agendamento status-fechado">
+                Carregando status da partida...
+            </div>
+            
+            <button class="btn-acao btn-wpp" style="margin-top: 0; margin-bottom: 20px;" onclick="compartilharListaPresenca()">📲 Avisar no Grupo (Enviar Parcial de Presença)</button>
+
+            <span style="color: var(--text-muted); font-size: 14px;">Abaixo estão os atletas disponíveis. Clique em <b>"✋ Marcar"</b> no SEU NOME.</span>
 
             <div class="req-master" style="margin-top: 15px; text-align: right;">
                 <button class="btn-acao btn-sm" style="background: #fd5d93;" onclick="limparTodasPresencas()">🧹 Limpar Todas as Presenças (Admin)</button>
             </div>
 
             <div id="listaPresencaSorteio" style="margin-top: 15px; margin-bottom: 25px; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; background: #1d1e2b; padding: 15px; border-radius: 8px; border: 1px solid #2b3553;">
-                <!-- Lista gerada via JS -->
-            </div>
+                </div>
 
-            <div class="flex-row" style="gap:15px; flex-wrap: wrap;">
+            <div class="flex-row req-master-flex" style="gap:15px; flex-wrap: wrap;">
                 <button class="btn-acao" style="background: #00a1ff; margin-top: 0; flex: 1;" onclick="executarSorteio()">🔄 Sorteio Automático</button>
                 <button class="btn-acao" style="background: #e14eca; margin-top: 0; flex: 1;" onclick="toggleModoManual()">⚙️ Escolher Manualmente</button>
             </div>
@@ -298,11 +317,10 @@
             <div id="painelManual" style="display:none; background:#1a1a24; padding:15px; border-radius:8px; margin-top:15px; border: 1px dashed #e14eca;">
                 <h4 style="margin-top:0; color:var(--accent);">👇 Jogadores Disponíveis (Sem Time)</h4>
                 <div id="listaDisponiveisManual" style="display:flex; flex-wrap:wrap; gap:10px;">
-                    <!-- Jogadores disponiveis gerados via JS -->
-                </div>
+                    </div>
             </div>
 
-            <button class="btn-acao btn-wpp" style="margin-top: 20px;" onclick="compartilharSorteio()">📋 Enviar Equipas Separadas (WhatsApp)</button>
+            <button class="btn-acao btn-wpp req-master" style="margin-top: 20px;" onclick="compartilharSorteio()">📋 Enviar Equipas Separadas (WhatsApp)</button>
 
             <div class="grid-sorteio">
                 <div style="flex: 1; background: #1d1e2b; padding: 15px; border-radius: 8px; border-left: 4px solid #ffffff;">
@@ -344,7 +362,6 @@
                 </div>
             </div>
 
-            <!-- PAINEL DE EDIÇÃO (Oculto por padrão, ativado apenas pelo Master no botão de lápis) -->
             <div id="painelEdicaoScout" style="display: none; background-color: #1d1e2b; padding: 20px; border-radius: 8px; margin-top: 15px; border: 2px dashed #ffb236;">
                 <strong style="font-size: 18px; color: #ffb236;">✏️ MODO EDIÇÃO ATIVO (Master)</strong><br>
                 <span style="font-size: 14px; color: white;">Corrija o Time ou Jogador e clique na <b>nova ação correta</b> abaixo para salvar.</span><br><br>
@@ -453,14 +470,12 @@
 
     </div>
 
-    <!-- MODAL DO JUIZ -->
     <div id="modalJuiz" class="modal-juiz">
         <div class="modal-juiz-content">
             <h2 id="modalJuizTitulo" style="margin-top: 0; color: var(--accent);">Ação</h2>
             <p id="modalJuizAcao" style="font-size: 20px; font-weight: bold; margin-bottom: 20px;"></p>
             <div id="listaJogadoresJuiz" style="max-height: 50vh; overflow-y: auto;">
-                <!-- Botões gerados via JS -->
-            </div>
+                </div>
             <button class="btn-acao" style="background: #333; margin-top: 20px;" onclick="fecharModalJuiz()">❌ Cancelar</button>
         </div>
     </div>
@@ -497,7 +512,7 @@
                 let s = prompt("ACESSO RESTRITO:\nDigite a Senha (Juiz ou Master):");
                 if (s === SENHA_MASTER) {
                     isMaster = true; 
-                    isJuiz = true; // Master também é juiz
+                    isJuiz = true; 
                     document.getElementById('btnLogin').innerText = "🔓 Master Ativo (Sair)";
                     document.body.classList.add('is-master', 'is-juiz');
                     alert("Acesso MASTER Liberado! Controle total ativado.");
@@ -524,6 +539,9 @@
         let modoManualAtivo = false;
         let juizTimeAtual = "";
         let juizAcaoAtual = "";
+        
+        // NOVO: Configurações Globais (Agendamento)
+        let configSistema = { dataProximaPartida: "", presencaLiberada: false };
 
         function mudarDataGlobal(novaData) {
             filtroDataGlobal = novaData;
@@ -532,6 +550,19 @@
             document.getElementById('dataJuiz').value = novaData;
             refreshTelas();
         }
+
+        // Listener de Configurações de Agendamento
+        db.collection("sistema").doc("config").onSnapshot(doc => {
+            if (doc.exists) {
+                configSistema = doc.data();
+                // Opcional: Quando uma data é agendada, reflete nas outras abas
+                if(configSistema.dataProximaPartida && !filtroDataGlobal) {
+                    mudarDataGlobal(configSistema.dataProximaPartida);
+                    document.getElementById('dataAgendamento').value = configSistema.dataProximaPartida;
+                }
+                atualizarListaSorteio();
+            }
+        });
 
         db.collection("atletas").onSnapshot(snap => { 
             atletasFC = snap.docs.map(doc => ({id: doc.id, ...doc.data()})).sort((a, b) => a.nome.localeCompare(b.nome)); 
@@ -556,19 +587,75 @@
         function zerarCronometro() { if(!isJuiz) return; pausarCronometro(); cSeg = 0; updateC(); }
         function ajustarMinutos(minutos) { if(!isJuiz) return alert("Faça login de Juiz primeiro!"); cSeg += minutos * 60; if(cSeg < 0) cSeg = 0; updateC(); }
 
-        // --- MÓDULO DE MONTAGEM DE EQUIPAS (AGORA ABERTO E COM TRAVA LOCAL) ---
+        // --- MÓDULO DE MONTAGEM DE EQUIPAS E AGENDAMENTO ---
+        
+        function agendarPartida() {
+            if(!isMaster) return alert("Ação bloqueada. Necessário senha Master.");
+            let dataEscolhida = document.getElementById('dataAgendamento').value;
+            if(!dataEscolhida) return alert("Selecione uma data para agendar a partida!");
+            
+            if(confirm(`Deseja agendar o jogo para ${dataEscolhida.split('-').reverse().join('/')}? Isso zerará a presença de todos.`)) {
+                
+                // 1. Zera presenças
+                atletasFC.forEach(a => db.collection("atletas").doc(a.id).update({ presente: false }));
+                
+                // 2. Remove travas locais para todos (embora só afete quem executar o comando, o BD vai resetar a interface de todos)
+                localStorage.removeItem('meuJogadorId');
+                
+                // 3. Atualiza Configuração Global
+                db.collection("sistema").doc("config").set({
+                    dataProximaPartida: dataEscolhida,
+                    presencaLiberada: true
+                });
+                
+                mudarDataGlobal(dataEscolhida);
+                alert("Partida Agendada! A lista está aberta para confirmações.");
+            }
+        }
+
+        // Verifica se passou das 07:00 da data marcada
+        function isListaBloqueadaPorHorario() {
+            if (!configSistema.dataProximaPartida || !configSistema.presencaLiberada) return true;
+
+            let partesData = configSistema.dataProximaPartida.split('-');
+            // Meses em JS começam no 0 (janeiro=0). Criamos a data limite: Data do jogo às 07:00:00
+            let dataLimite = new Date(partesData[0], partesData[1] - 1, partesData[2], 7, 0, 0);
+            let agora = new Date();
+
+            return agora >= dataLimite;
+        }
+
         function atualizarListaSorteio() {
             const container = document.getElementById('listaPresencaSorteio');
+            const banner = document.getElementById('bannerStatus');
             if(!container) return;
             
-            // Puxa o ID do jogador guardado no celular atual
+            let travadoPorHorario = isListaBloqueadaPorHorario();
             let meuJogadorId = localStorage.getItem('meuJogadorId');
+            
+            // Atualizar Banner
+            if (!configSistema.dataProximaPartida) {
+                banner.className = "status-agendamento status-fechado";
+                banner.innerHTML = "🚫 Nenhuma partida agendada. Aguarde a diretoria.";
+            } else if (travadoPorHorario) {
+                banner.className = "status-agendamento status-fechado";
+                banner.innerHTML = `🔒 Lista Fechada para a partida de ${configSistema.dataProximaPartida.split('-').reverse().join('/')}`;
+            } else {
+                banner.className = "status-agendamento status-aberto";
+                banner.innerHTML = `🟢 Lista Aberta para ${configSistema.dataProximaPartida.split('-').reverse().join('/')} (Fecha às 07:00 do dia do jogo)`;
+            }
 
             container.innerHTML = atletasFC.map(a => {
                 let presente = a.presente === true;
                 let isMeuJogador = (a.id === meuJogadorId);
                 let bloqueadoLocalmente = (meuJogadorId !== null && !isMeuJogador && !isMaster && !isJuiz);
                 
+                // Se estiver bloqueado por horário e não for master/juiz, ninguém pode mexer
+                if (travadoPorHorario && !isMaster && !isJuiz) {
+                    if(presente) return `<div class="presenca-item" style="border-color: #00d65f; opacity: 0.8;"><span>${a.nome}</span><span class="presenca-confirmado">✅ Confirmado</span></div>`;
+                    else return `<div class="presenca-item" style="opacity: 0.5;"><span>${a.nome}</span><span style="color:#666; font-size: 12px;">Ausente</span></div>`;
+                }
+
                 if(presente) {
                     let podeDesmarcar = isMaster || isJuiz || isMeuJogador;
                     let btnDesmarcar = podeDesmarcar ? `<button onclick="marcarPresenca('${a.id}', false)" style="background:transparent; border:none; color:#fd5d93; cursor:pointer; font-size:16px;" title="Desmarcar">❌</button>` : '';
@@ -600,13 +687,15 @@
         }
 
         function marcarPresenca(id, status) {
+            if (isListaBloqueadaPorHorario() && !isMaster && !isJuiz) {
+                return alert("A lista já fechou! As confirmações encerram às 07:00 da manhã do dia do jogo.");
+            }
+
             if (status === true) {
-                // Ao marcar presença, o celular "trava" nos outros caso não seja admin/juiz
                 if (!isMaster && !isJuiz) {
                     localStorage.setItem('meuJogadorId', id);
                 }
             } else {
-                // Ao desmarcar a presença
                 if (!isMaster && !isJuiz) {
                     let meuId = localStorage.getItem('meuJogadorId');
                     if (meuId === id) {
@@ -618,6 +707,22 @@
             }
             db.collection("atletas").doc(id).update({ presente: status });
         }
+        
+        function compartilharListaPresenca() {
+            let presentes = atletasFC.filter(a => a.presente === true).map(a => a.nome);
+            if(presentes.length === 0) return alert("Nenhum atleta marcou presença ainda.");
+            
+            let d = configSistema.dataProximaPartida ? configSistema.dataProximaPartida.split('-').reverse().join('/') : "Próximo Jogo";
+            
+            let txt = `⚽ *LISTA DE PRESENÇA - AMIGOS FC* ⚽\n📅 Data: ${d}\n\n`;
+            txt += `*Jogadores Confirmados (${presentes.length}):*\n`;
+            presentes.forEach((nome, i) => {
+                txt += `${i+1}. ${nome}\n`;
+            });
+            
+            txt += `\n*Acesse o app para confirmar sua presença (Fecha às 07:00 no domingo)!*`;
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(txt)}`, '_blank');
+        }
 
         function limparTodasPresencas() {
             if(!isMaster) return alert("Ação bloqueada. Necessário senha Master.");
@@ -626,8 +731,9 @@
             }
         }
 
-        // SORTEIO AUTOMÁTICO (Liberado para os atletas usarem)
+        // SORTEIO AUTOMÁTICO (Admin)
         function executarSorteio() {
+            if(!isMaster) return alert("Acesso restrito. Faça login com a senha Master para escalar.");
             let presentes = atletasFC.filter(a => a.presente === true).map(a => a.nome);
             if(presentes.length < 2) return alert("Ao menos 2 jogadores precisam marcar presença no campo!");
 
@@ -647,8 +753,9 @@
             alert("Equipas sorteadas aleatoriamente!");
         }
 
-        // MODO ESCOLHA MANUAL (Liberado para os atletas usarem)
+        // MODO ESCOLHA MANUAL (Admin)
         function toggleModoManual() {
+            if(!isMaster) return alert("Acesso restrito. Faça login com a senha Master para escalar.");
             modoManualAtivo = !modoManualAtivo;
             document.getElementById('painelManual').style.display = modoManualAtivo ? 'block' : 'none';
             if(modoManualAtivo) {
@@ -679,6 +786,7 @@
         }
 
         function alocarManual(jogador, time) {
+            if(!isMaster) return;
             sorteioEquipasAtuais.real = sorteioEquipasAtuais.real.filter(j => j !== jogador);
             sorteioEquipasAtuais.milan = sorteioEquipasAtuais.milan.filter(j => j !== jogador);
 
@@ -690,6 +798,7 @@
         }
 
         function removerDoTimeManual(jogador) {
+            if(!isMaster) return;
             sorteioEquipasAtuais.real = sorteioEquipasAtuais.real.filter(j => j !== jogador);
             sorteioEquipasAtuais.milan = sorteioEquipasAtuais.milan.filter(j => j !== jogador);
             atualizarPainelManual();
@@ -701,13 +810,13 @@
             document.getElementById('sorteioReal').innerHTML = sorteioEquipasAtuais.real.map(j => `
                 <li style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
                     ${j}
-                    ${modoManualAtivo ? `<button onclick="removerDoTimeManual('${j}')" style="background:transparent; color:#fd5d93; border:none; cursor:pointer; font-size:14px;" title="Remover do time">❌</button>` : ''}
+                    ${modoManualAtivo && isMaster ? `<button onclick="removerDoTimeManual('${j}')" style="background:transparent; color:#fd5d93; border:none; cursor:pointer; font-size:14px;" title="Remover do time">❌</button>` : ''}
                 </li>`).join('');
                 
             document.getElementById('sorteioMilan').innerHTML = sorteioEquipasAtuais.milan.map(j => `
                 <li style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
                     ${j}
-                    ${modoManualAtivo ? `<button onclick="removerDoTimeManual('${j}')" style="background:transparent; color:#fd5d93; border:none; cursor:pointer; font-size:14px;" title="Remover do time">❌</button>` : ''}
+                    ${modoManualAtivo && isMaster ? `<button onclick="removerDoTimeManual('${j}')" style="background:transparent; color:#fd5d93; border:none; cursor:pointer; font-size:14px;" title="Remover do time">❌</button>` : ''}
                 </li>`).join('');
         }
 
@@ -965,6 +1074,13 @@
                 options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { color: '#9a9a9a', stepSize: 1 }, grid: { color: '#2b3553' } }, x: { ticks: { color: '#9a9a9a' }, grid: { color: '#2b3553' } } }, plugins: { legend: { labels: { color: '#ffffff' } } } }
             });
         }
+
+        // Verifica a cada minuto se deu 07:00 para atualizar a tela sem precisar dar F5
+        setInterval(() => {
+            if (document.getElementById('sorteio').classList.contains('active')) {
+                atualizarListaSorteio();
+            }
+        }, 60000);
 
         window.onload = () => {
             const dataAtual = new Date().toISOString().split('T')[0];
