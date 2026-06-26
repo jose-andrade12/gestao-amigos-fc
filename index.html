@@ -54,27 +54,22 @@
         .btn-sm { padding: 5px 10px; width: auto; font-size: 12px; margin-top: 0; margin-right: 5px; border-radius: 3px; cursor: pointer; border: none; }
         
         /* === CONTROLE DE ACESSO (PERMISSÕES) === */
-        /* Esconde por padrão de todos os visitantes */
         .req-master, .req-master-flex, .req-master-cell, .req-master-grid { display: none !important; }
         .req-juiz, .req-juiz-flex, .req-juiz-cell, .req-juiz-grid { display: none !important; }
 
-        /* Quando Master logado */
         body.is-master .req-master { display: block !important; }
         body.is-master .req-master-flex { display: flex !important; }
         body.is-master .req-master-cell { display: table-cell !important; }
         body.is-master .req-master-grid { display: grid !important; }
         
-        /* Master tem privilégios de Juiz */
         body.is-master .req-juiz { display: block !important; }
         body.is-master .req-juiz-flex { display: flex !important; }
         body.is-master .req-juiz-grid { display: grid !important; }
 
-        /* Quando Juiz logado */
         body.is-juiz .req-juiz { display: block !important; }
         body.is-juiz .req-juiz-flex { display: flex !important; }
         body.is-juiz .req-juiz-grid { display: grid !important; }
 
-        /* Avisos de Tela Bloqueada */
         .aviso-bloqueio { background: rgba(255,178,54,0.1); color: #ffb236; padding: 15px; border-radius: 8px; border: 1px dashed #ffb236; text-align: center; margin-bottom: 20px; font-weight: bold; }
         body.is-juiz .aviso-bloqueio-juiz { display: none !important; }
         body.is-master .aviso-bloqueio-juiz { display: none !important; }
@@ -176,6 +171,7 @@
 
     <div class="main-content">
 
+        <!-- MÓDULO EXCLUSIVO DO JUIZ -->
         <div id="painelJuiz" class="modulo active">
             <h3 style="text-align: center; color: #00e5ff; margin-top: 0; margin-bottom: 20px;">⏱️ Painel de Observabilidade do Árbitro</h3>
             
@@ -183,6 +179,7 @@
                 🔒 MODO LEITURA: Efetue o Login (Juiz ou Master) para registrar eventos e controlar o tempo.
             </div>
 
+            <!-- SELETOR DE DATA DO JUIZ -->
             <div class="flex-row" style="background-color: #1d1e2b; padding: 15px; border-radius: 8px; margin-bottom: 20px; align-items: center; justify-content: center; border: 1px solid #00e5ff;">
                 <div class="form-group" style="margin-bottom: 0; width: 100%; text-align: center;">
                     <label style="color: #00e5ff; font-weight: bold; font-size: 16px;">📅 Referência da Partida (Data):</label>
@@ -198,6 +195,7 @@
                 <div style="text-align: center; flex-grow: 1;">
                     <div class="displayCronometro" id="displayCronometro2" style="font-size: 55px; margin-bottom: 10px;">00:00</div>
                     
+                    <!-- BOTÕES DO CRONÔMETRO NO JUIZ -->
                     <div class="cronometro-botoes req-juiz-flex" style="margin-bottom: 10px; max-width: 200px; margin-left: auto; margin-right: auto;">
                         <button onclick="iniciarCronometro()">▶️</button>
                         <button onclick="pausarCronometro()">⏸️</button>
@@ -215,6 +213,7 @@
             </div>
 
             <div class="painel-juiz-acoes req-juiz-grid">
+                <!-- Ações Real Madrid -->
                 <div class="time-card-juiz" style="border-top: 4px solid #ffffff;">
                     <h3 style="margin-top:0;">⚪ Real Madrid</h3>
                     <button class="btn-juiz-acao btn-gol" onclick="abrirModalJuiz('Real Madrid', 'Gol')">⚽ GOL</button>
@@ -225,6 +224,7 @@
                     </div>
                 </div>
 
+                <!-- Ações Milan -->
                 <div class="time-card-juiz" style="border-top: 4px solid #ff3b3b;">
                     <h3 style="margin-top:0;">🔴 Milan</h3>
                     <button class="btn-juiz-acao btn-gol" onclick="abrirModalJuiz('Milan', 'Gol')">⚽ GOL</button>
@@ -277,22 +277,20 @@
             </div>
         </div>
 
+        <!-- MÓDULO AGORA TOTALMENTE LIBERADO PARA OS ATLETAS -->
         <div id="sorteio" class="modulo">
             <h3>Montagem de Equipas</h3>
-            <span style="color: var(--text-muted); font-size: 14px;">Abaixo estão os atletas.</span>
-            
-            <div class="aviso-bloqueio aviso-bloqueio-juiz" style="margin-top: 15px;">
-                🔒 MODO LEITURA: Efetue Login como JUIZ para marcar presenças, ou MASTER para escalar os times.
-            </div>
+            <span style="color: var(--text-muted); font-size: 14px;">Abaixo estão os atletas disponíveis. Clique em <b>"✋ Marcar"</b> no SEU NOME ao chegar no campo.</span>
 
             <div class="req-master" style="margin-top: 15px; text-align: right;">
                 <button class="btn-acao btn-sm" style="background: #fd5d93;" onclick="limparTodasPresencas()">🧹 Limpar Todas as Presenças (Admin)</button>
             </div>
 
             <div id="listaPresencaSorteio" style="margin-top: 15px; margin-bottom: 25px; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; background: #1d1e2b; padding: 15px; border-radius: 8px; border: 1px solid #2b3553;">
-                </div>
+                <!-- Lista gerada via JS -->
+            </div>
 
-            <div class="flex-row req-master-flex" style="gap:15px; flex-wrap: wrap;">
+            <div class="flex-row" style="gap:15px; flex-wrap: wrap;">
                 <button class="btn-acao" style="background: #00a1ff; margin-top: 0; flex: 1;" onclick="executarSorteio()">🔄 Sorteio Automático</button>
                 <button class="btn-acao" style="background: #e14eca; margin-top: 0; flex: 1;" onclick="toggleModoManual()">⚙️ Escolher Manualmente</button>
             </div>
@@ -300,10 +298,11 @@
             <div id="painelManual" style="display:none; background:#1a1a24; padding:15px; border-radius:8px; margin-top:15px; border: 1px dashed #e14eca;">
                 <h4 style="margin-top:0; color:var(--accent);">👇 Jogadores Disponíveis (Sem Time)</h4>
                 <div id="listaDisponiveisManual" style="display:flex; flex-wrap:wrap; gap:10px;">
-                    </div>
+                    <!-- Jogadores disponiveis gerados via JS -->
+                </div>
             </div>
 
-            <button class="btn-acao btn-wpp req-master" style="margin-top: 20px;" onclick="compartilharSorteio()">📋 Enviar Equipas Separadas (WhatsApp)</button>
+            <button class="btn-acao btn-wpp" style="margin-top: 20px;" onclick="compartilharSorteio()">📋 Enviar Equipas Separadas (WhatsApp)</button>
 
             <div class="grid-sorteio">
                 <div style="flex: 1; background: #1d1e2b; padding: 15px; border-radius: 8px; border-left: 4px solid #ffffff;">
@@ -345,6 +344,7 @@
                 </div>
             </div>
 
+            <!-- PAINEL DE EDIÇÃO (Oculto por padrão, ativado apenas pelo Master no botão de lápis) -->
             <div id="painelEdicaoScout" style="display: none; background-color: #1d1e2b; padding: 20px; border-radius: 8px; margin-top: 15px; border: 2px dashed #ffb236;">
                 <strong style="font-size: 18px; color: #ffb236;">✏️ MODO EDIÇÃO ATIVO (Master)</strong><br>
                 <span style="font-size: 14px; color: white;">Corrija o Time ou Jogador e clique na <b>nova ação correta</b> abaixo para salvar.</span><br><br>
@@ -453,12 +453,14 @@
 
     </div>
 
+    <!-- MODAL DO JUIZ -->
     <div id="modalJuiz" class="modal-juiz">
         <div class="modal-juiz-content">
             <h2 id="modalJuizTitulo" style="margin-top: 0; color: var(--accent);">Ação</h2>
             <p id="modalJuizAcao" style="font-size: 20px; font-weight: bold; margin-bottom: 20px;"></p>
             <div id="listaJogadoresJuiz" style="max-height: 50vh; overflow-y: auto;">
-                </div>
+                <!-- Botões gerados via JS -->
+            </div>
             <button class="btn-acao" style="background: #333; margin-top: 20px;" onclick="fecharModalJuiz()">❌ Cancelar</button>
         </div>
     </div>
@@ -483,7 +485,6 @@
 
         function fazerLogin() {
             if (isMaster || isJuiz) {
-                // Fazer Logout
                 isMaster = false; 
                 isJuiz = false;
                 document.getElementById('btnLogin').innerText = "🔑 Fazer Login (Juiz/Master)";
@@ -506,7 +507,7 @@
                     isJuiz = true;
                     document.getElementById('btnLogin').innerText = "🔓 Juiz Ativo (Sair)";
                     document.body.classList.add('is-juiz');
-                    alert("Acesso JUIZ Liberado! Marcação de presença e Cronômetro ativados.");
+                    alert("Acesso JUIZ Liberado! Cronômetro e Painel ativados.");
                     atualizarListaSorteio();
                     refreshTelas();
                 } else if (s !== null && s.trim() !== "") { 
@@ -555,32 +556,37 @@
         function zerarCronometro() { if(!isJuiz) return; pausarCronometro(); cSeg = 0; updateC(); }
         function ajustarMinutos(minutos) { if(!isJuiz) return alert("Faça login de Juiz primeiro!"); cSeg += minutos * 60; if(cSeg < 0) cSeg = 0; updateC(); }
 
-        // --- MÓDULO DE MONTAGEM DE EQUIPAS ---
+        // --- MÓDULO DE MONTAGEM DE EQUIPAS (AGORA ABERTO E COM TRAVA LOCAL) ---
         function atualizarListaSorteio() {
             const container = document.getElementById('listaPresencaSorteio');
             if(!container) return;
             
+            // Puxa o ID do jogador guardado no celular atual
+            let meuJogadorId = localStorage.getItem('meuJogadorId');
+
             container.innerHTML = atletasFC.map(a => {
                 let presente = a.presente === true;
+                let isMeuJogador = (a.id === meuJogadorId);
+                let bloqueadoLocalmente = (meuJogadorId !== null && !isMeuJogador && !isMaster && !isJuiz);
                 
-                // Modo apenas leitura
-                if (!isJuiz && !isMaster) {
-                    if (presente) {
-                        return `<div class="presenca-item" style="border-color: #00d65f;"><span>${a.nome}</span><span class="presenca-confirmado">✅ Presente</span></div>`;
-                    } else {
-                        return `<div class="presenca-item"><span>${a.nome}</span><span style="color:#555; font-size: 12px;">Ausente</span></div>`;
-                    }
-                } 
-                // Modo Juiz ou Master
-                else {
-                    if(presente) {
+                if(presente) {
+                    let podeDesmarcar = isMaster || isJuiz || isMeuJogador;
+                    let btnDesmarcar = podeDesmarcar ? `<button onclick="marcarPresenca('${a.id}', false)" style="background:transparent; border:none; color:#fd5d93; cursor:pointer; font-size:16px;" title="Desmarcar">❌</button>` : '';
+                    
+                    return `
+                    <div class="presenca-item" style="border-color: #00d65f;">
+                        <span>${a.nome}</span>
+                        <div style="display:flex; align-items:center; gap:5px;">
+                            <span class="presenca-confirmado">✅</span>
+                            ${btnDesmarcar}
+                        </div>
+                    </div>`;
+                } else {
+                    if (bloqueadoLocalmente) {
                         return `
-                        <div class="presenca-item" style="border-color: #00d65f;">
-                            <span>${a.nome}</span>
-                            <div style="display:flex; align-items:center; gap:5px;">
-                                <span class="presenca-confirmado">✅</span>
-                                <button onclick="marcarPresenca('${a.id}', false)" style="background:transparent; border:none; color:#fd5d93; cursor:pointer;" title="Desmarcar">❌</button>
-                            </div>
+                        <div class="presenca-item">
+                            <span style="color: #666;">${a.nome}</span>
+                            <button class="presenca-btn" style="background: #333; color: #666; cursor: not-allowed;" disabled>Bloqueado</button>
                         </div>`;
                     } else {
                         return `
@@ -594,7 +600,22 @@
         }
 
         function marcarPresenca(id, status) {
-            if(!isJuiz) return alert("Faça Login (Juiz ou Master) para marcar a presença.");
+            if (status === true) {
+                // Ao marcar presença, o celular "trava" nos outros caso não seja admin/juiz
+                if (!isMaster && !isJuiz) {
+                    localStorage.setItem('meuJogadorId', id);
+                }
+            } else {
+                // Ao desmarcar a presença
+                if (!isMaster && !isJuiz) {
+                    let meuId = localStorage.getItem('meuJogadorId');
+                    if (meuId === id) {
+                        localStorage.removeItem('meuJogadorId');
+                    } else {
+                        return alert("Você só pode desmarcar a sua própria presença.");
+                    }
+                }
+            }
             db.collection("atletas").doc(id).update({ presente: status });
         }
 
@@ -605,9 +626,8 @@
             }
         }
 
-        // SORTEIO AUTOMÁTICO
+        // SORTEIO AUTOMÁTICO (Liberado para os atletas usarem)
         function executarSorteio() {
-            if(!isMaster) return alert("Acesso restrito. Faça login com a senha Master para escalar.");
             let presentes = atletasFC.filter(a => a.presente === true).map(a => a.nome);
             if(presentes.length < 2) return alert("Ao menos 2 jogadores precisam marcar presença no campo!");
 
@@ -624,12 +644,11 @@
 
             renderListasSorteio();
             if(modoManualAtivo) atualizarPainelManual(); 
-            alert("Equipas sorteadas aleatoriamente! O Painel do Juiz foi atualizado.");
+            alert("Equipas sorteadas aleatoriamente!");
         }
 
-        // MODO ESCOLHA MANUAL
+        // MODO ESCOLHA MANUAL (Liberado para os atletas usarem)
         function toggleModoManual() {
-            if(!isMaster) return alert("Acesso restrito. Faça login com a senha Master para escalar.");
             modoManualAtivo = !modoManualAtivo;
             document.getElementById('painelManual').style.display = modoManualAtivo ? 'block' : 'none';
             if(modoManualAtivo) {
@@ -660,7 +679,6 @@
         }
 
         function alocarManual(jogador, time) {
-            if(!isMaster) return;
             sorteioEquipasAtuais.real = sorteioEquipasAtuais.real.filter(j => j !== jogador);
             sorteioEquipasAtuais.milan = sorteioEquipasAtuais.milan.filter(j => j !== jogador);
 
@@ -672,7 +690,6 @@
         }
 
         function removerDoTimeManual(jogador) {
-            if(!isMaster) return;
             sorteioEquipasAtuais.real = sorteioEquipasAtuais.real.filter(j => j !== jogador);
             sorteioEquipasAtuais.milan = sorteioEquipasAtuais.milan.filter(j => j !== jogador);
             atualizarPainelManual();
@@ -684,13 +701,13 @@
             document.getElementById('sorteioReal').innerHTML = sorteioEquipasAtuais.real.map(j => `
                 <li style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
                     ${j}
-                    ${modoManualAtivo && isMaster ? `<button onclick="removerDoTimeManual('${j}')" style="background:transparent; color:#fd5d93; border:none; cursor:pointer; font-size:14px;" title="Remover do time">❌</button>` : ''}
+                    ${modoManualAtivo ? `<button onclick="removerDoTimeManual('${j}')" style="background:transparent; color:#fd5d93; border:none; cursor:pointer; font-size:14px;" title="Remover do time">❌</button>` : ''}
                 </li>`).join('');
                 
             document.getElementById('sorteioMilan').innerHTML = sorteioEquipasAtuais.milan.map(j => `
                 <li style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
                     ${j}
-                    ${modoManualAtivo && isMaster ? `<button onclick="removerDoTimeManual('${j}')" style="background:transparent; color:#fd5d93; border:none; cursor:pointer; font-size:14px;" title="Remover do time">❌</button>` : ''}
+                    ${modoManualAtivo ? `<button onclick="removerDoTimeManual('${j}')" style="background:transparent; color:#fd5d93; border:none; cursor:pointer; font-size:14px;" title="Remover do time">❌</button>` : ''}
                 </li>`).join('');
         }
 
@@ -851,7 +868,7 @@
         // COMPARTILHAMENTO E GRÁFICOS
         function compartilharSorteio() {
             if(sorteioEquipasAtuais.real.length === 0 && sorteioEquipasAtuais.milan.length === 0) return alert("Realize a montagem das equipas primeiro!");
-            let txt = `⚖️ *AMIGOS FC - EQUIPAS DO DIA* ⚖️\n\n⚪ *REAL MADRID:*\n`;
+            let txt = `⚖️ *AMIGOS FC - EQUIPES DO DIA* ⚖️\n\n⚪ *REAL MADRID:*\n`;
             sorteioEquipasAtuais.real.forEach(j => txt += `- ${j}\n`);
             txt += `\n🔴 *MILAN:*\n`;
             sorteioEquipasAtuais.milan.forEach(j => txt += `- ${j}\n`);
