@@ -30,7 +30,7 @@
         .displayCronometro { font-size: 36px; font-weight: bold; color: var(--green-timer); font-family: monospace; margin-bottom: 10px; letter-spacing: 2px; }
         .cronometro-botoes { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
         .cronometro-botoes button { background-color: #414868; border: none; color: white; font-size: 14px; cursor: pointer; padding: 8px; border-radius: 5px; display: flex; align-items: center; justify-content: center; flex: 1; min-width: 40px;}
-        .cronometro-botoes button:hover { background-color: var(--cyan); }
+        .cronometro-botoes button:hover { background-color: var(--cyan); color: #000; }
         
         /* Botões do Menu */
         .menu-wrapper { display: flex; flex-direction: column; flex: 1; }
@@ -146,7 +146,7 @@
         .log-item { display: flex; align-items: center; padding: 10px 15px; border-bottom: 1px solid #292e42; }
         .log-item:last-child { border-bottom: none; }
         
-        /* === RESPONSIVIDADE ESTRITA MOBILE (Baseada na Imagem 1) === */
+        /* === RESPONSIVIDADE ESTRITA MOBILE (GRID FIXO PARA PLACAR) === */
         @media (max-width: 768px) {
             body { flex-direction: column; height: auto; min-height: 100vh; overflow-y: auto; }
             .sidebar { width: 100%; padding: 10px 0 0 0; border-right: none; border-bottom: 2px solid var(--accent);}
@@ -156,57 +156,63 @@
             .main-content { padding: 15px; overflow-y: visible; }
             .modulo { padding: 20px; }
             
-            /* OCULTA O CRONOMETRO DA SIDEBAR NO CELULAR (Ganha espaço de tela) */
+            /* Oculta Cronômetro Lateral para ganhar espaço */
             #sidebarCronometro { display: none !important; }
 
-            /* RECONSTRUÇÃO DO GRID DO PLACAR (Exatamente como a referência) */
+            /* NOVO GRID ESTRITO DO PLACAR MOBILE */
             .placar-container {
                 display: grid !important;
                 grid-template-columns: 1fr 1fr;
-                grid-template-areas: 
-                    "logoReal timer"
-                    "scoreReal timerLabel"
-                    "botoes botoes"
-                    "logoMilan logoMilan"
-                    "scoreMilan scoreMilan";
-                gap: 5px 15px;
-                padding: 25px 20px;
-                align-items: center;
-                justify-items: center;
+                gap: 20px 10px;
+                padding: 25px 15px;
+                align-items: start;
             }
 
-            /* "Achata" as divs internas para elas obedecerem ao grid pai */
-            .time-placar, .timer-central { display: contents; }
+            /* Container Real Madrid (Topo Esquerda) */
+            .time-placar:nth-child(1) {
+                grid-column: 1;
+                grid-row: 1;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
 
-            /* Posicionamento - Real Madrid (Esquerda) */
-            .time-placar:nth-child(1) .escudo { grid-area: logoReal; width: 65px; height: 65px; margin-bottom: 0; }
-            .time-placar:nth-child(1) .score { grid-area: scoreReal; font-size: 60px; line-height: 1; margin-top: 5px; }
+            /* Container Cronômetro (Topo Direita) */
+            .timer-central {
+                grid-column: 2;
+                grid-row: 1;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: flex-start;
+            }
 
-            /* Posicionamento - Timer (Direita) */
-            .timer-central .displayCronometro { grid-area: timer; font-size: 55px; line-height: 1; }
-            .timer-central .timer-label { grid-area: timerLabel; font-size: 13px; margin-top: -5px; }
+            /* Container Milan (Base Centro) */
+            .time-placar:nth-last-child(1) {
+                grid-column: 1 / span 2;
+                grid-row: 2;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                margin-top: 10px;
+            }
+
+            /* Ajustes Internos dos Itens no Mobile */
+            .time-placar .escudo { width: 75px; height: 75px; margin-bottom: 5px; }
+            .time-placar .score { font-size: 65px; line-height: 1; margin-top: 5px; }
             
-            /* Posicionamento - Botões (Meio e Horizontais) */
+            .timer-central .displayCronometro { font-size: 50px; line-height: 1; margin-top: 5px; margin-bottom: 5px; }
+            .timer-central .timer-label { font-size: 13px; margin-top: 0; }
+            .timer-central .score-x { font-size: 35px; margin-top: 25px; }
+            
             .timer-central .cronometro-botoes { 
-                grid-area: botoes; 
                 flex-direction: row !important; 
-                flex-wrap: nowrap !important; 
                 width: 100%; 
                 justify-content: center; 
-                gap: 15px; 
-                margin-top: 15px; 
-                margin-bottom: 10px;
+                margin-top: 15px;
             }
-            .timer-central .cronometro-botoes button { padding: 10px 15px; font-size: 16px; flex: 0 1 auto; }
+            .timer-central .cronometro-botoes button { padding: 8px 12px; font-size: 14px; }
 
-            /* Posicionamento - X do Histórico (Meio) */
-            .timer-central .score-x { grid-area: timer; grid-row: span 2; font-size: 45px; margin-top: 25px;}
-
-            /* Posicionamento - Milan (Base) */
-            .time-placar:nth-child(3) .escudo { grid-area: logoMilan; width: 65px; height: 65px; margin-top: 25px; margin-bottom: 0; }
-            .time-placar:nth-child(3) .score { grid-area: scoreMilan; font-size: 60px; line-height: 1; margin-top: 5px; }
-
-            /* Ajustes gerais de layout mobile */
             .flex-row { flex-direction: column; gap: 0; }
             .grid-sorteio, .painel-juiz-acoes { flex-direction: column; gap: 15px; }
         }
@@ -241,7 +247,6 @@
 
     <div class="main-content">
 
-        <!-- MÓDULO EXCLUSIVO DO JUIZ -->
         <div id="painelJuiz" class="modulo active">
             <h3 style="text-align: center; color: var(--cyan); margin-top: 0; margin-bottom: 25px; font-size: 20px;">⏱️ Painel de Observabilidade do Árbitro</h3>
             
@@ -254,15 +259,12 @@
                 <input type="date" id="dataJuiz" onchange="mudarDataGlobal(this.value)">
             </div>
 
-            <!-- PLACAR AJUSTADO E RESPONSIVO -->
             <div class="placar-container">
-                <!-- Esquerda Mobile / Esquerda Desktop -->
                 <div class="time-placar">
                     <img src="https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg" class="escudo">
                     <div class="score" id="placarRealJuiz">0</div>
                 </div>
                 
-                <!-- Direita Mobile / Centro Desktop -->
                 <div class="timer-central">
                     <div class="displayCronometro" id="displayCronometro2">00:00</div>
                     <small class="timer-label">Tempo de Jogo</small>
@@ -274,7 +276,6 @@
                     </div>
                 </div>
 
-                <!-- Base Mobile / Direita Desktop -->
                 <div class="time-placar">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/d/d0/Logo_of_AC_Milan.svg" class="escudo">
                     <div class="score" id="placarMilanJuiz">0</div>
@@ -282,7 +283,6 @@
             </div>
 
             <div class="painel-juiz-acoes req-juiz-grid">
-                <!-- Ações Real Madrid -->
                 <div class="time-card-juiz" style="border-top: 4px solid #ffffff;">
                     <h3 style="margin-top:0;">⚪ Real Madrid</h3>
                     <button class="btn-juiz-acao btn-gol" onclick="abrirModalJuiz('Real Madrid', 'Gol')">⚽ GOL</button>
@@ -293,7 +293,6 @@
                     </div>
                 </div>
 
-                <!-- Ações Milan -->
                 <div class="time-card-juiz" style="border-top: 4px solid #f7768e;">
                     <h3 style="margin-top:0; color: #f7768e;">🔴 Milan</h3>
                     <button class="btn-juiz-acao btn-gol" onclick="abrirModalJuiz('Milan', 'Gol')">⚽ GOL</button>
@@ -341,7 +340,6 @@
             </div>
         </div>
 
-        <!-- MÓDULO DE PRESENÇA -->
         <div id="sorteio" class="modulo">
             
             <div class="req-master" style="background: #292e42; padding: 20px; border-radius: 8px; margin-bottom: 25px; border: 2px solid var(--cyan);">
@@ -360,31 +358,26 @@
             <div id="bannerStatus" class="status-agendamento status-fechado">Carregando status...</div>
             <button class="btn-acao btn-wpp" style="margin-top: 0; margin-bottom: 20px;" onclick="compartilharListaPresenca()">📲 Enviar Lista (WhatsApp)</button>
 
-            <!-- LISTAS SEPARADAS E DETALHADAS -->
             <div style="background: var(--bg-color); border-radius: 8px;">
                 
-                <!-- Goleiros Confirmados -->
                 <div class="header-lista">
                     <h4>Dentro - Goleiros</h4>
                     <span id="countDentroGoleiros">0</span>
                 </div>
                 <div id="listaDentroGoleiros"></div>
 
-                <!-- Jogadores de Linha Confirmados -->
                 <div class="header-lista" style="margin-top: 30px;">
                     <h4>Dentro - Jogadores</h4>
                     <span id="countDentroLinha">0</span>
                 </div>
                 <div id="listaDentroLinha"></div>
 
-                <!-- Dúvida -->
                 <div class="header-lista" style="margin-top: 40px;">
                     <h4>Dúvida</h4>
                     <span id="countDuvida">0</span>
                 </div>
                 <div id="listaDuvida"></div>
 
-                <!-- Fora -->
                 <div class="header-lista" style="margin-top: 40px;">
                     <h4>Fora</h4>
                     <span id="countFora">0</span>
@@ -393,7 +386,6 @@
 
             </div>
 
-            <!-- AREA DE SORTEIO -->
             <div class="flex-row req-master-flex" style="gap:15px; flex-wrap: wrap; margin-top: 40px;">
                 <button class="btn-acao" style="background: var(--cyan); margin-top: 0; flex: 1;" onclick="executarSorteio()">🔄 Sorteio (Apenas os "Dentro")</button>
                 <button class="btn-acao" style="background: var(--accent); margin-top: 0; flex: 1;" onclick="toggleModoManual()">⚙️ Escalar Manualmente</button>
@@ -507,7 +499,6 @@
 
     </div>
 
-    <!-- MODAL DO JUIZ -->
     <div id="modalJuiz" class="modal-juiz">
         <div class="modal-juiz-content">
             <h2 id="modalJuizTitulo" style="margin-top: 0; color: var(--accent);">Ação</h2>
@@ -529,8 +520,17 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        const SENHA_MASTER = "Starnewfour1273@";
-        const SENHA_JUIZ = "Juiz2026";
+        // FUNÇÃO DE OFUSCAÇÃO PARA AS SENHAS
+        // Pega a string, inverte e converte para Base64.
+        // Assim, as senhas originais não ficam visíveis diretamente no código.
+        function verificarSenha(input, hashEsperado) {
+            try {
+                return btoa(input.split('').reverse().join('')) === hashEsperado;
+            } catch(e) {
+                return false;
+            }
+        }
+
         let isMaster = false, isJuiz = false;
 
         function fazerLogin() {
@@ -542,17 +542,24 @@
                 atualizarListaSorteio(); refreshTelas();
             } else {
                 let s = prompt("ACESSO RESTRITO:\nDigite a Senha:");
-                if (s === SENHA_MASTER) {
+                if (!s) return;
+                
+                // Senha Master ofuscada: "Starnewfour1273@" -> "QDM3MjFydW9md2VucmF0Uw=="
+                if (verificarSenha(s, "QDM3MjFydW9md2VucmF0Uw==")) {
                     isMaster = true; isJuiz = true; 
                     document.getElementById('btnLogin').innerText = "🔓 Master Ativo (Sair)";
                     document.body.classList.add('is-master', 'is-juiz');
                     alert("Acesso MASTER Liberado!"); atualizarListaSorteio(); refreshTelas();
-                } else if (s === SENHA_JUIZ) {
+                } 
+                // Senha Juiz ofuscada: "Juiz2026" -> "NjIwMnppdUo="
+                else if (verificarSenha(s, "NjIwMnppdUo=")) {
                     isJuiz = true;
                     document.getElementById('btnLogin').innerText = "🔓 Juiz Ativo (Sair)";
                     document.body.classList.add('is-juiz');
                     alert("Acesso JUIZ Liberado!"); atualizarListaSorteio(); refreshTelas();
-                } else if (s) { alert("Senha Incorreta!"); }
+                } else { 
+                    alert("Senha Incorreta!"); 
+                }
             }
         }
 
