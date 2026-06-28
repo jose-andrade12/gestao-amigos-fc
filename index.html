@@ -149,6 +149,7 @@
         
         /* === RESPONSIVIDADE ESTRITA MOBILE (GRID FIXO PARA PLACAR) === */
         @media (max-width: 768px) {
+
             body { flex-direction: column; height: auto; min-height: 100vh; overflow-y: auto; }
             .sidebar { width: 100%; padding: 10px 0 0 0; border-right: none; border-bottom: 2px solid var(--accent);}
             .menu-wrapper { flex-direction: row; overflow-x: auto; padding-bottom: 5px; }
@@ -160,6 +161,31 @@
             /* Oculta Cronômetro Lateral para ganhar espaço */
             #sidebarCronometro { display: none !important; }
 
+
+/* GARANTIR BOTÕES DO CRONÔMETRO LADO A LADO NO MOBILE */
+    .cronometro-botoes,
+    .timer-central .cronometro-botoes {
+        display: flex !important;
+        flex-direction: row !important; /* Força estritamente a linha horizontal */
+        flex-wrap: nowrap !important; /* Impede que os botões pulem para baixo */
+        justify-content: space-between !important;
+        align-items: center !important;
+        width: 100% !important;
+        gap: 10px !important; /* Espaço entre os botões */
+        margin-top: 15px !important;
+    }
+
+    .cronometro-botoes button {
+        flex: 1 1 0px !important; /* Força divisão igual de tamanho para os 3 botões */
+        min-width: 0 !important; /* Permite que o botão encolha o necessário para caber na tela */
+        padding: 12px 5px !important; /* Área de clique confortável */
+        font-size: 16px !important;
+        white-space: nowrap !important;
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+    }
+}
 /* NOVO GRID ESTRITO DO PLACAR MOBILE - REORGANIZADO */
             .placar-container {
                 display: grid !important;
