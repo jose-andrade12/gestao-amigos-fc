@@ -160,39 +160,54 @@
             /* Oculta Cronômetro Lateral para ganhar espaço */
             #sidebarCronometro { display: none !important; }
 
-            /* NOVO GRID ESTRITO DO PLACAR MOBILE */
+/* NOVO GRID ESTRITO DO PLACAR MOBILE - REORGANIZADO */
             .placar-container {
                 display: grid !important;
-                grid-template-columns: 1fr 1fr;
-                gap: 20px 10px;
-                padding: 25px 15px;
-                align-items: start;
+                grid-template-columns: 1fr 1fr; /* Times lado a lado */
+                gap: 15px;
+                padding: 20px 10px;
+                align-items: center;
             }
 
+            /* Time 1 na esquerda */
             .time-placar:nth-child(1) { grid-column: 1; grid-row: 1; display: flex; flex-direction: column; align-items: center; }
-            .timer-central { grid-column: 2; grid-row: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; }
-            .time-placar:nth-last-child(1) { grid-column: 1 / span 2; grid-row: 2; display: flex; flex-direction: column; align-items: center; margin-top: 10px; }
+            
+            /* Time 2 na direita */
+            .time-placar:nth-last-child(1) { grid-column: 2; grid-row: 1; display: flex; flex-direction: column; align-items: center; margin-top: 0; }
+            
+            /* Cronômetro centralizado na linha de baixo, ocupando 100% da largura */
+            .timer-central { 
+                grid-column: 1 / span 2; 
+                grid-row: 2; 
+                display: flex; 
+                flex-direction: column; 
+                align-items: center; 
+                margin-top: 15px; 
+            }
 
-            .time-placar .escudo { width: 75px; height: 75px; margin-bottom: 5px; }
-            .time-placar .score { font-size: 65px; line-height: 1; margin-top: 5px; }
+            .time-placar .escudo { width: 70px; height: 70px; margin-bottom: 5px; }
+            .time-placar .score { font-size: 60px; line-height: 1; margin-top: 5px; }
             
-            .timer-central .displayCronometro { font-size: 50px; line-height: 1; margin-top: 5px; margin-bottom: 5px; }
-            .timer-central .timer-label { font-size: 13px; margin-top: 0; }
-            .timer-central .score-x { font-size: 35px; margin-top: 25px; }
+            .timer-central .displayCronometro { font-size: 55px; line-height: 1; margin-top: 5px; margin-bottom: 5px; }
+            .timer-central .timer-label { font-size: 14px; margin-top: 0; }
+            .timer-central .score-x { font-size: 35px; margin-top: 0; }
             
-            /* GARANTINDO BOTÕES HORIZONTAIS NO MOBILE E FORÇANDO O NÃO-WRAP */
+            /* ALINHAMENTO RESPONSIVO DOS BOTÕES */
             .timer-central .cronometro-botoes { 
                 flex-direction: row !important; 
                 flex-wrap: nowrap !important;
                 width: 100%; 
+                max-width: 300px; /* Evita que os botões estiquem demais em celulares grandes */
                 justify-content: center; 
+                gap: 12px;
                 margin-top: 15px;
             }
-            .timer-central .cronometro-botoes button { padding: 8px 12px; font-size: 14px; flex: 1;}
-
-            .flex-row { flex-direction: column; gap: 0; }
-            .grid-sorteio, .painel-juiz-acoes { flex-direction: column; gap: 15px; }
-        }
+            .timer-central .cronometro-botoes button { 
+                padding: 12px; 
+                font-size: 18px; /* Aumenta a área de toque para o polegar */
+                flex: 1; 
+                border-radius: 8px;
+            }
     </style>
 </head>
 <body>
