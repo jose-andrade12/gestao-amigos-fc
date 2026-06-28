@@ -25,12 +25,34 @@
         .sidebar h2 { text-align: center; color: var(--cyan); margin-bottom: 20px; font-size: 22px; }
         .status-nuvem { text-align: center; font-size: 12px; color: var(--green-timer); margin-top: -10px; margin-bottom: 20px; }
 
-        /* Cronômetro Lateral */
+        /* Cronômetro Lateral e Central */
         .cronometro-container { background-color: #16161e; padding: 15px; margin: 0 15px 15px 15px; border-radius: 8px; text-align: center; border: 1px solid #414868; }
         .displayCronometro { font-size: 36px; font-weight: bold; color: var(--green-timer); font-family: monospace; margin-bottom: 10px; letter-spacing: 2px; }
-        /* GARANTINDO QUE OS BOTOES NAO QUEBREM LINHA NO DESKTOP TAMBÉM */
-        .cronometro-botoes { display: flex; justify-content: center; gap: 8px; flex-wrap: nowrap; }
-        .cronometro-botoes button { background-color: #414868; border: none; color: white; font-size: 14px; cursor: pointer; padding: 8px; border-radius: 5px; display: flex; align-items: center; justify-content: center; flex: 1; min-width: 40px;}
+        
+        /* GARANTINDO BOTOES LADO A LADO GLOBALMENTE (DESKTOP E MOBILE) */
+        .cronometro-botoes { 
+            display: flex !important; 
+            flex-direction: row !important; /* Força linha horizontal */
+            justify-content: center !important; 
+            align-items: center !important;
+            gap: 10px !important; 
+            flex-wrap: nowrap !important; /* Impede de empilhar */
+            width: 100% !important;
+        }
+        .cronometro-botoes button { 
+            background-color: #414868; 
+            border: none; 
+            color: white; 
+            font-size: 16px; 
+            cursor: pointer; 
+            padding: 10px; 
+            border-radius: 5px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            flex: 1 1 0px !important; /* Divide o espaço igualmente */
+            min-width: 0 !important;
+        }
         .cronometro-botoes button:hover { background-color: var(--cyan); color: #000; }
         
         /* Botões do Menu */
@@ -65,8 +87,8 @@
         body.is-master .req-master-cell { display: table-cell !important; }
         body.is-master .req-master-grid { display: grid !important; }
         
-        body.is-master .req-juiz, body.is-master .req-juiz-flex, body.is-master .req-juiz-grid { display: block !important; }
-        body.is-juiz .req-juiz, body.is-juiz .req-juiz-flex, body.is-juiz .req-juiz-grid { display: block !important; }
+        body.is-master .req-juiz, body.is-master .req-juiz-flex, body.is-master .req-juiz-grid { display: flex !important; }
+        body.is-juiz .req-juiz, body.is-juiz .req-juiz-flex, body.is-juiz .req-juiz-grid { display: flex !important; }
 
         .aviso-bloqueio { background: rgba(255, 158, 100, 0.1); color: var(--admin-color); padding: 15px; border-radius: 8px; border: 1px dashed var(--admin-color); text-align: center; margin-bottom: 20px; font-weight: bold; }
         body.is-juiz .aviso-bloqueio-juiz, body.is-master .aviso-bloqueio-juiz, body.is-master .aviso-bloqueio-master { display: none !important; }
@@ -81,10 +103,9 @@
         .escudo { width: 90px; height: 90px; object-fit: contain; margin-bottom: 10px; }
         .score { font-size: 60px; font-weight: bold; color: #ffffff; }
         
-        .timer-central { text-align: center; }
+        .timer-central { text-align: center; width: 100%; max-width: 300px; display: flex; flex-direction: column; align-items: center; }
         .timer-central .displayCronometro { font-size: 70px; margin-bottom: 0; line-height: 1; color: var(--green-timer);}
         .timer-central .timer-label { color: #565f89; display: block; margin-top: 5px; }
-        .botoes-placar { margin-top: 15px; justify-content: center; gap: 10px; }
         .score-x { font-size: 50px; color: #414868; font-weight: bold; }
 
         /* Status Agendamento */
@@ -149,7 +170,6 @@
         
         /* === RESPONSIVIDADE ESTRITA MOBILE (GRID FIXO PARA PLACAR) === */
         @media (max-width: 768px) {
-
             body { flex-direction: column; height: auto; min-height: 100vh; overflow-y: auto; }
             .sidebar { width: 100%; padding: 10px 0 0 0; border-right: none; border-bottom: 2px solid var(--accent);}
             .menu-wrapper { flex-direction: row; overflow-x: auto; padding-bottom: 5px; }
@@ -161,54 +181,26 @@
             /* Oculta Cronômetro Lateral para ganhar espaço */
             #sidebarCronometro { display: none !important; }
 
-
-/* GARANTIR BOTÕES DO CRONÔMETRO LADO A LADO NO MOBILE */
-    .cronometro-botoes,
-    .timer-central .cronometro-botoes {
-        display: flex !important;
-        flex-direction: row !important; /* Força estritamente a linha horizontal */
-        flex-wrap: nowrap !important; /* Impede que os botões pulem para baixo */
-        justify-content: space-between !important;
-        align-items: center !important;
-        width: 100% !important;
-        gap: 10px !important; /* Espaço entre os botões */
-        margin-top: 15px !important;
-    }
-
-    .cronometro-botoes button {
-        flex: 1 1 0px !important; /* Força divisão igual de tamanho para os 3 botões */
-        min-width: 0 !important; /* Permite que o botão encolha o necessário para caber na tela */
-        padding: 12px 5px !important; /* Área de clique confortável */
-        font-size: 16px !important;
-        white-space: nowrap !important;
-        display: flex !important;
-        justify-content: center !important;
-        align-items: center !important;
-    }
-}
-/* NOVO GRID ESTRITO DO PLACAR MOBILE - REORGANIZADO */
+            /* NOVO GRID ESTRITO DO PLACAR MOBILE - REORGANIZADO */
             .placar-container {
                 display: grid !important;
-                grid-template-columns: 1fr 1fr; /* Times lado a lado */
+                grid-template-columns: 1fr 1fr;
                 gap: 15px;
                 padding: 20px 10px;
                 align-items: center;
             }
 
-            /* Time 1 na esquerda */
             .time-placar:nth-child(1) { grid-column: 1; grid-row: 1; display: flex; flex-direction: column; align-items: center; }
-            
-            /* Time 2 na direita */
             .time-placar:nth-last-child(1) { grid-column: 2; grid-row: 1; display: flex; flex-direction: column; align-items: center; margin-top: 0; }
             
-            /* Cronômetro centralizado na linha de baixo, ocupando 100% da largura */
             .timer-central { 
                 grid-column: 1 / span 2; 
                 grid-row: 2; 
                 display: flex; 
                 flex-direction: column; 
                 align-items: center; 
-                margin-top: 15px; 
+                margin-top: 15px;
+                max-width: none;
             }
 
             .time-placar .escudo { width: 70px; height: 70px; margin-bottom: 5px; }
@@ -218,22 +210,14 @@
             .timer-central .timer-label { font-size: 14px; margin-top: 0; }
             .timer-central .score-x { font-size: 35px; margin-top: 0; }
             
-            /* ALINHAMENTO RESPONSIVO DOS BOTÕES */
             .timer-central .cronometro-botoes { 
-                flex-direction: row !important; 
-                flex-wrap: nowrap !important;
-                width: 100%; 
                 max-width: 300px; /* Evita que os botões estiquem demais em celulares grandes */
-                justify-content: center; 
-                gap: 12px;
-                margin-top: 15px;
+                margin-top: 15px !important;
             }
-            .timer-central .cronometro-botoes button { 
-                padding: 12px; 
-                font-size: 18px; /* Aumenta a área de toque para o polegar */
-                flex: 1; 
-                border-radius: 8px;
-            }
+
+            .flex-row { flex-direction: column; gap: 0; }
+            .grid-sorteio, .painel-juiz-acoes { flex-direction: column; gap: 15px; }
+        }
     </style>
 </head>
 <body>
@@ -265,7 +249,6 @@
 
     <div class="main-content">
 
-        <!-- MÓDULO EXCLUSIVO DO JUIZ -->
         <div id="painelJuiz" class="modulo active">
             <h3 style="text-align: center; color: var(--cyan); margin-top: 0; margin-bottom: 25px; font-size: 20px;">⏱️ Painel de Observabilidade do Árbitro</h3>
             
@@ -288,7 +271,7 @@
                     <div class="displayCronometro" id="displayCronometro2">00:00</div>
                     <small class="timer-label">Tempo de Jogo</small>
                     
-                    <div class="cronometro-botoes botoes-placar req-juiz-flex">
+                    <div class="cronometro-botoes req-juiz-flex" style="margin-top: 15px;">
                         <button onclick="iniciarCronometro()">▶️</button>
                         <button onclick="pausarCronometro()">⏸️</button>
                         <button onclick="zerarCronometro()">🔄</button>
@@ -508,7 +491,6 @@
 
     </div>
 
-    <!-- MODAL DO JUIZ -->
     <div id="modalJuiz" class="modal-juiz">
         <div class="modal-juiz-content">
             <h2 id="modalJuizTitulo" style="margin-top: 0; color: var(--accent);">Ação</h2>
