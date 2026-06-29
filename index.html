@@ -539,7 +539,7 @@
                         
                         // Verifica Master
                         if (verificarSenha(s, senhasDB.master)) {
-                            isMaster = true; isJuiz = true; 
+                            isMaster = true; isJuiz = true; isAmigos = true; 
                             document.getElementById('btnLogin').innerText = "🔓 Master Ativo (Sair)";
                             document.body.classList.add('is-master', 'is-juiz');
                             alert("Acesso MASTER Liberado!"); atualizarListaSorteio(); refreshTelas();
@@ -550,6 +550,14 @@
                             document.getElementById('btnLogin').innerText = "🔓 Juiz Ativo (Sair)";
                             document.body.classList.add('is-juiz');
                             alert("Acesso JUIZ Liberado!"); atualizarListaSorteio(); refreshTelas();
+
+                        // Verifica Amigos
+                        if (verificarSenha(s, senhasDB.amigos)) {
+                            isAmigos = true;
+                            document.getElementById('btnLogin').innerText = "🔓 Amigos Ativo (Sair)";
+                            document.body.classList.add('is-amigos');
+                            alert("Acesso AMIGOS Liberado!"); atualizarListaSorteio(); refreshTelas();
+                        }                             
                         } else { 
                             alert("Senha Incorreta!"); 
                         }
