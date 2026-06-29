@@ -55,11 +55,14 @@
         }
         .cronometro-botoes button:hover { background-color: var(--cyan); color: #000; }
         
-        /* Botões do Menu */
-        .menu-wrapper { display: flex; flex-direction: column; flex: 1; }
-        .menu-btn { width: 100%; background: none; border: none; color: #a9b1d6; padding: 13px 20px; text-align: left; font-size: 15px; cursor: pointer; transition: 0.3s; }
-        .menu-btn:hover, .menu-btn.active { background-color: #292e42; color: #ffffff; border-left: 4px solid var(--accent); }
-        .btn-juiz { color: #ffffff; font-weight: bold; border-left: 4px solid var(--cyan) !important; background-color: #292e42; }
+        /* Botões do Menu (Estilo Dinâmico) */
+        .menu-wrapper { display: flex; flex-direction: column; gap: 10px; padding: 0 15px 20px 15px; flex: 1; }
+        .menu-btn { background: #16161e; border: 1px solid #292e42; color: #a9b1d6; padding: 12px 15px; border-radius: 10px; text-align: left; font-size: 14px; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; gap: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .menu-btn:hover { background-color: #24283b; color: #ffffff; transform: translateY(-2px); box-shadow: 0 6px 10px rgba(0,0,0,0.3); border-color: #414868; }
+        .menu-btn.active { background: linear-gradient(135deg, #24283b, #16161e); color: #ffffff; border-color: var(--cyan); border-left: 4px solid var(--cyan); }
+        .menu-btn .menu-icon { font-size: 20px; }
+        .btn-juiz { border-color: var(--cyan); border-left: 4px solid var(--cyan) !important; }
+        .btn-login { margin-top: auto; border-color: var(--admin-color); }
         
         /* Área Principal */
         .main-content { flex: 1; padding: 30px; overflow-y: auto; position: relative;}
@@ -168,18 +171,17 @@
         .log-item { display: flex; align-items: center; padding: 10px 15px; border-bottom: 1px solid #292e42; }
         .log-item:last-child { border-bottom: none; }
         
-        /* === RESPONSIVIDADE ESTRITA MOBILE (GRID FIXO PARA PLACAR) === */
-        @media (max-width: 768px) {
-            body { flex-direction: column; height: auto; min-height: 100vh; overflow-y: auto; }
-            .sidebar { width: 100%; padding: 10px 0 0 0; border-right: none; border-bottom: 2px solid var(--accent);}
-            .menu-wrapper { flex-direction: row; overflow-x: auto; padding-bottom: 5px; }
-            .menu-btn { white-space: nowrap; width: auto; flex-shrink: 0; padding: 10px 15px; border-left: none; border-bottom: 3px solid transparent; }
-            .menu-btn.active { border-left: none; border-bottom: 3px solid var(--cyan); background-color: transparent; }
-            .main-content { padding: 15px; overflow-y: visible; }
-            .modulo { padding: 20px; }
+/* Menu em formato de App Mobile */
+            .menu-wrapper { flex-direction: row; overflow-x: auto; padding: 15px 10px; gap: 12px; border-bottom: 1px solid #16161e; }
+            .menu-btn { flex-direction: column; align-items: center; justify-content: center; padding: 10px; min-width: 85px; border-radius: 12px; gap: 6px; text-align: center; border-left: 1px solid #292e42 !important; }
+            .menu-btn:hover { transform: none; } /* Remove o pulo no toque do celular */
+            .menu-btn.active { border-bottom: 3px solid var(--cyan); border-left: 1px solid var(--cyan) !important; background: #24283b; }
+            .menu-btn .menu-icon { font-size: 24px; margin: 0; }
+            .menu-btn .menu-text { font-size: 11px; white-space: nowrap; font-weight: bold; }
+            .btn-login { margin-top: 0; }
             
-            /* Oculta Cronômetro Lateral para ganhar espaço */
-            #sidebarCronometro { display: none !important; }
+            /* Esconde a barra de rolagem no mobile para ficar mais clean */
+            .menu-wrapper::-webkit-scrollbar { display: none; }
 
             /* NOVO GRID ESTRITO DO PLACAR MOBILE - REORGANIZADO */
             .placar-container {
@@ -237,15 +239,35 @@
         </div>
 
         <div class="menu-wrapper">
-            <button class="menu-btn btn-juiz active" onclick="abrirAba('painelJuiz')">⏱️ Modo Juiz (Live)</button>
-            <button class="menu-btn" onclick="abrirAba('cadastro')">1. Cadastro de Atletas</button>
-            <button class="menu-btn" onclick="abrirAba('sorteio')">2. Marcar Presença</button>
-            <button class="menu-btn" onclick="abrirAba('jogo')">3. Histórico das Partidas</button>
-            <button class="menu-btn" onclick="abrirAba('resenha')">4. Resenha</button>
-            <button class="menu-btn" onclick="abrirAba('dashboard')">📊 Dashboard</button>
-            <button class="menu-btn" onclick="fazerLogin()" id="btnLogin" style="color: var(--admin-color); border-top: 1px solid #16161e; margin-top: 10px;">🔑 Login (Juiz/Master)</button>
+            <button class="menu-btn btn-juiz active" onclick="abrirAba('painelJuiz')">
+                <span class="menu-icon">⏱️</span>
+                <span class="menu-text">Modo Juiz</span>
+            </button>
+            <button class="menu-btn" onclick="abrirAba('cadastro')">
+                <span class="menu-icon">📋</span>
+                <span class="menu-text">Cadastro</span>
+            </button>
+            <button class="menu-btn" onclick="abrirAba('sorteio')">
+                <span class="menu-icon">✅</span>
+                <span class="menu-text">Presença</span>
+            </button>
+            <button class="menu-btn" onclick="abrirAba('jogo')">
+                <span class="menu-icon">⚽</span>
+                <span class="menu-text">Histórico</span>
+            </button>
+            <button class="menu-btn" onclick="abrirAba('resenha')">
+                <span class="menu-icon">🍻</span>
+                <span class="menu-text">Resenha</span>
+            </button>
+            <button class="menu-btn" onclick="abrirAba('dashboard')">
+                <span class="menu-icon">📊</span>
+                <span class="menu-text">Dashboard</span>
+            </button>
+            <button class="menu-btn btn-login" onclick="fazerLogin()" id="btnLogin">
+                <span class="menu-icon">🔑</span>
+                <span class="menu-text">Login</span>
+            </button>
         </div>
-    </div>
 
     <div class="main-content">
 
