@@ -171,51 +171,39 @@
         .log-item { display: flex; align-items: center; padding: 10px 15px; border-bottom: 1px solid #292e42; }
         .log-item:last-child { border-bottom: none; }
         
-        /* === RESPONSIVIDADE ESTRITA MOBILE (GRID FIXO PARA PLACAR) === */
+/* === RESPONSIVIDADE ESTRITA MOBILE (GRID FIXO PARA PLACAR) === */
         @media (max-width: 768px) {
-            body { flex-direction: column; height: auto; min-height: 100vh; overflow-y: auto; }
-            .sidebar { width: 100%; padding: 10px 0 0 0; border-right: none; border-bottom: 2px solid var(--accent);}
+            /* Mantém o corpo da página fixo como um App nativo */
+            body { flex-direction: column; height: 100vh; overflow: hidden; } 
             
-            /* Menu em formato de App Mobile */
-            .menu-wrapper { flex-direction: row; overflow-x: auto; padding: 15px 10px; gap: 12px; border-bottom: 1px solid #16161e; }
+            /* Sidebar fixa no topo */
+            .sidebar { width: 100%; padding: 10px 0 0 0; border-right: none; flex-shrink: 0; box-shadow: 0 4px 6px rgba(0,0,0,0.3); z-index: 20; }
+            
+            /* Menu com rolagem HORIZONTAL (arraste os botões para os lados) */
+            .menu-wrapper { flex-direction: row; overflow-x: auto; padding: 15px 10px; gap: 12px; border-bottom: 2px solid var(--accent); -webkit-overflow-scrolling: touch; }
             .menu-btn { flex-direction: column; align-items: center; justify-content: center; padding: 10px; min-width: 85px; border-radius: 12px; gap: 6px; text-align: center; border-left: 1px solid #292e42 !important; }
-            .menu-btn:hover { transform: none; } /* Remove o pulo no toque do celular */
+            .menu-btn:hover { transform: none; } 
             .menu-btn.active { border-bottom: 3px solid var(--cyan); border-left: 1px solid var(--cyan) !important; background: #24283b; }
             .menu-btn .menu-icon { font-size: 24px; margin: 0; }
             .menu-btn .menu-text { font-size: 11px; white-space: nowrap; font-weight: bold; }
             .btn-login { margin-top: 0; }
             
-            /* Esconde a barra de rolagem no mobile para ficar mais clean */
+            /* Esconde a barra de rolagem horizontal para ficar elegante */
             .menu-wrapper::-webkit-scrollbar { display: none; }
 
-            .main-content { padding: 15px; overflow-y: visible; }
+            /* ÁREA PRINCIPAL COM SCROLL VERTICAL ATIVADO E FLUIDO */
+            .main-content { padding: 15px; overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch; padding-bottom: 40px; }
             .modulo { padding: 20px; }
             
             /* Oculta Cronômetro Lateral para ganhar espaço */
             #sidebarCronometro { display: none !important; }
 
             /* NOVO GRID ESTRITO DO PLACAR MOBILE - REORGANIZADO */
-            .placar-container {
-                display: grid !important;
-                grid-template-columns: 1fr 1fr;
-                gap: 15px;
-                padding: 20px 10px;
-                align-items: center;
-            }
-
+            .placar-container { display: grid !important; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px 10px; align-items: center; }
             .time-placar:nth-child(1) { grid-column: 1; grid-row: 1; display: flex; flex-direction: column; align-items: center; }
             .time-placar:nth-last-child(1) { grid-column: 2; grid-row: 1; display: flex; flex-direction: column; align-items: center; margin-top: 0; }
             
-            .timer-central { 
-                grid-column: 1 / span 2; 
-                grid-row: 2; 
-                display: flex; 
-                flex-direction: column; 
-                align-items: center; 
-                margin-top: 15px;
-                max-width: none;
-            }
-
+            .timer-central { grid-column: 1 / span 2; grid-row: 2; display: flex; flex-direction: column; align-items: center; margin-top: 15px; max-width: none; }
             .time-placar .escudo { width: 70px; height: 70px; margin-bottom: 5px; }
             .time-placar .score { font-size: 60px; line-height: 1; margin-top: 5px; }
             
@@ -223,11 +211,7 @@
             .timer-central .timer-label { font-size: 14px; margin-top: 0; }
             .timer-central .score-x { font-size: 35px; margin-top: 0; }
             
-            .timer-central .cronometro-botoes { 
-                max-width: 300px; /* Evita que os botões estiquem demais em celulares grandes */
-                margin-top: 15px !important;
-            }
-
+            .timer-central .cronometro-botoes { max-width: 300px; margin-top: 15px !important; }
             .flex-row { flex-direction: column; gap: 0; }
             .grid-sorteio, .painel-juiz-acoes { flex-direction: column; gap: 15px; }
         }
