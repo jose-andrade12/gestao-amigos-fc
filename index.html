@@ -171,7 +171,12 @@
         .log-item { display: flex; align-items: center; padding: 10px 15px; border-bottom: 1px solid #292e42; }
         .log-item:last-child { border-bottom: none; }
         
-/* Menu em formato de App Mobile */
+        /* === RESPONSIVIDADE ESTRITA MOBILE (GRID FIXO PARA PLACAR) === */
+        @media (max-width: 768px) {
+            body { flex-direction: column; height: auto; min-height: 100vh; overflow-y: auto; }
+            .sidebar { width: 100%; padding: 10px 0 0 0; border-right: none; border-bottom: 2px solid var(--accent);}
+            
+            /* Menu em formato de App Mobile */
             .menu-wrapper { flex-direction: row; overflow-x: auto; padding: 15px 10px; gap: 12px; border-bottom: 1px solid #16161e; }
             .menu-btn { flex-direction: column; align-items: center; justify-content: center; padding: 10px; min-width: 85px; border-radius: 12px; gap: 6px; text-align: center; border-left: 1px solid #292e42 !important; }
             .menu-btn:hover { transform: none; } /* Remove o pulo no toque do celular */
@@ -182,6 +187,12 @@
             
             /* Esconde a barra de rolagem no mobile para ficar mais clean */
             .menu-wrapper::-webkit-scrollbar { display: none; }
+
+            .main-content { padding: 15px; overflow-y: visible; }
+            .modulo { padding: 20px; }
+            
+            /* Oculta Cronômetro Lateral para ganhar espaço */
+            #sidebarCronometro { display: none !important; }
 
             /* NOVO GRID ESTRITO DO PLACAR MOBILE - REORGANIZADO */
             .placar-container {
@@ -268,6 +279,7 @@
                 <span class="menu-text">Login</span>
             </button>
         </div>
+    </div>
 
     <div class="main-content">
 
@@ -544,7 +556,7 @@
         async function fazerLogin() {
             if (isMaster || isJuiz) {
                 isMaster = false; isJuiz = false;
-                document.getElementById('btnLogin').innerText = "🔑 Login (Juiz/Master)";
+                document.getElementById('btnLogin').innerHTML = `<span class="menu-icon">🔑</span><span class="menu-text">Login</span>`;
                 document.body.classList.remove('is-master', 'is-juiz');
                 alert("Logout realizado com sucesso. Modo Leitura ativado.");
                 atualizarListaSorteio(); refreshTelas();
@@ -562,21 +574,21 @@
                         // Verifica Master
                         if (verificarSenha(s, senhasDB.master)) {
                             isMaster = true; isJuiz = true; isAmigos = true; 
-                            document.getElementById('btnLogin').innerText = "🔓 Master Ativo (Sair)";
+                            document.getElementById('btnLogin').innerHTML = `<span class="menu-icon">🔓</span><span class="menu-text">Sair (Master)</span>`;
                             document.body.classList.add('is-master', 'is-juiz');
                             alert("Acesso MASTER Liberado!"); atualizarListaSorteio(); refreshTelas();
                         } 
                         // Verifica Juiz
                         else if (verificarSenha(s, senhasDB.juiz)) {
                             isJuiz = true;
-                            document.getElementById('btnLogin').innerText = "🔓 Juiz Ativo (Sair)";
+                            document.getElementById('btnLogin').innerHTML = `<span class="menu-icon">🔓</span><span class="menu-text">Sair (Juiz)</span>`;
                             document.body.classList.add('is-juiz');
                             alert("Acesso JUIZ Liberado!"); atualizarListaSorteio(); refreshTelas();
 
                         // Verifica Amigos
                         if (verificarSenha(s, senhasDB.amigos)) {
                             isAmigos = true;
-                            document.getElementById('btnLogin').innerText = "🔓 Amigos Ativo (Sair)";
+                            document.getElementById('btnLogin').innerHTML = `<span class="menu-icon">🔓</span><span class="menu-text">Sair (Amigos)</span>`;
                             document.body.classList.add('is-amigos');
                             alert("Acesso AMIGOS Liberado!"); atualizarListaSorteio(); refreshTelas();
                         }                             
