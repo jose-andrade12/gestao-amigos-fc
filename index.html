@@ -519,7 +519,7 @@
 
         let isMaster = false, isJuiz = false;
 
-        function fazerLogin() {
+        async function fazerLogin() {
             if (isMaster || isJuiz) {
                 isMaster = false; isJuiz = false;
                 document.getElementById('btnLogin').innerText = "🔑 Login (Juiz/Master)";
@@ -530,17 +530,36 @@
                 let s = prompt("ACESSO RESTRITO:\nDigite a Senha:");
                 if (!s) return;
                 
-                if (verificarSenha(s, "QDM3MjFydW9md2VucmF0Uw==")) {
-                    isMaster = true; isJuiz = true; 
-                    document.getElementById('btnLogin').innerText = "🔓 Master Ativo (Sair)";
-                    document.body.classList.add('is-master', 'is-juiz');
-                    alert("Acesso MASTER Liberado!"); atualizarListaSorteio(); refreshTelas();
-                } else if (verificarSenha(s, "NjIwMnppdUo=")) {
-                    isJuiz = true;
-                    document.getElementById('btnLogin').innerText = "🔓 Juiz Ativo (Sair)";
-                    document.body.classList.add('is-juiz');
-                    alert("Acesso JUIZ Liberado!"); atualizarListaSorteio(); refreshTelas();
-                } else { alert("Senha Incorreta!"); }
+                try {
+                    // Busca as senhas criptografadas no Firebase
+                    const doc = await db.collection("sistema").doc("senhas").get();
+                    
+                    if (doc.exists) {
+                        const senhasDB = doc.data();
+                        
+                        // Verifica Master
+                        if (verificarSenha(s, senhasDB.master)) {
+                            isMaster = true; isJuiz = true; 
+                            document.getElementById('btnLogin').innerText = "🔓 Master Ativo (Sair)";
+                            document.body.classList.add('is-master', 'is-juiz');
+                            alert("Acesso MASTER Liberado!"); atualizarListaSorteio(); refreshTelas();
+                        } 
+                        // Verifica Juiz
+                        else if (verificarSenha(s, senhasDB.juiz)) {
+                            isJuiz = true;
+                            document.getElementById('btnLogin').innerText = "🔓 Juiz Ativo (Sair)";
+                            document.body.classList.add('is-juiz');
+                            alert("Acesso JUIZ Liberado!"); atualizarListaSorteio(); refreshTelas();
+                        } else { 
+                            alert("Senha Incorreta!"); 
+                        }
+                    } else {
+                        alert("Erro: Configuração de senhas não encontrada no banco de dados.");
+                    }
+                } catch (error) {
+                    console.error("Erro ao verificar senha:", error);
+                    alert("Erro ao conectar com o banco de dados.");
+                }
             }
         }
 
