@@ -20,7 +20,7 @@
         }
         body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-color); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
         
-        /* Menu Lateral - Atualizado com rolagem vertical para modo paisagem */
+        /* Menu Lateral - Com rolagem vertical para modo paisagem */
         .sidebar { 
             width: 280px; 
             background-color: var(--panel-bg); 
@@ -48,33 +48,23 @@
         .cronometro-container { background-color: #16161e; padding: 15px; margin: 0 15px 15px 15px; border-radius: 8px; text-align: center; border: 1px solid #414868; }
         .displayCronometro { font-size: 36px; font-weight: bold; color: var(--green-timer); font-family: monospace; margin-bottom: 10px; letter-spacing: 2px; }
         
-        /* GARANTINDO BOTOES LADO A LADO GLOBALMENTE (DESKTOP E MOBILE) */
         .cronometro-botoes { 
             display: flex !important; 
-            flex-direction: row !important; /* Força linha horizontal */
+            flex-direction: row !important; 
             justify-content: center !important; 
             align-items: center !important;
             gap: 10px !important; 
-            flex-wrap: nowrap !important; /* Impede de empilhar */
+            flex-wrap: nowrap !important; 
             width: 100% !important;
         }
         .cronometro-botoes button { 
-            background-color: #414868; 
-            border: none; 
-            color: white; 
-            font-size: 16px; 
-            cursor: pointer; 
-            padding: 10px; 
-            border-radius: 5px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            flex: 1 1 0px !important; /* Divide o espaço igualmente */
-            min-width: 0 !important;
+            background-color: #414868; border: none; color: white; font-size: 16px; 
+            cursor: pointer; padding: 10px; border-radius: 5px; display: flex; 
+            align-items: center; justify-content: center; flex: 1 1 0px !important; min-width: 0 !important;
         }
         .cronometro-botoes button:hover { background-color: var(--cyan); color: #000; }
         
-        /* Botões do Menu (Estilo Dinâmico) */
+        /* Botões do Menu */
         .menu-wrapper { display: flex; flex-direction: column; gap: 10px; padding: 0 15px 20px 15px; flex: 1; }
         .menu-btn { background: #16161e; border: 1px solid #292e42; color: #a9b1d6; padding: 12px 15px; border-radius: 10px; text-align: left; font-size: 14px; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; gap: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
         .menu-btn:hover { background-color: #24283b; color: #ffffff; transform: translateY(-2px); box-shadow: 0 6px 10px rgba(0,0,0,0.3); border-color: #414868; }
@@ -190,15 +180,10 @@
         .log-item { display: flex; align-items: center; padding: 10px 15px; border-bottom: 1px solid #292e42; }
         .log-item:last-child { border-bottom: none; }
         
-        /* === RESPONSIVIDADE ESTRITA MOBILE (GRID FIXO PARA PLACAR) === */
+        /* === RESPONSIVIDADE ESTRITA MOBILE === */
         @media (max-width: 768px) {
-            /* Mantém o corpo da página fixo como um App nativo */
             body { flex-direction: column; height: 100vh; overflow: hidden; } 
-            
-            /* Sidebar fixa no topo */
             .sidebar { width: 100%; padding: 10px 0 0 0; border-right: none; flex-shrink: 0; box-shadow: 0 4px 6px rgba(0,0,0,0.3); z-index: 20; }
-            
-            /* Menu com rolagem HORIZONTAL (arraste os botões para os lados) */
             .menu-wrapper { flex-direction: row; overflow-x: auto; padding: 15px 10px; gap: 12px; border-bottom: 2px solid var(--accent); -webkit-overflow-scrolling: touch; }
             .menu-btn { flex-direction: column; align-items: center; justify-content: center; padding: 10px; min-width: 85px; border-radius: 12px; gap: 6px; text-align: center; border-left: 1px solid #292e42 !important; }
             .menu-btn:hover { transform: none; } 
@@ -206,18 +191,11 @@
             .menu-btn .menu-icon { font-size: 24px; margin: 0; }
             .menu-btn .menu-text { font-size: 11px; white-space: nowrap; font-weight: bold; }
             .btn-login { margin-top: 0; }
-            
-            /* Esconde a barra de rolagem horizontal para ficar elegante */
             .menu-wrapper::-webkit-scrollbar { display: none; }
-
-            /* ÁREA PRINCIPAL COM SCROLL VERTICAL ATIVADO E FLUIDO */
             .main-content { padding: 15px; overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch; padding-bottom: 40px; }
             .modulo { padding: 20px; }
-            
-            /* Oculta Cronômetro Lateral para ganhar espaço */
             #sidebarCronometro { display: none !important; }
 
-            /* NOVO GRID ESTRITO DO PLACAR MOBILE - REORGANIZADO */
             .placar-container { display: grid !important; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px 10px; align-items: center; }
             .time-placar:nth-child(1) { grid-column: 1; grid-row: 1; display: flex; flex-direction: column; align-items: center; }
             .time-placar:nth-last-child(1) { grid-column: 2; grid-row: 1; display: flex; flex-direction: column; align-items: center; margin-top: 0; }
@@ -225,11 +203,9 @@
             .timer-central { grid-column: 1 / span 2; grid-row: 2; display: flex; flex-direction: column; align-items: center; margin-top: 15px; max-width: none; }
             .time-placar .escudo { width: 70px; height: 70px; margin-bottom: 5px; }
             .time-placar .score { font-size: 60px; line-height: 1; margin-top: 5px; }
-            
             .timer-central .displayCronometro { font-size: 55px; line-height: 1; margin-top: 5px; margin-bottom: 5px; }
             .timer-central .timer-label { font-size: 14px; margin-top: 0; }
             .timer-central .score-x { font-size: 35px; margin-top: 0; }
-            
             .timer-central .cronometro-botoes { max-width: 300px; margin-top: 15px !important; }
             .flex-row { flex-direction: column; gap: 0; }
             .grid-sorteio, .painel-juiz-acoes { flex-direction: column; gap: 15px; }
@@ -417,7 +393,10 @@
                 <div id="listaDisponiveisManual" style="display:flex; flex-wrap:wrap; gap:10px;"></div>
             </div>
 
-            <button class="btn-acao btn-wpp req-master" style="margin-top: 20px;" onclick="compartilharSorteio()">📋 Enviar Equipas Separadas</button>
+            <div class="flex-row req-master-flex" style="gap:10px; margin-top: 20px; flex-wrap: wrap;">
+                <button class="btn-acao btn-wpp req-master" style="margin-top: 0; flex: 1;" onclick="compartilharSorteio()">📋 Enviar P/ WhatsApp</button>
+                <button class="btn-acao req-master" style="margin-top: 0; flex: 1; background-color: var(--green-timer); color:#000;" onclick="salvarEscalacaoHistorico()">💾 Salvar no Histórico</button>
+            </div>
 
             <div class="grid-sorteio">
                 <div style="flex: 1; background: #16161e; padding: 15px; border-radius: 8px; border-left: 4px solid #ffffff;">
@@ -449,6 +428,19 @@
                 <div class="time-placar"><img src="https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg" class="escudo"><div class="score" id="placarReal">0</div></div>
                 <div class="timer-central"><div class="score-x">X</div></div>
                 <div class="time-placar"><img src="https://upload.wikimedia.org/wikipedia/commons/d/d0/Logo_of_AC_Milan.svg" class="escudo"><div class="score" id="placarMilan">0</div></div>
+            </div>
+
+            <!-- NOVA SESSÃO: ESCALAÇÃO HISTÓRICA -->
+            <h4 style="margin-top: 20px; color: var(--text-main); margin-bottom: 10px; border-bottom: 1px solid #414868; padding-bottom: 5px;">👥 Jogadores em Campo (Nesta Data)</h4>
+            <div id="historicoEscalacaoContainer" style="display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 25px;">
+                <div style="flex: 1; min-width: 140px; background: #16161e; padding: 15px; border-radius: 8px; border-left: 4px solid #ffffff;">
+                    <h4 style="margin-top:0; color: #ffffff; font-size: 16px;">⚪ Real Madrid</h4>
+                    <ul id="historicoEscalacaoReal" style="padding-left: 20px; color: #a9b1d6; line-height: 1.6; margin-bottom: 0; font-size: 14px;"></ul>
+                </div>
+                <div style="flex: 1; min-width: 140px; background: #16161e; padding: 15px; border-radius: 8px; border-left: 4px solid #f7768e;">
+                    <h4 style="margin-top:0; color: #f7768e; font-size: 16px;">🔴 Milan</h4>
+                    <ul id="historicoEscalacaoMilan" style="padding-left: 20px; color: #a9b1d6; line-height: 1.6; margin-bottom: 0; font-size: 14px;"></ul>
+                </div>
             </div>
 
             <div id="painelEdicaoScout" style="display: none; background-color: #16161e; padding: 20px; border-radius: 8px; margin-top: 15px; border: 2px dashed var(--admin-color);">
@@ -488,6 +480,24 @@
         </div>
 
         <div id="dashboard" class="modulo">
+            <!-- NOVO FILTRO DE DATA NO DASHBOARD -->
+            <div style="background: #16161e; padding: 15px; border-radius: 8px; border: 1px solid #414868; margin-bottom: 20px;">
+                <label style="color: var(--cyan); font-weight: bold; margin-bottom: 10px;">📅 Filtro de Período (Opcional)</label>
+                <div class="flex-row" style="align-items: flex-end;">
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label>Data Início:</label>
+                        <input type="date" id="dashDataInicio" onchange="atualizarDashboard()">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label>Data Fim:</label>
+                        <input type="date" id="dashDataFim" onchange="atualizarDashboard()">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0; flex: 0.5;">
+                        <button class="btn-acao btn-sm" style="margin:0; width:100%; height:40px; background:#414868; color:#fff;" onclick="limparFiltroDashboard()">Limpar</button>
+                    </div>
+                </div>
+            </div>
+
             <div class="flex-row" style="align-items: center; justify-content: space-between; margin-bottom: 20px;">
                 <h3 style="margin: 0; border: none; color: var(--cyan);">📈 Estatísticas do Elenco</h3>
                 <div>
@@ -554,13 +564,13 @@
             try { return btoa(input.split('').reverse().join('')) === hashEsperado; } catch(e) { return false; }
         }
 
-        let isMaster = false, isJuiz = false;
+        let isMaster = false, isJuiz = false, isAmigos = false;
 
         async function fazerLogin() {
-            if (isMaster || isJuiz) {
-                isMaster = false; isJuiz = false;
+            if (isMaster || isJuiz || isAmigos) {
+                isMaster = false; isJuiz = false; isAmigos = false;
                 document.getElementById('btnLogin').innerHTML = `<span class="menu-icon">🔑</span><span class="menu-text">Login</span>`;
-                document.body.classList.remove('is-master', 'is-juiz');
+                document.body.classList.remove('is-master', 'is-juiz', 'is-amigos');
                 alert("Logout realizado com sucesso. Modo Leitura ativado.");
                 atualizarListaSorteio(); refreshTelas();
             } else {
@@ -568,9 +578,7 @@
                 if (!s) return;
                 
                 try {
-                    // Busca as senhas criptografadas no Firebase
                     const doc = await db.collection("sistema").doc("senhas").get();
-                    
                     if (doc.exists) {
                         const senhasDB = doc.data();
                         
@@ -578,37 +586,35 @@
                         if (verificarSenha(s, senhasDB.master)) {
                             isMaster = true; isJuiz = true; isAmigos = true; 
                             document.getElementById('btnLogin').innerHTML = `<span class="menu-icon">🔓</span><span class="menu-text">Sair (Master)</span>`;
-                            document.body.classList.add('is-master', 'is-juiz');
+                            document.body.classList.add('is-master', 'is-juiz', 'is-amigos');
                             alert("Acesso MASTER Liberado!"); atualizarListaSorteio(); refreshTelas();
                         } 
                         // Verifica Juiz
                         else if (verificarSenha(s, senhasDB.juiz)) {
-                            isJuiz = true;
+                            isJuiz = true; isAmigos = true;
                             document.getElementById('btnLogin').innerHTML = `<span class="menu-icon">🔓</span><span class="menu-text">Sair (Juiz)</span>`;
-                            document.body.classList.add('is-juiz');
+                            document.body.classList.add('is-juiz', 'is-amigos');
                             alert("Acesso JUIZ Liberado!"); atualizarListaSorteio(); refreshTelas();
-
-                        // Verifica Amigos
-                        if (verificarSenha(s, senhasDB.amigos)) {
+                        }
+                        // Verifica Amigos (CORRIGIDO)
+                        else if (verificarSenha(s, senhasDB.amigos)) {
                             isAmigos = true;
                             document.getElementById('btnLogin').innerHTML = `<span class="menu-icon">🔓</span><span class="menu-text">Sair (Amigos)</span>`;
                             document.body.classList.add('is-amigos');
-                            alert("Acesso AMIGOS Liberado!"); atualizarListaSorteio(); refreshTelas();
-                        }                             
+                            alert("Acesso AMIGOS Liberado! Modo Visualização Autenticada ativado."); atualizarListaSorteio(); refreshTelas();
                         } else { 
                             alert("Senha Incorreta!"); 
                         }
                     } else {
-                        alert("Erro: Configuração de senhas não encontrada no banco de dados.");
+                        alert("Erro: Configuração de senhas não encontrada no banco.");
                     }
                 } catch (error) {
-                    console.error("Erro ao verificar senha:", error);
                     alert("Erro ao conectar com o banco de dados.");
                 }
             }
         }
 
-        let atletasFC = [], scoutsFC = [], premiacoesFC = [];
+        let atletasFC = [], scoutsFC = [], premiacoesFC = [], escalacoesFC = [];
         let atletaEditandoId = null, scoutEditandoId = null, premioEditandoId = null; 
         let filtroDataGlobal = "", chartInstancia = null, sorteioEquipasAtuais = { real: [], milan: [] };
         let modoManualAtivo = false, juizTimeAtual = "", juizAcaoAtual = "";
@@ -639,6 +645,9 @@
         });
         db.collection("scouts").onSnapshot(snap => { scoutsFC = snap.docs.map(doc => ({id: doc.id, ...doc.data()})).sort((a,b) => a.timestamp - b.timestamp); refreshTelas(); });
         db.collection("premiacoes").onSnapshot(snap => { premiacoesFC = snap.docs.map(doc => ({id: doc.id, ...doc.data()})).sort((a,b) => b.timestamp - a.timestamp); refreshTelas(); });
+        
+        // NOVO: Coleta de histórico de escalações
+        db.collection("escalacoes").onSnapshot(snap => { escalacoesFC = snap.docs.map(doc => ({id: doc.id, ...doc.data()})); refreshTelas(); });
 
         let cInt = null; let cSeg = 0;
         function updateC() { 
@@ -656,16 +665,32 @@
             return `${dia}/${mes} às ${h}:${m}`;
         }
 
-        // --- DASHBOARD JS (ATUALIZADO E CONECTADO) ---
+        // --- DASHBOARD FILTROS ---
+        function limparFiltroDashboard() {
+            document.getElementById('dashDataInicio').value = '';
+            document.getElementById('dashDataFim').value = '';
+            atualizarDashboard();
+        }
+
+        function getScoutsFiltrados() {
+            let dataInicio = document.getElementById('dashDataInicio') ? document.getElementById('dashDataInicio').value : '';
+            let dataFim = document.getElementById('dashDataFim') ? document.getElementById('dashDataFim').value : '';
+            
+            let filtrados = scoutsFC;
+            if(dataInicio) filtrados = filtrados.filter(s => s.data >= dataInicio);
+            if(dataFim) filtrados = filtrados.filter(s => s.data <= dataFim);
+            
+            return filtrados;
+        }
+
         function atualizarDashboard() {
             if(!document.getElementById('tabelaArtilharia')) return;
             let stats = {};
+            let scoutsFiltradosParaDash = getScoutsFiltrados();
             
-            // Inicializa todos os atletas registrados com 0
             atletasFC.forEach(a => { stats[a.nome] = { gols: 0, assists: 0, amarelos: 0, vermelhos: 0 }; });
 
-            // Soma os dados dos scouts (Histórico)
-            scoutsFC.forEach(s => {
+            scoutsFiltradosParaDash.forEach(s => {
                 if(!stats[s.jogador]) stats[s.jogador] = { gols: 0, assists: 0, amarelos: 0, vermelhos: 0 };
                 if (s.acao === 'Gol') stats[s.jogador].gols++;
                 if (s.acao === 'Assistência') stats[s.jogador].assists++;
@@ -673,15 +698,13 @@
                 if (s.acao === 'Vermelho') stats[s.jogador].vermelhos++;
             });
 
-            // Transforma em array e ordena (Gols > Assists)
             let arrStats = Object.keys(stats).map(nome => ({
                 nome: nome, ...stats[nome], total: stats[nome].gols + stats[nome].assists
             })).filter(s => s.total > 0 || s.amarelos > 0 || s.vermelhos > 0).sort((a, b) => b.gols - a.gols || b.assists - a.assists);
 
-            // Renderiza na tela
-            document.getElementById('tabelaArtilharia').innerHTML = arrStats.length === 0 ? '<tr><td colspan="5" style="text-align:center; color:#7aa2f7;">Nenhuma estatística registrada no banco.</td></tr>' : arrStats.map(s => `<tr><td>${s.nome}</td><td>${s.gols}</td><td>${s.assists}</td><td>${s.amarelos}</td><td>${s.vermelhos}</td></tr>`).join('');
+            document.getElementById('tabelaArtilharia').innerHTML = arrStats.length === 0 ? '<tr><td colspan="5" style="text-align:center; color:#7aa2f7;">Nenhuma estatística no período selecionado.</td></tr>' : arrStats.map(s => `<tr><td>${s.nome}</td><td>${s.gols}</td><td>${s.assists}</td><td>${s.amarelos}</td><td>${s.vermelhos}</td></tr>`).join('');
             
-            atualizarGrafico(); // Atualiza o gráfico se estiver aberto
+            atualizarGrafico(); 
         }
 
         function toggleGrafico() {
@@ -695,6 +718,8 @@
             const ctx = document.getElementById('meuGrafico').getContext('2d');
             const metrica = document.getElementById('graficoMetrica').value;
             const tipo = document.getElementById('graficoTipo').value;
+            
+            let scoutsFiltradosParaDash = getScoutsFiltrados();
 
             if(chartInstancia) chartInstancia.destroy();
 
@@ -704,7 +729,7 @@
                 labels = ['Real Madrid', 'Milan'];
                 let valReal = 0, valMilan = 0;
                 let acaoFiltro = metrica === 'gols' ? 'Gol' : metrica === 'assists' ? 'Assistência' : metrica === 'amarelos' ? 'Amarelo' : 'Vermelho';
-                scoutsFC.forEach(s => {
+                scoutsFiltradosParaDash.forEach(s => {
                     if(s.acao === acaoFiltro) {
                         if(s.time === 'Real Madrid') valReal++;
                         if(s.time === 'Milan') valMilan++;
@@ -715,7 +740,7 @@
             } else {
                 let stats = {};
                 let acaoFiltro = metrica === 'gols' ? 'Gol' : metrica === 'assists' ? 'Assistência' : metrica === 'amarelos' ? 'Amarelo' : 'Vermelho';
-                scoutsFC.forEach(s => {
+                scoutsFiltradosParaDash.forEach(s => {
                     if(s.acao === acaoFiltro) { stats[s.jogador] = (stats[s.jogador] || 0) + 1; }
                 });
                 let arr = Object.keys(stats).map(k => ({nome: k, val: stats[k]})).sort((a,b)=>b.val - a.val).slice(0,5); 
@@ -732,12 +757,20 @@
         }
 
         function compartilharEstatisticas() {
-            let txt = `📈 *ESTATÍSTICAS - AMIGOS FC* 📈\n\n_Artilharia Geral_\n`;
+            let inicio = document.getElementById('dashDataInicio') ? document.getElementById('dashDataInicio').value : '';
+            let fim = document.getElementById('dashDataFim') ? document.getElementById('dashDataFim').value : '';
+            let scoutsFiltradosParaDash = getScoutsFiltrados();
+
+            let txt = `📈 *ESTATÍSTICAS - AMIGOS FC* 📈\n`;
+            if(inicio || fim) {
+                txt += `Período: ${inicio ? inicio.split('-').reverse().join('/') : 'Sempre'} até ${fim ? fim.split('-').reverse().join('/') : 'Hoje'}\n`;
+            }
+            txt += `\n_Artilharia_\n`;
             let stats = {};
-            scoutsFC.forEach(s => { if(s.acao === 'Gol') stats[s.jogador] = (stats[s.jogador] || 0) + 1; });
+            scoutsFiltradosParaDash.forEach(s => { if(s.acao === 'Gol') stats[s.jogador] = (stats[s.jogador] || 0) + 1; });
             let topGols = Object.keys(stats).map(k => ({nome:k, gols:stats[k]})).sort((a,b)=>b.gols-a.gols).slice(0,10);
             
-            if(topGols.length === 0) { txt += "Nenhum gol registrado."; }
+            if(topGols.length === 0) { txt += "Nenhum gol registrado no período."; }
             else { topGols.forEach((t, i) => txt += `${i+1}º - ${t.nome} (${t.gols} gols)\n`); }
             window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(txt)}`, '_blank');
         }
@@ -839,6 +872,33 @@
             renderListasSorteio(); if(modoManualAtivo) atualizarPainelManual(); alert("Sorteados!");
         }
 
+        // NOVO: COMPARTILHAR SORTEIO WHATSAPP
+        function compartilharSorteio() {
+            if(sorteioEquipasAtuais.real.length === 0 && sorteioEquipasAtuais.milan.length === 0) return alert("Realize o sorteio primeiro!");
+            let d = configSistema.dataProximaPartida ? configSistema.dataProximaPartida.split('-').reverse().join('/') : "Data não definida";
+            let txt = `⚽ *ESCALAÇÃO DEFINIDA - AMIGOS FC* ⚽\n📅 Data: ${d}\n\n`;
+            txt += `⚪ *REAL MADRID*\n`;
+            sorteioEquipasAtuais.real.forEach(j => txt += `- ${j}\n`);
+            txt += `\n🔴 *MILAN*\n`;
+            sorteioEquipasAtuais.milan.forEach(j => txt += `- ${j}\n`);
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(txt)}`, '_blank');
+        }
+
+        // NOVO: SALVAR ESCALACAO NO HISTÓRICO
+        function salvarEscalacaoHistorico() {
+            if(!isMaster) return alert("Apenas Master.");
+            let dataAgendamento = document.getElementById('dataAgendamento').value;
+            if(!dataAgendamento) return alert("Defina a data do agendamento primeiro.");
+            if(sorteioEquipasAtuais.real.length === 0 && sorteioEquipasAtuais.milan.length === 0) return alert("Faça o sorteio primeiro!");
+            
+            db.collection("escalacoes").doc(dataAgendamento).set({
+                data: dataAgendamento,
+                real: sorteioEquipasAtuais.real,
+                milan: sorteioEquipasAtuais.milan,
+                timestamp: Date.now()
+            }).then(() => alert("Escalação salva no histórico com sucesso!"));
+        }
+
         function toggleModoManual() { if(!isMaster) return alert("Faça login Master para escalar."); modoManualAtivo = !modoManualAtivo; document.getElementById('painelManual').style.display = modoManualAtivo ? 'block' : 'none'; atualizarPainelManual(); renderListasSorteio(); }
         function atualizarPainelManual() {
             if(!modoManualAtivo) return;
@@ -884,6 +944,19 @@
             }
 
             const data = filtroDataGlobal || (document.getElementById('dataJogo') ? document.getElementById('dataJogo').value : "");
+            
+            // CARREGAR ESCALAÇÃO HISTÓRICA DO BANCO
+            const escalacaoDoDia = escalacoesFC.find(e => e.data === data);
+            if(document.getElementById('historicoEscalacaoReal') && document.getElementById('historicoEscalacaoMilan')) {
+                if(escalacaoDoDia) {
+                    document.getElementById('historicoEscalacaoReal').innerHTML = escalacaoDoDia.real.map(j => `<li>${j}</li>`).join('');
+                    document.getElementById('historicoEscalacaoMilan').innerHTML = escalacaoDoDia.milan.map(j => `<li>${j}</li>`).join('');
+                } else {
+                    document.getElementById('historicoEscalacaoReal').innerHTML = `<li><small>Nenhuma escalação salva neste dia.</small></li>`;
+                    document.getElementById('historicoEscalacaoMilan').innerHTML = `<li><small>Nenhuma escalação salva neste dia.</small></li>`;
+                }
+            }
+
             const scoutsDia = scoutsFC.filter(s => s.data === data);
             
             const golsR = scoutsDia.filter(s => s.time === 'Real Madrid' && s.acao === 'Gol').length;
@@ -903,7 +976,7 @@
             if(document.getElementById('logPartida')) document.getElementById('logPartida').innerHTML = logsHTML;
             if(document.getElementById('logPartidaJuiz')) document.getElementById('logPartidaJuiz').innerHTML = logsHTML;
 
-            atualizarDashboard(); // CHAMA A FUNÇÃO PARA PREENCHER A TABELA DO DASHBOARD
+            atualizarDashboard(); 
         }
 
         function salvarAtleta() {
