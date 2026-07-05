@@ -22,18 +22,10 @@
         
         /* Menu Lateral - Com rolagem vertical para modo paisagem */
         .sidebar { 
-            width: 280px; 
-            background-color: var(--panel-bg); 
-            padding: 20px 0; 
-            box-shadow: 2px 0 5px rgba(0,0,0,0.3); 
-            display: flex; 
-            flex-direction: column; 
-            flex-shrink: 0; 
-            z-index: 10; 
-            border-right: 1px solid #16161e;
-            max-height: 100vh;
-            overflow-y: auto;
-            overflow-x: hidden;
+            width: 280px; background-color: var(--panel-bg); padding: 20px 0; 
+            box-shadow: 2px 0 5px rgba(0,0,0,0.3); display: flex; flex-direction: column; 
+            flex-shrink: 0; z-index: 10; border-right: 1px solid #16161e;
+            max-height: 100vh; overflow-y: auto; overflow-x: hidden;
         }
         
         /* Customização da barra de rolagem do menu lateral */
@@ -49,13 +41,8 @@
         .displayCronometro { font-size: 36px; font-weight: bold; color: var(--green-timer); font-family: monospace; margin-bottom: 10px; letter-spacing: 2px; }
         
         .cronometro-botoes { 
-            display: flex !important; 
-            flex-direction: row !important; 
-            justify-content: center !important; 
-            align-items: center !important;
-            gap: 10px !important; 
-            flex-wrap: nowrap !important; 
-            width: 100% !important;
+            display: flex !important; flex-direction: row !important; justify-content: center !important; 
+            align-items: center !important; gap: 10px !important; flex-wrap: nowrap !important; width: 100% !important;
         }
         .cronometro-botoes button { 
             background-color: #414868; border: none; color: white; font-size: 16px; 
@@ -93,15 +80,12 @@
         /* === CONTROLE DE ACESSO (PERMISSÕES) === */
         .req-master, .req-master-flex, .req-master-cell, .req-master-grid { display: none !important; }
         .req-juiz, .req-juiz-flex, .req-juiz-cell, .req-juiz-grid { display: none !important; }
-
         body.is-master .req-master { display: block !important; }
         body.is-master .req-master-flex { display: flex !important; }
         body.is-master .req-master-cell { display: table-cell !important; }
         body.is-master .req-master-grid { display: grid !important; }
-        
         body.is-master .req-juiz, body.is-master .req-juiz-flex, body.is-master .req-juiz-grid { display: flex !important; }
         body.is-juiz .req-juiz, body.is-juiz .req-juiz-flex, body.is-juiz .req-juiz-grid { display: flex !important; }
-
         .aviso-bloqueio { background: rgba(255, 158, 100, 0.1); color: var(--admin-color); padding: 15px; border-radius: 8px; border: 1px dashed var(--admin-color); text-align: center; margin-bottom: 20px; font-weight: bold; }
         body.is-juiz .aviso-bloqueio-juiz, body.is-master .aviso-bloqueio-juiz, body.is-master .aviso-bloqueio-master { display: none !important; }
         
@@ -114,7 +98,6 @@
         .time-placar { text-align: center; }
         .escudo { width: 90px; height: 90px; object-fit: contain; margin-bottom: 10px; }
         .score { font-size: 60px; font-weight: bold; color: #ffffff; }
-        
         .timer-central { text-align: center; width: 100%; max-width: 300px; display: flex; flex-direction: column; align-items: center; }
         .timer-central .displayCronometro { font-size: 70px; margin-bottom: 0; line-height: 1; color: var(--green-timer);}
         .timer-central .timer-label { color: #565f89; display: block; margin-top: 5px; }
@@ -125,10 +108,7 @@
         .status-aberto { background: rgba(0, 214, 95, 0.1); color: var(--green-timer); border: 1px solid var(--green-timer); }
         .status-fechado { background: rgba(247, 118, 142, 0.1); color: var(--red-deny); border: 1px solid var(--red-deny); }
 
-        /* Grades do Sorteio */
-        .grid-sorteio { display: flex; gap: 20px; margin-top: 25px; }
-        
-        /* Lista de Presença */
+        /* Lista de Presença & Badges (Novos) */
         .header-lista { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #414868; margin-top: 25px; margin-bottom: 10px; }
         .header-lista h4 { margin: 0; color: #a9b1d6; font-size: 18px; font-weight: normal;}
         .header-lista span { color: #a9b1d6; font-size: 18px; }
@@ -151,24 +131,25 @@
         .btn-fora:hover, .btn-fora.active { background: var(--red-deny); color: #fff; }
         .btn-desfazer { background: #414868; color: #fff; padding: 5px 10px; border-radius: 5px; font-size: 12px; cursor: pointer; border: none; }
 
-        /* Cores de Ação Súmula */
+        /* Selos Titular/Reserva */
+        .badge { padding: 3px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; margin-right: 5px; text-transform: uppercase; }
+        .badge-titular { background-color: rgba(255, 158, 100, 0.15); color: var(--admin-color); border: 1px solid var(--admin-color); }
+        .badge-reserva { background-color: rgba(122, 162, 247, 0.15); color: var(--text-muted); border: 1px solid var(--text-muted); }
+
         .btn-gol { background-color: var(--green-timer); color: #000; }
         .btn-assist { background-color: var(--cyan); color: #000; }
         .btn-amarelo { background-color: #e0af68; color: #000; }
         .btn-vermelho { background-color: var(--red-deny); color: #fff; }
         
-        /* Modal do Juiz */
         .modal-juiz { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 999; justify-content: center; align-items: center; }
         .modal-juiz-content { background: var(--panel-bg); padding: 25px; border-radius: 10px; width: 90%; max-width: 400px; text-align: center; }
         .btn-jogador-juiz { display: block; width: 100%; padding: 15px; margin-bottom: 10px; background: #16161e; border: 1px solid #414868; color: white; font-size: 18px; border-radius: 8px; cursor: pointer; }
         .btn-jogador-juiz:hover { background: var(--accent); color: #000;}
 
-        /* Painel do Juiz Específico */
         .painel-juiz-acoes { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 30px; }
         .time-card-juiz { background: #16161e; padding: 20px; border-radius: 10px; text-align: center; border: 1px solid #414868; }
         .btn-juiz-acao { width: 100%; padding: 15px; margin-bottom: 10px; font-size: 18px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; }
 
-        /* Tabelas e Logs */
         .table-responsive { overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px; white-space: nowrap; }
         th, td { padding: 12px; text-align: left; border-bottom: 1px solid #292e42; }
@@ -199,7 +180,6 @@
             .placar-container { display: grid !important; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px 10px; align-items: center; }
             .time-placar:nth-child(1) { grid-column: 1; grid-row: 1; display: flex; flex-direction: column; align-items: center; }
             .time-placar:nth-last-child(1) { grid-column: 2; grid-row: 1; display: flex; flex-direction: column; align-items: center; margin-top: 0; }
-            
             .timer-central { grid-column: 1 / span 2; grid-row: 2; display: flex; flex-direction: column; align-items: center; margin-top: 15px; max-width: none; }
             .time-placar .escudo { width: 70px; height: 70px; margin-bottom: 5px; }
             .time-placar .score { font-size: 60px; line-height: 1; margin-top: 5px; }
@@ -208,7 +188,8 @@
             .timer-central .score-x { font-size: 35px; margin-top: 0; }
             .timer-central .cronometro-botoes { max-width: 300px; margin-top: 15px !important; }
             .flex-row { flex-direction: column; gap: 0; }
-            .grid-sorteio, .painel-juiz-acoes { flex-direction: column; gap: 15px; }
+            .painel-juiz-acoes { flex-direction: column; gap: 15px; }
+            .grid-sorteio { flex-direction: column; gap: 15px; }
         }
     </style>
 </head>
@@ -373,9 +354,9 @@
             <button class="btn-acao btn-wpp" style="margin-top: 0; margin-bottom: 20px;" onclick="compartilharListaPresenca()">📲 Enviar Lista (WhatsApp)</button>
 
             <div style="background: var(--bg-color); border-radius: 8px;">
-                <div class="header-lista"><h4>Dentro - Goleiros</h4><span id="countDentroGoleiros">0</span></div>
+                <div class="header-lista"><h4>Dentro - Goleiros (Ordem de chegada)</h4><span id="countDentroGoleiros">0</span></div>
                 <div id="listaDentroGoleiros"></div>
-                <div class="header-lista" style="margin-top: 30px;"><h4>Dentro - Jogadores</h4><span id="countDentroLinha">0</span></div>
+                <div class="header-lista" style="margin-top: 30px;"><h4>Dentro - Jogadores (Ordem de chegada)</h4><span id="countDentroLinha">0</span></div>
                 <div id="listaDentroLinha"></div>
                 <div class="header-lista" style="margin-top: 40px;"><h4>Dúvida</h4><span id="countDuvida">0</span></div>
                 <div id="listaDuvida"></div>
@@ -384,7 +365,7 @@
             </div>
 
             <div class="flex-row req-master-flex" style="gap:15px; flex-wrap: wrap; margin-top: 40px;">
-                <button class="btn-acao" style="background: var(--cyan); margin-top: 0; flex: 1;" onclick="executarSorteio()">🔄 Sorteio (Apenas os "Dentro")</button>
+                <button class="btn-acao" style="background: var(--cyan); margin-top: 0; flex: 1;" onclick="executarSorteio()">🔄 Sorteio de Equipes</button>
                 <button class="btn-acao" style="background: var(--accent); margin-top: 0; flex: 1;" onclick="toggleModoManual()">⚙️ Escalar Manualmente</button>
             </div>
 
@@ -398,7 +379,7 @@
                 <button class="btn-acao req-master" style="margin-top: 0; flex: 1; background-color: var(--green-timer); color:#000;" onclick="salvarEscalacaoHistorico()">💾 Salvar no Histórico</button>
             </div>
 
-            <div class="grid-sorteio">
+            <div class="grid-sorteio" style="margin-top: 15px;">
                 <div style="flex: 1; background: #16161e; padding: 15px; border-radius: 8px; border-left: 4px solid #ffffff;">
                     <h4 style="margin-top:0; color: #ffffff;">⚪ Real Madrid</h4>
                     <ul id="sorteioReal" style="padding-left: 20px; color: #ffffff; line-height: 1.8;"></ul>
@@ -430,7 +411,6 @@
                 <div class="time-placar"><img src="https://upload.wikimedia.org/wikipedia/commons/d/d0/Logo_of_AC_Milan.svg" class="escudo"><div class="score" id="placarMilan">0</div></div>
             </div>
 
-            <!-- NOVA SESSÃO: ESCALAÇÃO HISTÓRICA -->
             <h4 style="margin-top: 20px; color: var(--text-main); margin-bottom: 10px; border-bottom: 1px solid #414868; padding-bottom: 5px;">👥 Jogadores em Campo (Nesta Data)</h4>
             <div id="historicoEscalacaoContainer" style="display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 25px;">
                 <div style="flex: 1; min-width: 140px; background: #16161e; padding: 15px; border-radius: 8px; border-left: 4px solid #ffffff;">
@@ -480,7 +460,6 @@
         </div>
 
         <div id="dashboard" class="modulo">
-            <!-- NOVO FILTRO DE DATA NO DASHBOARD -->
             <div style="background: #16161e; padding: 15px; border-radius: 8px; border: 1px solid #414868; margin-bottom: 20px;">
                 <label style="color: var(--cyan); font-weight: bold; margin-bottom: 10px;">📅 Filtro de Período (Opcional)</label>
                 <div class="flex-row" style="align-items: flex-end;">
@@ -559,7 +538,6 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // OFUSCAÇÃO DAS SENHAS
         function verificarSenha(input, hashEsperado) {
             try { return btoa(input.split('').reverse().join('')) === hashEsperado; } catch(e) { return false; }
         }
@@ -581,22 +559,18 @@
                     const doc = await db.collection("sistema").doc("senhas").get();
                     if (doc.exists) {
                         const senhasDB = doc.data();
-                        
-                        // Verifica Master
                         if (verificarSenha(s, senhasDB.master)) {
                             isMaster = true; isJuiz = true; isAmigos = true; 
                             document.getElementById('btnLogin').innerHTML = `<span class="menu-icon">🔓</span><span class="menu-text">Sair (Master)</span>`;
                             document.body.classList.add('is-master', 'is-juiz', 'is-amigos');
                             alert("Acesso MASTER Liberado!"); atualizarListaSorteio(); refreshTelas();
                         } 
-                        // Verifica Juiz
                         else if (verificarSenha(s, senhasDB.juiz)) {
                             isJuiz = true; isAmigos = true;
                             document.getElementById('btnLogin').innerHTML = `<span class="menu-icon">🔓</span><span class="menu-text">Sair (Juiz)</span>`;
                             document.body.classList.add('is-juiz', 'is-amigos');
                             alert("Acesso JUIZ Liberado!"); atualizarListaSorteio(); refreshTelas();
                         }
-                        // Verifica Amigos (CORRIGIDO)
                         else if (verificarSenha(s, senhasDB.amigos)) {
                             isAmigos = true;
                             document.getElementById('btnLogin').innerHTML = `<span class="menu-icon">🔓</span><span class="menu-text">Sair (Amigos)</span>`;
@@ -645,8 +619,6 @@
         });
         db.collection("scouts").onSnapshot(snap => { scoutsFC = snap.docs.map(doc => ({id: doc.id, ...doc.data()})).sort((a,b) => a.timestamp - b.timestamp); refreshTelas(); });
         db.collection("premiacoes").onSnapshot(snap => { premiacoesFC = snap.docs.map(doc => ({id: doc.id, ...doc.data()})).sort((a,b) => b.timestamp - a.timestamp); refreshTelas(); });
-        
-        // NOVO: Coleta de histórico de escalações
         db.collection("escalacoes").onSnapshot(snap => { escalacoesFC = snap.docs.map(doc => ({id: doc.id, ...doc.data()})); refreshTelas(); });
 
         let cInt = null; let cSeg = 0;
@@ -667,19 +639,15 @@
 
         // --- DASHBOARD FILTROS ---
         function limparFiltroDashboard() {
-            document.getElementById('dashDataInicio').value = '';
-            document.getElementById('dashDataFim').value = '';
-            atualizarDashboard();
+            document.getElementById('dashDataInicio').value = ''; document.getElementById('dashDataFim').value = ''; atualizarDashboard();
         }
 
         function getScoutsFiltrados() {
             let dataInicio = document.getElementById('dashDataInicio') ? document.getElementById('dashDataInicio').value : '';
             let dataFim = document.getElementById('dashDataFim') ? document.getElementById('dashDataFim').value : '';
-            
             let filtrados = scoutsFC;
             if(dataInicio) filtrados = filtrados.filter(s => s.data >= dataInicio);
             if(dataFim) filtrados = filtrados.filter(s => s.data <= dataFim);
-            
             return filtrados;
         }
 
@@ -687,9 +655,7 @@
             if(!document.getElementById('tabelaArtilharia')) return;
             let stats = {};
             let scoutsFiltradosParaDash = getScoutsFiltrados();
-            
             atletasFC.forEach(a => { stats[a.nome] = { gols: 0, assists: 0, amarelos: 0, vermelhos: 0 }; });
-
             scoutsFiltradosParaDash.forEach(s => {
                 if(!stats[s.jogador]) stats[s.jogador] = { gols: 0, assists: 0, amarelos: 0, vermelhos: 0 };
                 if (s.acao === 'Gol') stats[s.jogador].gols++;
@@ -697,13 +663,11 @@
                 if (s.acao === 'Amarelo') stats[s.jogador].amarelos++;
                 if (s.acao === 'Vermelho') stats[s.jogador].vermelhos++;
             });
-
             let arrStats = Object.keys(stats).map(nome => ({
                 nome: nome, ...stats[nome], total: stats[nome].gols + stats[nome].assists
             })).filter(s => s.total > 0 || s.amarelos > 0 || s.vermelhos > 0).sort((a, b) => b.gols - a.gols || b.assists - a.assists);
 
-            document.getElementById('tabelaArtilharia').innerHTML = arrStats.length === 0 ? '<tr><td colspan="5" style="text-align:center; color:#7aa2f7;">Nenhuma estatística no período selecionado.</td></tr>' : arrStats.map(s => `<tr><td>${s.nome}</td><td>${s.gols}</td><td>${s.assists}</td><td>${s.amarelos}</td><td>${s.vermelhos}</td></tr>`).join('');
-            
+            document.getElementById('tabelaArtilharia').innerHTML = arrStats.length === 0 ? '<tr><td colspan="5" style="text-align:center; color:#7aa2f7;">Nenhuma estatística no período.</td></tr>' : arrStats.map(s => `<tr><td>${s.nome}</td><td>${s.gols}</td><td>${s.assists}</td><td>${s.amarelos}</td><td>${s.vermelhos}</td></tr>`).join('');
             atualizarGrafico(); 
         }
 
@@ -718,11 +682,9 @@
             const ctx = document.getElementById('meuGrafico').getContext('2d');
             const metrica = document.getElementById('graficoMetrica').value;
             const tipo = document.getElementById('graficoTipo').value;
-            
             let scoutsFiltradosParaDash = getScoutsFiltrados();
 
             if(chartInstancia) chartInstancia.destroy();
-
             let labels = [], dados = [], cores = [];
 
             if (tipo === 'times') {
@@ -730,28 +692,19 @@
                 let valReal = 0, valMilan = 0;
                 let acaoFiltro = metrica === 'gols' ? 'Gol' : metrica === 'assists' ? 'Assistência' : metrica === 'amarelos' ? 'Amarelo' : 'Vermelho';
                 scoutsFiltradosParaDash.forEach(s => {
-                    if(s.acao === acaoFiltro) {
-                        if(s.time === 'Real Madrid') valReal++;
-                        if(s.time === 'Milan') valMilan++;
-                    }
+                    if(s.acao === acaoFiltro) { if(s.time === 'Real Madrid') valReal++; if(s.time === 'Milan') valMilan++; }
                 });
-                dados = [valReal, valMilan];
-                cores = ['#ffffff', '#f7768e'];
+                dados = [valReal, valMilan]; cores = ['#ffffff', '#f7768e'];
             } else {
                 let stats = {};
                 let acaoFiltro = metrica === 'gols' ? 'Gol' : metrica === 'assists' ? 'Assistência' : metrica === 'amarelos' ? 'Amarelo' : 'Vermelho';
-                scoutsFiltradosParaDash.forEach(s => {
-                    if(s.acao === acaoFiltro) { stats[s.jogador] = (stats[s.jogador] || 0) + 1; }
-                });
+                scoutsFiltradosParaDash.forEach(s => { if(s.acao === acaoFiltro) { stats[s.jogador] = (stats[s.jogador] || 0) + 1; } });
                 let arr = Object.keys(stats).map(k => ({nome: k, val: stats[k]})).sort((a,b)=>b.val - a.val).slice(0,5); 
-                labels = arr.map(i => i.nome);
-                dados = arr.map(i => i.val);
+                labels = arr.map(i => i.nome); dados = arr.map(i => i.val);
                 cores = ['#0db9d7', '#bb9af7', '#00d65f', '#e0af68', '#f7768e'];
             }
-
             chartInstancia = new Chart(ctx, {
-                type: 'bar',
-                data: { labels: labels, datasets: [{ label: metrica.toUpperCase(), data: dados, backgroundColor: cores }] },
+                type: 'bar', data: { labels: labels, datasets: [{ label: metrica.toUpperCase(), data: dados, backgroundColor: cores }] },
                 options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { color: '#c0caf5', stepSize: 1 } }, x: { ticks: { color: '#c0caf5' } } }, plugins: { legend: { display: false } } }
             });
         }
@@ -762,16 +715,12 @@
             let scoutsFiltradosParaDash = getScoutsFiltrados();
 
             let txt = `📈 *ESTATÍSTICAS - AMIGOS FC* 📈\n`;
-            if(inicio || fim) {
-                txt += `Período: ${inicio ? inicio.split('-').reverse().join('/') : 'Sempre'} até ${fim ? fim.split('-').reverse().join('/') : 'Hoje'}\n`;
-            }
+            if(inicio || fim) { txt += `Período: ${inicio ? inicio.split('-').reverse().join('/') : 'Sempre'} até ${fim ? fim.split('-').reverse().join('/') : 'Hoje'}\n`; }
             txt += `\n_Artilharia_\n`;
-            let stats = {};
-            scoutsFiltradosParaDash.forEach(s => { if(s.acao === 'Gol') stats[s.jogador] = (stats[s.jogador] || 0) + 1; });
+            let stats = {}; scoutsFiltradosParaDash.forEach(s => { if(s.acao === 'Gol') stats[s.jogador] = (stats[s.jogador] || 0) + 1; });
             let topGols = Object.keys(stats).map(k => ({nome:k, gols:stats[k]})).sort((a,b)=>b.gols-a.gols).slice(0,10);
             
-            if(topGols.length === 0) { txt += "Nenhum gol registrado no período."; }
-            else { topGols.forEach((t, i) => txt += `${i+1}º - ${t.nome} (${t.gols} gols)\n`); }
+            if(topGols.length === 0) { txt += "Nenhum gol registrado no período."; } else { topGols.forEach((t, i) => txt += `${i+1}º - ${t.nome} (${t.gols} gols)\n`); }
             window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(txt)}`, '_blank');
         }
 
@@ -782,7 +731,9 @@
             if(!dataEscolhida) return alert("Selecione uma data para agendar a partida!");
             
             if(confirm(`Deseja agendar o jogo para ${dataEscolhida.split('-').reverse().join('/')}? Isso enviará TODOS para "Dúvida".`)) {
-                atletasFC.forEach(a => db.collection("atletas").doc(a.id).update({ presente: false, statusPresenca: 'duvida', timestampConfirmacao: null }));
+                atletasFC.forEach(a => db.collection("atletas").doc(a.id).update({ 
+                    presente: false, statusPresenca: 'duvida', timestampConfirmacao: null, tsOrdenacao: null, titular: false
+                }));
                 localStorage.removeItem('meuJogadorId');
                 db.collection("sistema").doc("config").set({ dataProximaPartida: dataEscolhida, presencaLiberada: true });
                 mudarDataGlobal(dataEscolhida); alert("Partida Agendada! A lista está aberta e todos estão na Dúvida.");
@@ -796,7 +747,14 @@
             return new Date() >= dataLimite;
         }
 
-        function gerarCardAtleta(a, isBloqueado) {
+        // NOVA FUNCAO: ALTERAR TITULAR/RESERVA
+        function toggleTitular(id, isTitular) {
+            if(!isMaster && !isJuiz) return;
+            db.collection("atletas").doc(id).update({ titular: isTitular });
+        }
+
+        // ATUALIZADO: Geração do Card com Badges e Ordem
+        function gerarCardAtleta(a, isBloqueado, isDentro = false, index = 0) {
             let initial = a.nome.charAt(0).toUpperCase(); let isGol = a.posicao === 'Goleiro' || a.posicao === 'GOL';
             let avatarClass = isGol ? 'avatar-circle goleiro' : 'avatar-circle';
             let status = a.statusPresenca || (a.presente ? 'dentro' : 'duvida');
@@ -804,13 +762,40 @@
             let podeDesfazer = (isMaster || isJuiz || isMeuJogador) && !isBloqueado;
             let htmlAcoes = '', labelTempo = '';
 
-            if (status === 'dentro') { htmlAcoes = `<div class="status-dot"></div>`; if(podeDesfazer) htmlAcoes += `<button onclick="marcarPresenca('${a.id}', 'duvida')" class="btn-desfazer" title="Voltar para Dúvida">❌</button>`; labelTempo = a.timestampConfirmacao ? `Confirmou ${a.timestampConfirmacao}` : 'Confirmado'; } 
-            else if (status === 'fora') { htmlAcoes = `<span style="font-size:12px; color:var(--red-deny);">Negou</span>`; if(podeDesfazer) htmlAcoes += `<button onclick="marcarPresenca('${a.id}', 'duvida')" class="btn-desfazer" title="Voltar para Dúvida">❌</button>`; labelTempo = a.timestampConfirmacao ? `Negou ${a.timestampConfirmacao}` : 'Não vai'; } 
-            else { if (isBloqueado && !podeDesfazer) { htmlAcoes = `<span style="color:#7aa2f7; font-size:12px;">🔒 Fechado</span>`; } else { htmlAcoes = `<button class="btn-dentro" onclick="marcarPresenca('${a.id}', 'dentro')">Vou</button><button class="btn-fora" onclick="marcarPresenca('${a.id}', 'fora')">Não Vou</button>`; } }
+            let nomeDisplay = a.nome;
+            if (isDentro) { nomeDisplay = `<span style="color:var(--text-muted); font-size:12px; margin-right:5px;">${index+1}º</span> ` + a.nome; }
 
-            return `<div class="presenca-card"><div class="${avatarClass}">${initial}</div><div class="presenca-info"><div class="presenca-nome">${a.nome}</div><div class="presenca-pos">${a.posicao || 'Jogador'}</div>${labelTempo ? `<div class="presenca-tempo" style="color: ${status==='fora'? 'var(--red-deny)' : 'var(--cyan)'}">${labelTempo}</div>` : ''}</div><div class="presenca-acoes">${htmlAcoes}</div></div>`;
+            if (status === 'dentro') { 
+                let badgeClass = a.titular ? 'badge-titular' : 'badge-reserva';
+                let badgeText = a.titular ? '⭐ Titular' : '🔄 Reserva';
+                labelTempo = `<span class="badge ${badgeClass}">${badgeText}</span> ` + (a.timestampConfirmacao ? `Confirmou ${a.timestampConfirmacao}` : 'Confirmado');
+
+                if(podeDesfazer) { 
+                    if (isMaster || isJuiz) {
+                        htmlAcoes += `<button onclick="toggleTitular('${a.id}', ${!a.titular})" class="btn-desfazer" style="background:#24283b; border:1px solid var(--accent); color:var(--text-main); margin-right:5px;" title="Mudar Titular/Reserva">${a.titular ? '👇 Res' : '⭐ Tit'}</button>`;
+                    }
+                    htmlAcoes += `<button onclick="marcarPresenca('${a.id}', 'duvida')" class="btn-desfazer" title="Voltar para Dúvida">❌</button>`; 
+                } else {
+                    htmlAcoes = `<div class="status-dot"></div>`;
+                }
+            } 
+            else if (status === 'fora') { 
+                htmlAcoes = `<span style="font-size:12px; color:var(--red-deny);">Negou</span>`; 
+                if(podeDesfazer) htmlAcoes += `<button onclick="marcarPresenca('${a.id}', 'duvida')" class="btn-desfazer" title="Voltar para Dúvida">❌</button>`; 
+                labelTempo = a.timestampConfirmacao ? `Negou ${a.timestampConfirmacao}` : 'Não vai'; 
+            } 
+            else { 
+                if (isBloqueado && !podeDesfazer) { 
+                    htmlAcoes = `<span style="color:#7aa2f7; font-size:12px;">🔒 Fechado</span>`; 
+                } else { 
+                    htmlAcoes = `<button class="btn-dentro" onclick="marcarPresenca('${a.id}', 'dentro')">Vou</button><button class="btn-fora" onclick="marcarPresenca('${a.id}', 'fora')">Não Vou</button>`; 
+                } 
+            }
+
+            return `<div class="presenca-card"><div class="${avatarClass}">${initial}</div><div class="presenca-info"><div class="presenca-nome">${nomeDisplay}</div><div class="presenca-pos">${a.posicao || 'Jogador'}</div>${labelTempo ? `<div class="presenca-tempo" style="color: ${status==='fora'? 'var(--red-deny)' : 'var(--cyan)'}">${labelTempo}</div>` : ''}</div><div class="presenca-acoes">${htmlAcoes}</div></div>`;
         }
 
+        // ATUALIZADO: Ordenação da lista por chegada
         function atualizarListaSorteio() {
             if(!document.getElementById('listaDentroGoleiros')) return;
             let travadoPorHorario = isListaBloqueadaPorHorario(); let meuJogadorId = localStorage.getItem('meuJogadorId');
@@ -819,46 +804,98 @@
             else if (travadoPorHorario) { banner.className = "status-agendamento status-fechado"; banner.innerHTML = `🔒 Lista Fechada (${configSistema.dataProximaPartida.split('-').reverse().join('/')})`; }
             else { banner.className = "status-agendamento status-aberto"; banner.innerHTML = `🟢 Lista Aberta para ${configSistema.dataProximaPartida.split('-').reverse().join('/')}`; }
 
-            let htmlDG = '', htmlDL = '', htmlF = '', htmlD = ''; let cDG = 0, cDL = 0, cF = 0, cD = 0;
+            let dg = [], dl = [], f = [], d = [];
+            
             atletasFC.forEach(a => {
                 let status = a.statusPresenca || (a.presente ? 'dentro' : 'duvida');
-                let travado = (meuJogadorId !== null && a.id !== meuJogadorId && !isMaster && !isJuiz) || (travadoPorHorario && !isMaster && !isJuiz);
-                let card = gerarCardAtleta(a, travado);
-                if (status === 'dentro') { if (a.posicao === 'Goleiro' || a.posicao === 'GOL') { htmlDG += card; cDG++; } else { htmlDL += card; cDL++; } } 
-                else if (status === 'fora') { htmlF += card; cF++; } else { htmlD += card; cD++; }
+                if (status === 'dentro') {
+                    if (a.posicao === 'Goleiro' || a.posicao === 'GOL') dg.push(a); else dl.push(a);
+                } else if (status === 'fora') { f.push(a); } else { d.push(a); }
             });
+
+            // Ordenar quem está dentro pelo momento que confirmou
+            const sortChegada = (a, b) => {
+                let tsA = a.tsOrdenacao || 0; let tsB = b.tsOrdenacao || 0;
+                if (tsA === 0 && tsB !== 0) return 1; if (tsB === 0 && tsA !== 0) return -1;
+                return tsA - tsB; 
+            };
+
+            dg.sort(sortChegada);
+            dl.sort(sortChegada);
+
+            let htmlDG = dg.map((a, i) => gerarCardAtleta(a, (meuJogadorId !== null && a.id !== meuJogadorId && !isMaster && !isJuiz) || (travadoPorHorario && !isMaster && !isJuiz), true, i)).join('');
+            let htmlDL = dl.map((a, i) => gerarCardAtleta(a, (meuJogadorId !== null && a.id !== meuJogadorId && !isMaster && !isJuiz) || (travadoPorHorario && !isMaster && !isJuiz), true, i)).join('');
+            let htmlF = f.map(a => gerarCardAtleta(a, (meuJogadorId !== null && a.id !== meuJogadorId && !isMaster && !isJuiz) || (travadoPorHorario && !isMaster && !isJuiz))).join('');
+            let htmlD = d.map(a => gerarCardAtleta(a, (meuJogadorId !== null && a.id !== meuJogadorId && !isMaster && !isJuiz) || (travadoPorHorario && !isMaster && !isJuiz))).join('');
+
             document.getElementById('listaDentroGoleiros').innerHTML = htmlDG || "<div class='presenca-card'><span style='color:#7aa2f7; font-size:14px;'>Nenhum goleiro confirmado.</span></div>";
             document.getElementById('listaDentroLinha').innerHTML = htmlDL || "<div class='presenca-card'><span style='color:#7aa2f7; font-size:14px;'>Nenhum jogador confirmado.</span></div>";
             document.getElementById('listaFora').innerHTML = htmlF || "<div class='presenca-card'><span style='color:#7aa2f7; font-size:14px;'>Ninguém de fora.</span></div>";
             document.getElementById('listaDuvida').innerHTML = htmlD || "<div class='presenca-card'><span style='color:#7aa2f7; font-size:14px;'>Nenhuma dúvida.</span></div>";
             
-            document.getElementById('countDentroGoleiros').innerText = cDG; document.getElementById('countDentroLinha').innerText = cDL;
-            document.getElementById('countFora').innerText = cF; document.getElementById('countDuvida').innerText = cD;
+            document.getElementById('countDentroGoleiros').innerText = dg.length; 
+            document.getElementById('countDentroLinha').innerText = dl.length;
+            document.getElementById('countFora').innerText = f.length; 
+            document.getElementById('countDuvida').innerText = d.length;
         }
 
         function marcarPresenca(id, novoStatus) {
             if (isListaBloqueadaPorHorario() && !isMaster && !isJuiz) return alert("A lista encerrou às 07:00 da manhã!");
             if (novoStatus === 'dentro' || novoStatus === 'fora') { if (!isMaster && !isJuiz) localStorage.setItem('meuJogadorId', id); } 
             else if (novoStatus === 'duvida') { if (!isMaster && !isJuiz) { if (localStorage.getItem('meuJogadorId') === id) localStorage.removeItem('meuJogadorId'); else return alert("Você só pode desmarcar a sua própria presença."); } }
-            let updateData = { statusPresenca: novoStatus, presente: (novoStatus === 'dentro'), timestampConfirmacao: novoStatus !== 'duvida' ? getTimestampFormatado() : null };
+            
+            let updateData = { 
+                statusPresenca: novoStatus, 
+                presente: (novoStatus === 'dentro'), 
+                timestampConfirmacao: novoStatus !== 'duvida' ? getTimestampFormatado() : null 
+            };
+
+            // Registra a ordem de chegada exata
+            if (novoStatus === 'dentro') {
+                updateData.tsOrdenacao = Date.now();
+                updateData.titular = false; // Todo mundo que entra por padrão é reserva, admin que promove
+            } else {
+                updateData.tsOrdenacao = null;
+                updateData.titular = false;
+            }
+
             db.collection("atletas").doc(id).update(updateData);
         }
         
+        // ATUALIZADO: WhatsApp separando Titulares e Reservas
         function compartilharListaPresenca() {
-            let goleiros = atletasFC.filter(a => (a.statusPresenca === 'dentro' || (!a.statusPresenca && a.presente)) && (a.posicao === 'Goleiro' || a.posicao === 'GOL')).map(a => a.nome);
-            let linha = atletasFC.filter(a => (a.statusPresenca === 'dentro' || (!a.statusPresenca && a.presente)) && (a.posicao !== 'Goleiro' && a.posicao !== 'GOL')).map(a => a.nome);
-            let fora = atletasFC.filter(a => a.statusPresenca === 'fora').map(a => a.nome);
-            let duvida = atletasFC.filter(a => a.statusPresenca === 'duvida' || (!a.statusPresenca && !a.presente)).map(a => a.nome);
+            let dg = [], dlTitulares = [], dlReservas = [], fora = [], duvida = [];
+            
+            // Pega a lista toda, e ordena ela inteira pela ordem de chegada para o WhatsApp ficar perfeito
+            let atletasOrdenados = [...atletasFC].sort((a, b) => (a.tsOrdenacao || 0) - (b.tsOrdenacao || 0));
+
+            atletasOrdenados.forEach(a => {
+                let status = a.statusPresenca || (a.presente ? 'dentro' : 'duvida');
+                if (status === 'dentro') {
+                    if (a.posicao === 'Goleiro' || a.posicao === 'GOL') dg.push(a.nome);
+                    else { if (a.titular) dlTitulares.push(a.nome); else dlReservas.push(a.nome); }
+                } else if (status === 'fora') { fora.push(a.nome); } else { duvida.push(a.nome); }
+            });
+
             let d = configSistema.dataProximaPartida ? configSistema.dataProximaPartida.split('-').reverse().join('/') : "Próximo Jogo";
             
-            let txt = `⚽ *LISTA DE PRESENÇA - AMIGOS FC* ⚽\n📅 Data: ${d}\n\n🧤 *DENTRO - GOLEIROS (${goleiros.length}):*\n`;
-            if(goleiros.length === 0) txt += `- Nenhum\n`; else goleiros.forEach(n => txt += `- ${n}\n`);
-            txt += `\n🏃‍♂️ *DENTRO - JOGADORES (${linha.length}):*\n`;
-            if(linha.length === 0) txt += `- Nenhum\n`; else linha.forEach(n => txt += `- ${n}\n`);
+            let txt = `⚽ *LISTA DE PRESENÇA - AMIGOS FC* ⚽\n📅 Data: ${d}\n\n`;
+            
+            txt += `🧤 *GOLEIROS (${dg.length}):*\n`;
+            if(dg.length === 0) txt += `- Nenhum\n`; else dg.forEach((n, i) => txt += `${i+1}º - ${n}\n`);
+            
+            txt += `\n⭐ *TITULARES (${dlTitulares.length}):*\n`;
+            if(dlTitulares.length === 0) txt += `- Nenhum\n`; else dlTitulares.forEach((n, i) => txt += `${i+1}º - ${n}\n`);
+            
+            txt += `\n🔄 *RESERVAS (${dlReservas.length}):*\n`;
+            if(dlReservas.length === 0) txt += `- Nenhum\n`; else dlReservas.forEach((n, i) => txt += `${i+1}º - ${n}\n`);
+            
             txt += `\n❌ *FORA (${fora.length}):*\n`;
             if(fora.length === 0) txt += `- Ninguém\n`; else fora.forEach(n => txt += `- ${n}\n`);
+            
             txt += `\n❓ *DÚVIDA (${duvida.length}):*\n`;
             if(duvida.length === 0) txt += `- Ninguém\n`; else duvida.forEach(n => txt += `- ${n}\n`);
+            
             window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(txt)}`, '_blank');
         }
 
@@ -872,31 +909,21 @@
             renderListasSorteio(); if(modoManualAtivo) atualizarPainelManual(); alert("Sorteados!");
         }
 
-        // NOVO: COMPARTILHAR SORTEIO WHATSAPP
         function compartilharSorteio() {
             if(sorteioEquipasAtuais.real.length === 0 && sorteioEquipasAtuais.milan.length === 0) return alert("Realize o sorteio primeiro!");
             let d = configSistema.dataProximaPartida ? configSistema.dataProximaPartida.split('-').reverse().join('/') : "Data não definida";
             let txt = `⚽ *ESCALAÇÃO DEFINIDA - AMIGOS FC* ⚽\n📅 Data: ${d}\n\n`;
-            txt += `⚪ *REAL MADRID*\n`;
-            sorteioEquipasAtuais.real.forEach(j => txt += `- ${j}\n`);
-            txt += `\n🔴 *MILAN*\n`;
-            sorteioEquipasAtuais.milan.forEach(j => txt += `- ${j}\n`);
+            txt += `⚪ *REAL MADRID*\n`; sorteioEquipasAtuais.real.forEach(j => txt += `- ${j}\n`);
+            txt += `\n🔴 *MILAN*\n`; sorteioEquipasAtuais.milan.forEach(j => txt += `- ${j}\n`);
             window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(txt)}`, '_blank');
         }
 
-        // NOVO: SALVAR ESCALACAO NO HISTÓRICO
         function salvarEscalacaoHistorico() {
             if(!isMaster) return alert("Apenas Master.");
             let dataAgendamento = document.getElementById('dataAgendamento').value;
             if(!dataAgendamento) return alert("Defina a data do agendamento primeiro.");
             if(sorteioEquipasAtuais.real.length === 0 && sorteioEquipasAtuais.milan.length === 0) return alert("Faça o sorteio primeiro!");
-            
-            db.collection("escalacoes").doc(dataAgendamento).set({
-                data: dataAgendamento,
-                real: sorteioEquipasAtuais.real,
-                milan: sorteioEquipasAtuais.milan,
-                timestamp: Date.now()
-            }).then(() => alert("Escalação salva no histórico com sucesso!"));
+            db.collection("escalacoes").doc(dataAgendamento).set({ data: dataAgendamento, real: sorteioEquipasAtuais.real, milan: sorteioEquipasAtuais.milan, timestamp: Date.now() }).then(() => alert("Escalação salva no histórico com sucesso!"));
         }
 
         function toggleModoManual() { if(!isMaster) return alert("Faça login Master para escalar."); modoManualAtivo = !modoManualAtivo; document.getElementById('painelManual').style.display = modoManualAtivo ? 'block' : 'none'; atualizarPainelManual(); renderListasSorteio(); }
@@ -945,7 +972,6 @@
 
             const data = filtroDataGlobal || (document.getElementById('dataJogo') ? document.getElementById('dataJogo').value : "");
             
-            // CARREGAR ESCALAÇÃO HISTÓRICA DO BANCO
             const escalacaoDoDia = escalacoesFC.find(e => e.data === data);
             if(document.getElementById('historicoEscalacaoReal') && document.getElementById('historicoEscalacaoMilan')) {
                 if(escalacaoDoDia) {
@@ -984,7 +1010,7 @@
             const n = document.getElementById('cadNome').value; const p = document.getElementById('cadPosicao').value;
             if(!n) return alert("Digite o nome!");
             if(atletaEditandoId) { db.collection("atletas").doc(atletaEditandoId).update({nome:n, posicao:p}); cancelarEdicaoAtleta(); alert("Atualizado!"); } 
-            else { db.collection("atletas").add({nome:n, posicao:p, presente: false, statusPresenca: 'duvida', timestampConfirmacao: null, timestamp: Date.now()}); document.getElementById('cadNome').value = ""; alert("Cadastrado!"); }
+            else { db.collection("atletas").add({nome:n, posicao:p, presente: false, statusPresenca: 'duvida', timestampConfirmacao: null, timestamp: Date.now(), tsOrdenacao: null, titular: false}); document.getElementById('cadNome').value = ""; alert("Cadastrado!"); }
         }
 
         function editarAtleta(id) { if(!isMaster) return; const a = atletasFC.find(i => i.id === id); document.getElementById('cadNome').value = a.nome; document.getElementById('cadPosicao').value = a.posicao; atletaEditandoId = id; document.getElementById('btnSalvarAtleta').innerText = "💾 Confirmar Edição"; window.scrollTo(0, 0); }
