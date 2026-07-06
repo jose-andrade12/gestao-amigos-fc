@@ -100,7 +100,6 @@
         .status-aberto { background: rgba(0, 214, 95, 0.1); color: var(--green-timer); border: 1px solid var(--green-timer); }
         .status-fechado { background: rgba(247, 118, 142, 0.1); color: var(--red-deny); border: 1px solid var(--red-deny); }
 
-        /* Lista de Presença Modificada */
         .header-lista { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #414868; margin-top: 25px; margin-bottom: 10px; }
         .header-lista h4 { margin: 0; color: #a9b1d6; font-size: 18px; font-weight: normal;}
         .header-lista span { color: #a9b1d6; font-size: 18px; }
@@ -324,7 +323,7 @@
             </div>
         </div>
 
-        <!-- MÓDULO PRESENÇA (TITULAR/RESERVA MANUAL E LISTAS SEPARADAS) -->
+        <!-- MÓDULO PRESENÇA -->
         <div id="sorteio" class="modulo">
             <div class="req-master" style="background: #292e42; padding: 20px; border-radius: 8px; margin-bottom: 25px; border: 2px solid var(--cyan);">
                 <h4 style="margin-top:0; color: #ffffff;">📅 Gestão de Partida (Admin)</h4>
@@ -342,7 +341,6 @@
             <div id="bannerStatus" class="status-agendamento status-fechado">Carregando status...</div>
             <button class="btn-acao btn-wpp" style="margin-top: 0; margin-bottom: 20px;" onclick="compartilharListaPresenca()">📲 Enviar Lista (WhatsApp)</button>
 
-            <!-- LISTAS DE PRESENÇA REFEITAS -->
             <div style="background: var(--bg-color); border-radius: 8px;">
                 <div class="header-lista"><h4>Dentro - Goleiros</h4><span id="countDentroGoleiros">0</span></div>
                 <div id="listaDentroGoleiros"></div>
@@ -387,6 +385,7 @@
             </div>
         </div>
 
+        <!-- MÓDULO HISTÓRICO -->
         <div id="jogo" class="modulo">
             <h3>Consulta do Histórico da Partida</h3>
             
@@ -419,7 +418,7 @@
                 </div>
             </div>
 
-            <div id="painelEdicaoScout" style="display: none; background-color: #16161e; padding: 20px; border-radius: 8px; margin-top: 15px; border: 2px dashed var(--admin-color);">
+            <div id="painelEdicaoScout" class="req-master" style="background-color: #16161e; padding: 20px; border-radius: 8px; margin-top: 15px; border: 2px dashed var(--admin-color);">
                 <strong style="font-size: 18px; color: var(--admin-color);">✏️ MODO EDIÇÃO ATIVO (Master)</strong><br><br>
                 <div class="flex-row">
                     <div class="form-group"><label>Time:</label><select id="timeAcao"><option>Real Madrid</option><option>Milan</option></select></div>
@@ -431,13 +430,15 @@
                     <button class="btn-acao btn-amarelo" onclick="registrarScout('Amarelo')">🟨 AMARELO</button>
                     <button class="btn-acao btn-vermelho" onclick="registrarScout('Vermelho')">🟥 VERMELHO</button>
                 </div>
-                <button onclick="cancelarEdicaoScout()" style="margin-top: 15px; background: #292e42; color: white; border: none; padding: 10px; border-radius: 5px; width: 100%;">❌ Cancelar Edição</button>
+                <button onclick="cancelarEdicaoScout()" style="margin-top: 15px; background: #292e42; color: white; border: none; padding: 10px; border-radius: 5px; width: 100%;">❌ Cancelar Edição (Apenas recarrega a página)</button>
             </div>
-            <button class="btn-acao btn-wpp" onclick="compartilharJogo()" style="margin-top: 25px;">Enviar Resumo (WhatsApp)</button>
+
+            <button class="btn-acao btn-wpp" onclick="compartilharJogo()" style="margin-top: 25px;">📲 Enviar Resumo (WhatsApp)</button>
             <h3 style="margin-top: 40px; color: var(--cyan);">📜 Súmula Geral da Partida</h3>
             <div class="log-container" id="logPartida"></div>
         </div>
 
+        <!-- MÓDULO RESENHA -->
         <div id="resenha" class="modulo">
             <h3>Resenha Pós-Jogo</h3>
             <div class="aviso-bloqueio aviso-bloqueio-master">🔒 MODO LEITURA: Efetue Login Master para registrar as premiações.</div>
@@ -451,10 +452,11 @@
                     <div class="form-group"><label>🛡️ Xerifão</label><select id="premioXerifao" class="select-jogadores"></select></div>
                     <div class="form-group"><label>🎈 Bola Murcha</label><select id="premioBolaMurcha" class="select-jogadores"></select></div>
                 </div>
-                <button class="btn-acao" onclick="salvarPremiacao()">Salvar Histórico da Resenha</button>
+                <button class="btn-acao" onclick="salvarPremiacao()">💾 Salvar Histórico da Resenha</button>
             </div>
         </div>
 
+        <!-- MÓDULO DASHBOARD -->
         <div id="dashboard" class="modulo">
             <div style="background: #16161e; padding: 15px; border-radius: 8px; border: 1px solid #414868; margin-bottom: 20px;">
                 <label style="color: var(--cyan); font-weight: bold; margin-bottom: 10px;">📅 Filtro de Período (Opcional)</label>
@@ -585,7 +587,7 @@
         }
 
         let atletasFC = [], scoutsFC = [], premiacoesFC = [], escalacoesFC = [];
-        let atletaEditandoId = null, scoutEditandoId = null, premioEditandoId = null; 
+        let atletaEditandoId = null;
         let filtroDataGlobal = "", chartInstancia = null, sorteioEquipasAtuais = { real: [], milan: [] };
         let modoManualAtivo = false, juizTimeAtual = "", juizAcaoAtual = "";
         let configSistema = { dataProximaPartida: "", presencaLiberada: false };
@@ -617,7 +619,7 @@
         db.collection("premiacoes").onSnapshot(snap => { premiacoesFC = snap.docs.map(doc => ({id: doc.id, ...doc.data()})).sort((a,b) => b.timestamp - a.timestamp); refreshTelas(); });
         db.collection("escalacoes").onSnapshot(snap => { escalacoesFC = snap.docs.map(doc => ({id: doc.id, ...doc.data()})); refreshTelas(); });
 
-        /* === SISTEMA DE CRONÔMETRO ABSOLUTO (À PROVA DE BLOQUEIO DE TELA) === */
+        /* === SISTEMA DE CRONÔMETRO ABSOLUTO === */
         let tempoRodando = false;
         let tempoInicio = 0;
         let tempoPausadoTotal = 0;
@@ -647,7 +649,7 @@
                 tempoInicio = Date.now() - tempoPausadoTotal;
                 tempoRodando = true;
                 if(cInt) clearInterval(cInt);
-                cInt = setInterval(updateC, 500); // Atualiza 2x por segundo para não ter delay
+                cInt = setInterval(updateC, 500); 
                 updateC();
             }
         }
@@ -790,7 +792,6 @@
             return new Date() >= dataLimite;
         }
 
-        /* === FUNÇÃO PARA ALTERAR MANUALMENTE TITULAR/RESERVA === */
         function toggleTitular(id, isTitular) {
             if(!isMaster && !isJuiz) return;
             db.collection("atletas").doc(id).update({ titular: isTitular });
@@ -805,15 +806,12 @@
             let htmlAcoes = '', labelTempo = '';
 
             let nomeDisplay = a.nome;
-            // Mostra o número da ordem de chegada se estiver confirmado
             if (isDentro && a.displayIndex) { 
                 nomeDisplay = `<span style="color:var(--text-muted); font-size:12px; margin-right:5px;">${a.displayIndex}º</span> ` + a.nome; 
             }
 
             if (status === 'dentro') { 
                 let htmlSeloToggle = '';
-                
-                // Botão Interativo para Admin escolher Titular/Reserva (Apenas para Jogadores de Linha)
                 if (!isGol) {
                     if (isMaster || isJuiz) {
                         let corBtn = a.titular ? 'var(--admin-color)' : 'var(--text-muted)';
@@ -867,23 +865,19 @@
                 } else if (status === 'fora') { f.push(a); } else { d.push(a); }
             });
 
-            // Ordenador por tempo exato de confirmação
             const sortChegada = (a, b) => {
                 let tsA = a.tsOrdenacao || 0; let tsB = b.tsOrdenacao || 0;
                 if (tsA === 0 && tsB !== 0) return 1; if (tsB === 0 && tsA !== 0) return -1;
                 return tsA - tsB; 
             };
 
-            // Aplica a ordem global para definir quem chegou primeiro
             dg.sort(sortChegada);
             dg.forEach((a, i) => a.displayIndex = i + 1);
 
             let linhaGlobal = dt.concat(dr).sort(sortChegada);
             linhaGlobal.forEach((a, i) => a.displayIndex = i + 1);
 
-            // Re-ordena as sublistas individualmente para renderização
-            dt.sort(sortChegada);
-            dr.sort(sortChegada);
+            dt.sort(sortChegada); dr.sort(sortChegada);
 
             let htmlDG = dg.map(a => gerarCardAtleta(a, (meuJogadorId !== null && a.id !== meuJogadorId && !isMaster && !isJuiz) || (travadoPorHorario && !isMaster && !isJuiz), true)).join('');
             let htmlDT = dt.map(a => gerarCardAtleta(a, (meuJogadorId !== null && a.id !== meuJogadorId && !isMaster && !isJuiz) || (travadoPorHorario && !isMaster && !isJuiz), true)).join('');
@@ -918,13 +912,12 @@
             };
 
             if (novoStatus === 'dentro') {
-                updateData.tsOrdenacao = Date.now(); // Grava a hora exata do clique
-                updateData.titular = false; // Entra como reserva até que o Admin promova a Titular
+                updateData.tsOrdenacao = Date.now();
+                updateData.titular = false; 
             } else {
                 updateData.tsOrdenacao = null;
                 updateData.titular = false;
             }
-
             db.collection("atletas").doc(id).update(updateData);
         }
         
@@ -937,35 +930,19 @@
             atletasOrdenados.forEach(a => {
                 let status = a.statusPresenca || (a.presente ? 'dentro' : 'duvida');
                 if (status === 'dentro') {
-                    if (a.posicao === 'Goleiro' || a.posicao === 'GOL') {
-                        dg.push(`${numGoleiro}º - ${a.nome}`);
-                        numGoleiro++;
-                    } else { 
-                        if (a.titular) dt.push(`${numLinha}º - ${a.nome}`);
-                        else dr.push(`${numLinha}º - ${a.nome}`);
-                        numLinha++;
-                    }
+                    if (a.posicao === 'Goleiro' || a.posicao === 'GOL') { dg.push(`${numGoleiro}º - ${a.nome}`); numGoleiro++; } 
+                    else { if (a.titular) dt.push(`${numLinha}º - ${a.nome}`); else dr.push(`${numLinha}º - ${a.nome}`); numLinha++; }
                 } else if (status === 'fora') { fora.push(a.nome); } else { duvida.push(a.nome); }
             });
 
             let d = configSistema.dataProximaPartida ? configSistema.dataProximaPartida.split('-').reverse().join('/') : "Próximo Jogo";
-            
             let txt = `⚽ *LISTA DE PRESENÇA - AMIGOS FC* ⚽\n📅 Data: ${d}\n\n`;
             
-            txt += `🧤 *GOLEIROS (${dg.length}):*\n`;
-            if(dg.length === 0) txt += `- Nenhum\n`; else dg.forEach(n => txt += `${n}\n`);
-            
-            txt += `\n⭐ *TITULARES (${dt.length}):*\n`;
-            if(dt.length === 0) txt += `- Nenhum\n`; else dt.forEach(n => txt += `${n}\n`);
-            
-            txt += `\n🔄 *RESERVAS (${dr.length}):*\n`;
-            if(dr.length === 0) txt += `- Nenhum\n`; else dr.forEach(n => txt += `${n}\n`);
-            
-            txt += `\n❌ *FORA (${fora.length}):*\n`;
-            if(fora.length === 0) txt += `- Ninguém\n`; else fora.forEach(n => txt += `- ${n}\n`);
-            
-            txt += `\n❓ *DÚVIDA (${duvida.length}):*\n`;
-            if(duvida.length === 0) txt += `- Ninguém\n`; else duvida.forEach(n => txt += `- ${n}\n`);
+            txt += `🧤 *GOLEIROS (${dg.length}):*\n`; if(dg.length === 0) txt += `- Nenhum\n`; else dg.forEach(n => txt += `${n}\n`);
+            txt += `\n⭐ *TITULARES (${dt.length}):*\n`; if(dt.length === 0) txt += `- Nenhum\n`; else dt.forEach(n => txt += `${n}\n`);
+            txt += `\n🔄 *RESERVAS (${dr.length}):*\n`; if(dr.length === 0) txt += `- Nenhum\n`; else dr.forEach(n => txt += `${n}\n`);
+            txt += `\n❌ *FORA (${fora.length}):*\n`; if(fora.length === 0) txt += `- Ninguém\n`; else fora.forEach(n => txt += `- ${n}\n`);
+            txt += `\n❓ *DÚVIDA (${duvida.length}):*\n`; if(duvida.length === 0) txt += `- Ninguém\n`; else duvida.forEach(n => txt += `- ${n}\n`);
             
             window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(txt)}`, '_blank');
         }
@@ -1022,10 +999,102 @@
             document.getElementById('modalJuiz').style.display = 'flex';
         }
         function fecharModalJuiz() { document.getElementById('modalJuiz').style.display = 'none'; }
+        
         function registrarScoutJuiz(jogador) {
             if(!isJuiz) return; const dataEscolhida = document.getElementById('dataJuiz').value || filtroDataGlobal;
             if(!dataEscolhida) return alert("Verifique a data da partida!");
             db.collection("scouts").add({data: dataEscolhida, time: juizTimeAtual, jogador: jogador, acao: juizAcaoAtual, timestamp: Date.now()}); fecharModalJuiz();
+        }
+
+        /* === NOVAS FUNÇÕES DO HISTÓRICO E RESENHA (REINCLUÍDAS) === */
+        
+        function registrarScout(acao) {
+            if(!isMaster) return alert("Apenas Master.");
+            let time = document.getElementById('timeAcao').value;
+            let jogador = document.getElementById('jogadorAcao').value;
+            let dataAcao = filtroDataGlobal;
+            
+            if(!dataAcao) return alert("Selecione uma data no Histórico primeiro!");
+            
+            db.collection("scouts").add({ 
+                data: dataAcao, time: time, jogador: jogador, acao: acao, timestamp: Date.now() 
+            });
+            alert(`${acao} registrado com sucesso para ${jogador}!`);
+        }
+
+        function cancelarEdicaoScout() {
+            alert("Edição cancelada/Atualizada.");
+        }
+
+        function salvarPremiacao() {
+            if(!isMaster) return alert("Apenas Master.");
+            let data = document.getElementById('dataPremio').value;
+            if(!data) return alert("Selecione a data da partida!");
+            
+            let craque = document.getElementById('premioCraque').value;
+            let paredao = document.getElementById('premioParedao').value;
+            let xerifao = document.getElementById('premioXerifao').value;
+            let bolaMurcha = document.getElementById('premioBolaMurcha').value;
+            
+            db.collection("premiacoes").doc(data).set({
+                data: data, craque: craque, paredao: paredao, xerifao: xerifao, bolaMurcha: bolaMurcha, timestamp: Date.now()
+            }).then(() => alert("Resenha salva no histórico com sucesso!"));
+        }
+
+        function compartilharJogo() {
+            const data = filtroDataGlobal || (document.getElementById('dataJogo') ? document.getElementById('dataJogo').value : "");
+            if (!data) return alert("Selecione uma data no histórico primeiro!");
+
+            let dFormatada = data.split('-').reverse().join('/');
+            const golsR = document.getElementById('placarReal').innerText;
+            const golsM = document.getElementById('placarMilan').innerText;
+
+            let txt = `⚽ *RESUMO DA PARTIDA - AMIGOS FC* ⚽\n📅 Data: ${dFormatada}\n\n`;
+            txt += `⚪ *REAL MADRID*  ${golsR} x ${golsM}  *MILAN* 🔴\n\n`;
+
+            const scoutsDia = scoutsFC.filter(s => s.data === data);
+            
+            if (scoutsDia.length === 0) {
+                txt += "Nenhum evento registrado nesta partida.\n";
+            } else {
+                let gols = scoutsDia.filter(s => s.acao === 'Gol');
+                let assists = scoutsDia.filter(s => s.acao === 'Assistência');
+                let amarelos = scoutsDia.filter(s => s.acao === 'Amarelo');
+                let vermelhos = scoutsDia.filter(s => s.acao === 'Vermelho');
+
+                if(gols.length > 0) {
+                    txt += `⚽ *Gols:*\n`;
+                    gols.forEach(g => txt += `- ${g.jogador} (${g.time})\n`);
+                    txt += `\n`;
+                }
+                if(assists.length > 0) {
+                    txt += `👟 *Assistências:*\n`;
+                    assists.forEach(a => txt += `- ${a.jogador} (${a.time})\n`);
+                    txt += `\n`;
+                }
+                if(amarelos.length > 0) {
+                    txt += `🟨 *Cartões Amarelos:*\n`;
+                    amarelos.forEach(c => txt += `- ${c.jogador} (${c.time})\n`);
+                    txt += `\n`;
+                }
+                if(vermelhos.length > 0) {
+                    txt += `🟥 *Cartões Vermelhos:*\n`;
+                    vermelhos.forEach(c => txt += `- ${c.jogador} (${c.time})\n`);
+                    txt += `\n`;
+                }
+            }
+            
+            // Adiciona as premiações da resenha, se existirem para a data
+            let premioDia = premiacoesFC.find(p => p.data === data);
+            if (premioDia) {
+                txt += `🏆 *PREMIAÇÕES (RESENHA):*\n`;
+                txt += `⭐ Craque: ${premioDia.craque}\n`;
+                txt += `🧱 Paredão: ${premioDia.paredao}\n`;
+                txt += `🛡️ Xerifão: ${premioDia.xerifao}\n`;
+                txt += `🎈 Bola Murcha: ${premioDia.bolaMurcha}\n`;
+            }
+
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(txt)}`, '_blank');
         }
 
         function refreshTelas() {
@@ -1072,6 +1141,15 @@
 
             if(document.getElementById('logPartida')) document.getElementById('logPartida').innerHTML = logsHTML;
             if(document.getElementById('logPartidaJuiz')) document.getElementById('logPartidaJuiz').innerHTML = logsHTML;
+
+            // Preenche os selects da Resenha com os dados já salvos
+            const premioDoDia = premiacoesFC.find(p => p.data === data);
+            if(premioDoDia) {
+                if(document.getElementById('premioCraque')) document.getElementById('premioCraque').value = premioDoDia.craque;
+                if(document.getElementById('premioParedao')) document.getElementById('premioParedao').value = premioDoDia.paredao;
+                if(document.getElementById('premioXerifao')) document.getElementById('premioXerifao').value = premioDoDia.xerifao;
+                if(document.getElementById('premioBolaMurcha')) document.getElementById('premioBolaMurcha').value = premioDoDia.bolaMurcha;
+            }
 
             atualizarDashboard(); 
         }
