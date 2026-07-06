@@ -20,7 +20,6 @@
         }
         body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-color); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
         
-        /* Menu Lateral - Com rolagem vertical para modo paisagem */
         .sidebar { 
             width: 280px; background-color: var(--panel-bg); padding: 20px 0; 
             box-shadow: 2px 0 5px rgba(0,0,0,0.3); display: flex; flex-direction: column; 
@@ -28,7 +27,6 @@
             max-height: 100vh; overflow-y: auto; overflow-x: hidden;
         }
         
-        /* Customização da barra de rolagem do menu lateral */
         .sidebar::-webkit-scrollbar { width: 6px; }
         .sidebar::-webkit-scrollbar-track { background: transparent; }
         .sidebar::-webkit-scrollbar-thumb { background-color: #414868; border-radius: 8px; }
@@ -36,7 +34,6 @@
         .sidebar h2 { text-align: center; color: var(--cyan); margin-bottom: 20px; font-size: 22px; }
         .status-nuvem { text-align: center; font-size: 12px; color: var(--green-timer); margin-top: -10px; margin-bottom: 20px; }
 
-        /* Cronômetro Lateral e Central */
         .cronometro-container { background-color: #16161e; padding: 15px; margin: 0 15px 15px 15px; border-radius: 8px; text-align: center; border: 1px solid #414868; }
         .displayCronometro { font-size: 36px; font-weight: bold; color: var(--green-timer); font-family: monospace; margin-bottom: 10px; letter-spacing: 2px; }
         
@@ -51,7 +48,6 @@
         }
         .cronometro-botoes button:hover { background-color: var(--cyan); color: #000; }
         
-        /* Botões do Menu */
         .menu-wrapper { display: flex; flex-direction: column; gap: 10px; padding: 0 15px 20px 15px; flex: 1; }
         .menu-btn { background: #16161e; border: 1px solid #292e42; color: #a9b1d6; padding: 12px 15px; border-radius: 10px; text-align: left; font-size: 14px; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; gap: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
         .menu-btn:hover { background-color: #24283b; color: #ffffff; transform: translateY(-2px); box-shadow: 0 6px 10px rgba(0,0,0,0.3); border-color: #414868; }
@@ -60,13 +56,11 @@
         .btn-juiz { border-color: var(--cyan); border-left: 4px solid var(--cyan) !important; }
         .btn-login { margin-top: auto; border-color: var(--admin-color); }
         
-        /* Área Principal */
         .main-content { flex: 1; padding: 30px; overflow-y: auto; position: relative;}
         .modulo { display: none; background-color: var(--panel-bg); padding: 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); animation: fadeIn 0.3s ease-in-out; }
         .modulo.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        /* Formulários e Componentes */
         .form-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 5px; color: var(--text-muted); font-size: 14px;}
         input, select { width: 100%; padding: 10px; background-color: #16161e; border: 1px solid #414868; color: white; border-radius: 5px; box-sizing: border-box; outline: none; }
@@ -77,7 +71,7 @@
         .btn-wpp:hover { background-color: #128C7E; }
         .btn-sm { padding: 5px 10px; width: auto; font-size: 12px; margin-top: 0; margin-right: 5px; border-radius: 3px; cursor: pointer; border: none; }
         
-        /* === CONTROLE DE ACESSO (PERMISSÕES) === */
+        /* CONTROLE DE ACESSO */
         .req-master, .req-master-flex, .req-master-cell, .req-master-grid { display: none !important; }
         .req-juiz, .req-juiz-flex, .req-juiz-cell, .req-juiz-grid { display: none !important; }
         body.is-master .req-master { display: block !important; }
@@ -93,7 +87,6 @@
         .caixa-data-juiz label { color: var(--cyan); font-weight: bold; font-size: 16px; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 8px;}
         .caixa-data-juiz input { font-size: 16px; text-align: center; background-color: transparent; border: none; font-weight: bold; cursor: pointer;}
         
-        /* Placar Grid Base (Desktop) */
         .placar-container { background-color: #16161e; border-radius: 12px; padding: 25px; margin-bottom: 25px; display: flex; justify-content: space-around; align-items: center; }
         .time-placar { text-align: center; }
         .escudo { width: 90px; height: 90px; object-fit: contain; margin-bottom: 10px; }
@@ -103,12 +96,11 @@
         .timer-central .timer-label { color: #565f89; display: block; margin-top: 5px; }
         .score-x { font-size: 50px; color: #414868; font-weight: bold; }
 
-        /* Status Agendamento */
         .status-agendamento { padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-size: 16px; font-weight: bold; }
         .status-aberto { background: rgba(0, 214, 95, 0.1); color: var(--green-timer); border: 1px solid var(--green-timer); }
         .status-fechado { background: rgba(247, 118, 142, 0.1); color: var(--red-deny); border: 1px solid var(--red-deny); }
 
-        /* Lista de Presença & Badges (Novos) */
+        /* Lista de Presença Modificada */
         .header-lista { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #414868; margin-top: 25px; margin-bottom: 10px; }
         .header-lista h4 { margin: 0; color: #a9b1d6; font-size: 18px; font-weight: normal;}
         .header-lista span { color: #a9b1d6; font-size: 18px; }
@@ -120,7 +112,7 @@
         .presenca-info { flex-grow: 1; display: flex; flex-direction: column; }
         .presenca-nome { font-size: 16px; color: #ffffff; font-weight: 500; }
         .presenca-pos { font-size: 13px; color: #7aa2f7; margin-top: 2px; }
-        .presenca-tempo { font-size: 13px; color: var(--cyan); margin-top: 2px; }
+        .presenca-tempo { font-size: 13px; color: var(--cyan); margin-top: 2px; display: flex; align-items: center; }
         
         .presenca-acoes { display: flex; gap: 8px; align-items: center; justify-content: flex-end; min-width: 80px;}
         .status-dot { width: 12px; height: 12px; border-radius: 50%; background-color: var(--cyan); }
@@ -130,11 +122,6 @@
         .btn-fora { background: transparent; border: 1px solid var(--red-deny); color: var(--red-deny); padding: 6px 12px; border-radius: 20px; font-size: 12px; cursor: pointer; transition: 0.2s;}
         .btn-fora:hover, .btn-fora.active { background: var(--red-deny); color: #fff; }
         .btn-desfazer { background: #414868; color: #fff; padding: 5px 10px; border-radius: 5px; font-size: 12px; cursor: pointer; border: none; }
-
-        /* Selos Titular/Reserva */
-        .badge { padding: 3px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; margin-right: 5px; text-transform: uppercase; }
-        .badge-titular { background-color: rgba(255, 158, 100, 0.15); color: var(--admin-color); border: 1px solid var(--admin-color); }
-        .badge-reserva { background-color: rgba(122, 162, 247, 0.15); color: var(--text-muted); border: 1px solid var(--text-muted); }
 
         .btn-gol { background-color: var(--green-timer); color: #000; }
         .btn-assist { background-color: var(--cyan); color: #000; }
@@ -161,7 +148,6 @@
         .log-item { display: flex; align-items: center; padding: 10px 15px; border-bottom: 1px solid #292e42; }
         .log-item:last-child { border-bottom: none; }
         
-        /* === RESPONSIVIDADE ESTRITA MOBILE === */
         @media (max-width: 768px) {
             body { flex-direction: column; height: 100vh; overflow: hidden; } 
             .sidebar { width: 100%; padding: 10px 0 0 0; border-right: none; flex-shrink: 0; box-shadow: 0 4px 6px rgba(0,0,0,0.3); z-index: 20; }
@@ -243,6 +229,7 @@
 
     <div class="main-content">
 
+        <!-- PAINEL DO JUIZ -->
         <div id="painelJuiz" class="modulo active">
             <h3 style="text-align: center; color: var(--cyan); margin-top: 0; margin-bottom: 25px; font-size: 20px;">⏱️ Painel de Observabilidade do Árbitro</h3>
             
@@ -304,6 +291,7 @@
             <div class="log-container" id="logPartidaJuiz" style="max-height: 150px;"></div>
         </div>
 
+        <!-- MÓDULO CADASTRO -->
         <div id="cadastro" class="modulo">
             <h3>Cadastrar / Editar Atleta</h3>
             <div class="aviso-bloqueio aviso-bloqueio-master">🔒 MODO LEITURA: Efetue o Login com a Senha Master para cadastrar ou editar atletas.</div>
@@ -336,6 +324,7 @@
             </div>
         </div>
 
+        <!-- MÓDULO PRESENÇA (TITULAR/RESERVA MANUAL E LISTAS SEPARADAS) -->
         <div id="sorteio" class="modulo">
             <div class="req-master" style="background: #292e42; padding: 20px; border-radius: 8px; margin-bottom: 25px; border: 2px solid var(--cyan);">
                 <h4 style="margin-top:0; color: #ffffff;">📅 Gestão de Partida (Admin)</h4>
@@ -353,13 +342,20 @@
             <div id="bannerStatus" class="status-agendamento status-fechado">Carregando status...</div>
             <button class="btn-acao btn-wpp" style="margin-top: 0; margin-bottom: 20px;" onclick="compartilharListaPresenca()">📲 Enviar Lista (WhatsApp)</button>
 
+            <!-- LISTAS DE PRESENÇA REFEITAS -->
             <div style="background: var(--bg-color); border-radius: 8px;">
-                <div class="header-lista"><h4>Dentro - Goleiros (Ordem de chegada)</h4><span id="countDentroGoleiros">0</span></div>
+                <div class="header-lista"><h4>Dentro - Goleiros</h4><span id="countDentroGoleiros">0</span></div>
                 <div id="listaDentroGoleiros"></div>
-                <div class="header-lista" style="margin-top: 30px;"><h4>Dentro - Jogadores (Ordem de chegada)</h4><span id="countDentroLinha">0</span></div>
-                <div id="listaDentroLinha"></div>
+                
+                <div class="header-lista" style="margin-top: 30px;"><h4>⭐ Titulares</h4><span id="countDentroTitulares">0</span></div>
+                <div id="listaDentroTitulares"></div>
+
+                <div class="header-lista" style="margin-top: 30px;"><h4>🔄 Reservas (Ordem de chegada)</h4><span id="countDentroReservas">0</span></div>
+                <div id="listaDentroReservas"></div>
+
                 <div class="header-lista" style="margin-top: 40px;"><h4>Dúvida</h4><span id="countDuvida">0</span></div>
                 <div id="listaDuvida"></div>
+                
                 <div class="header-lista" style="margin-top: 40px;"><h4>Fora</h4><span id="countFora">0</span></div>
                 <div id="listaFora"></div>
             </div>
@@ -621,14 +617,61 @@
         db.collection("premiacoes").onSnapshot(snap => { premiacoesFC = snap.docs.map(doc => ({id: doc.id, ...doc.data()})).sort((a,b) => b.timestamp - a.timestamp); refreshTelas(); });
         db.collection("escalacoes").onSnapshot(snap => { escalacoesFC = snap.docs.map(doc => ({id: doc.id, ...doc.data()})); refreshTelas(); });
 
-        let cInt = null; let cSeg = 0;
+        /* === SISTEMA DE CRONÔMETRO ABSOLUTO (À PROVA DE BLOQUEIO DE TELA) === */
+        let tempoRodando = false;
+        let tempoInicio = 0;
+        let tempoPausadoTotal = 0;
+        let cInt = null;
+
         function updateC() { 
-            let m = Math.floor(cSeg/60).toString().padStart(2,'0'); let s = (cSeg%60).toString().padStart(2,'0'); 
-            let t = `${m}:${s}`; document.getElementById('displayCronometro1').innerText = t; document.getElementById('displayCronometro2').innerText = t; 
+            if (!tempoRodando && tempoInicio === 0 && tempoPausadoTotal === 0) {
+                document.getElementById('displayCronometro1').innerText = "00:00"; 
+                document.getElementById('displayCronometro2').innerText = "00:00"; 
+                return;
+            }
+            let agora = Date.now();
+            let tempoDecorrido = tempoRodando ? (agora - tempoInicio) : tempoPausadoTotal;
+            
+            let cSeg = Math.floor(tempoDecorrido / 1000);
+            let m = Math.floor(cSeg / 60).toString().padStart(2, '0');
+            let s = (cSeg % 60).toString().padStart(2, '0');
+            let t = `${m}:${s}`; 
+            
+            document.getElementById('displayCronometro1').innerText = t; 
+            document.getElementById('displayCronometro2').innerText = t; 
         }
-        function iniciarCronometro() { if(!isJuiz) return alert("Faça login de Juiz primeiro!"); if(!cInt) cInt = setInterval(()=>{cSeg++; updateC()}, 1000); }
-        function pausarCronometro() { if(!isJuiz) return; clearInterval(cInt); cInt = null; }
-        function zerarCronometro() { if(!isJuiz) return; pausarCronometro(); cSeg = 0; updateC(); }
+
+        function iniciarCronometro() { 
+            if(!isJuiz) return alert("Faça login de Juiz primeiro!"); 
+            if(!tempoRodando) {
+                tempoInicio = Date.now() - tempoPausadoTotal;
+                tempoRodando = true;
+                if(cInt) clearInterval(cInt);
+                cInt = setInterval(updateC, 500); // Atualiza 2x por segundo para não ter delay
+                updateC();
+            }
+        }
+
+        function pausarCronometro() { 
+            if(!isJuiz) return; 
+            if(tempoRodando) {
+                tempoPausadoTotal = Date.now() - tempoInicio;
+                tempoRodando = false;
+                clearInterval(cInt);
+                cInt = null;
+                updateC();
+            }
+        }
+
+        function zerarCronometro() { 
+            if(!isJuiz) return; 
+            tempoRodando = false;
+            tempoPausadoTotal = 0;
+            tempoInicio = 0;
+            if(cInt) clearInterval(cInt);
+            cInt = null;
+            updateC(); 
+        }
 
         function getTimestampFormatado() {
             const now = new Date();
@@ -747,14 +790,13 @@
             return new Date() >= dataLimite;
         }
 
-        // NOVA FUNCAO: ALTERAR TITULAR/RESERVA
+        /* === FUNÇÃO PARA ALTERAR MANUALMENTE TITULAR/RESERVA === */
         function toggleTitular(id, isTitular) {
             if(!isMaster && !isJuiz) return;
             db.collection("atletas").doc(id).update({ titular: isTitular });
         }
 
-        // ATUALIZADO: Geração do Card com Badges e Ordem
-        function gerarCardAtleta(a, isBloqueado, isDentro = false, index = 0) {
+        function gerarCardAtleta(a, isBloqueado, isDentro = false) {
             let initial = a.nome.charAt(0).toUpperCase(); let isGol = a.posicao === 'Goleiro' || a.posicao === 'GOL';
             let avatarClass = isGol ? 'avatar-circle goleiro' : 'avatar-circle';
             let status = a.statusPresenca || (a.presente ? 'dentro' : 'duvida');
@@ -763,17 +805,27 @@
             let htmlAcoes = '', labelTempo = '';
 
             let nomeDisplay = a.nome;
-            if (isDentro) { nomeDisplay = `<span style="color:var(--text-muted); font-size:12px; margin-right:5px;">${index+1}º</span> ` + a.nome; }
+            // Mostra o número da ordem de chegada se estiver confirmado
+            if (isDentro && a.displayIndex) { 
+                nomeDisplay = `<span style="color:var(--text-muted); font-size:12px; margin-right:5px;">${a.displayIndex}º</span> ` + a.nome; 
+            }
 
             if (status === 'dentro') { 
-                let badgeClass = a.titular ? 'badge-titular' : 'badge-reserva';
-                let badgeText = a.titular ? '⭐ Titular' : '🔄 Reserva';
-                labelTempo = `<span class="badge ${badgeClass}">${badgeText}</span> ` + (a.timestampConfirmacao ? `Confirmou ${a.timestampConfirmacao}` : 'Confirmado');
+                let htmlSeloToggle = '';
+                
+                // Botão Interativo para Admin escolher Titular/Reserva (Apenas para Jogadores de Linha)
+                if (!isGol) {
+                    if (isMaster || isJuiz) {
+                        let corBtn = a.titular ? 'var(--admin-color)' : 'var(--text-muted)';
+                        let txtBtn = a.titular ? '⭐ Titular' : '👇 Reserva';
+                        let bgBtn = a.titular ? 'rgba(255, 158, 100, 0.15)' : 'rgba(122, 162, 247, 0.15)';
+                        htmlSeloToggle = `<button onclick="toggleTitular('${a.id}', ${!a.titular})" style="background:${bgBtn}; color:${corBtn}; border:1px solid ${corBtn}; border-radius:4px; font-size:10px; font-weight:bold; padding:3px 8px; cursor:pointer; margin-right:8px;" title="Clique para alterar">${txtBtn}</button>`;
+                    }
+                }
+
+                labelTempo = htmlSeloToggle + (a.timestampConfirmacao ? ` Confirmou ${a.timestampConfirmacao}` : 'Confirmado');
 
                 if(podeDesfazer) { 
-                    if (isMaster || isJuiz) {
-                        htmlAcoes += `<button onclick="toggleTitular('${a.id}', ${!a.titular})" class="btn-desfazer" style="background:#24283b; border:1px solid var(--accent); color:var(--text-main); margin-right:5px;" title="Mudar Titular/Reserva">${a.titular ? '👇 Res' : '⭐ Tit'}</button>`;
-                    }
                     htmlAcoes += `<button onclick="marcarPresenca('${a.id}', 'duvida')" class="btn-desfazer" title="Voltar para Dúvida">❌</button>`; 
                 } else {
                     htmlAcoes = `<div class="status-dot"></div>`;
@@ -795,7 +847,6 @@
             return `<div class="presenca-card"><div class="${avatarClass}">${initial}</div><div class="presenca-info"><div class="presenca-nome">${nomeDisplay}</div><div class="presenca-pos">${a.posicao || 'Jogador'}</div>${labelTempo ? `<div class="presenca-tempo" style="color: ${status==='fora'? 'var(--red-deny)' : 'var(--cyan)'}">${labelTempo}</div>` : ''}</div><div class="presenca-acoes">${htmlAcoes}</div></div>`;
         }
 
-        // ATUALIZADO: Ordenação da lista por chegada
         function atualizarListaSorteio() {
             if(!document.getElementById('listaDentroGoleiros')) return;
             let travadoPorHorario = isListaBloqueadaPorHorario(); let meuJogadorId = localStorage.getItem('meuJogadorId');
@@ -804,37 +855,53 @@
             else if (travadoPorHorario) { banner.className = "status-agendamento status-fechado"; banner.innerHTML = `🔒 Lista Fechada (${configSistema.dataProximaPartida.split('-').reverse().join('/')})`; }
             else { banner.className = "status-agendamento status-aberto"; banner.innerHTML = `🟢 Lista Aberta para ${configSistema.dataProximaPartida.split('-').reverse().join('/')}`; }
 
-            let dg = [], dl = [], f = [], d = [];
+            let dg = [], dt = [], dr = [], f = [], d = [];
             
             atletasFC.forEach(a => {
                 let status = a.statusPresenca || (a.presente ? 'dentro' : 'duvida');
                 if (status === 'dentro') {
-                    if (a.posicao === 'Goleiro' || a.posicao === 'GOL') dg.push(a); else dl.push(a);
+                    if (a.posicao === 'Goleiro' || a.posicao === 'GOL') dg.push(a); 
+                    else {
+                        if (a.titular) dt.push(a); else dr.push(a);
+                    }
                 } else if (status === 'fora') { f.push(a); } else { d.push(a); }
             });
 
-            // Ordenar quem está dentro pelo momento que confirmou
+            // Ordenador por tempo exato de confirmação
             const sortChegada = (a, b) => {
                 let tsA = a.tsOrdenacao || 0; let tsB = b.tsOrdenacao || 0;
                 if (tsA === 0 && tsB !== 0) return 1; if (tsB === 0 && tsA !== 0) return -1;
                 return tsA - tsB; 
             };
 
+            // Aplica a ordem global para definir quem chegou primeiro
             dg.sort(sortChegada);
-            dl.sort(sortChegada);
+            dg.forEach((a, i) => a.displayIndex = i + 1);
 
-            let htmlDG = dg.map((a, i) => gerarCardAtleta(a, (meuJogadorId !== null && a.id !== meuJogadorId && !isMaster && !isJuiz) || (travadoPorHorario && !isMaster && !isJuiz), true, i)).join('');
-            let htmlDL = dl.map((a, i) => gerarCardAtleta(a, (meuJogadorId !== null && a.id !== meuJogadorId && !isMaster && !isJuiz) || (travadoPorHorario && !isMaster && !isJuiz), true, i)).join('');
+            let linhaGlobal = dt.concat(dr).sort(sortChegada);
+            linhaGlobal.forEach((a, i) => a.displayIndex = i + 1);
+
+            // Re-ordena as sublistas individualmente para renderização
+            dt.sort(sortChegada);
+            dr.sort(sortChegada);
+
+            let htmlDG = dg.map(a => gerarCardAtleta(a, (meuJogadorId !== null && a.id !== meuJogadorId && !isMaster && !isJuiz) || (travadoPorHorario && !isMaster && !isJuiz), true)).join('');
+            let htmlDT = dt.map(a => gerarCardAtleta(a, (meuJogadorId !== null && a.id !== meuJogadorId && !isMaster && !isJuiz) || (travadoPorHorario && !isMaster && !isJuiz), true)).join('');
+            let htmlDR = dr.map(a => gerarCardAtleta(a, (meuJogadorId !== null && a.id !== meuJogadorId && !isMaster && !isJuiz) || (travadoPorHorario && !isMaster && !isJuiz), true)).join('');
+            
             let htmlF = f.map(a => gerarCardAtleta(a, (meuJogadorId !== null && a.id !== meuJogadorId && !isMaster && !isJuiz) || (travadoPorHorario && !isMaster && !isJuiz))).join('');
             let htmlD = d.map(a => gerarCardAtleta(a, (meuJogadorId !== null && a.id !== meuJogadorId && !isMaster && !isJuiz) || (travadoPorHorario && !isMaster && !isJuiz))).join('');
 
             document.getElementById('listaDentroGoleiros').innerHTML = htmlDG || "<div class='presenca-card'><span style='color:#7aa2f7; font-size:14px;'>Nenhum goleiro confirmado.</span></div>";
-            document.getElementById('listaDentroLinha').innerHTML = htmlDL || "<div class='presenca-card'><span style='color:#7aa2f7; font-size:14px;'>Nenhum jogador confirmado.</span></div>";
+            document.getElementById('listaDentroTitulares').innerHTML = htmlDT || "<div class='presenca-card'><span style='color:#7aa2f7; font-size:14px;'>Nenhum titular definido pelo Admin.</span></div>";
+            document.getElementById('listaDentroReservas').innerHTML = htmlDR || "<div class='presenca-card'><span style='color:#7aa2f7; font-size:14px;'>Nenhum jogador na reserva.</span></div>";
+            
             document.getElementById('listaFora').innerHTML = htmlF || "<div class='presenca-card'><span style='color:#7aa2f7; font-size:14px;'>Ninguém de fora.</span></div>";
             document.getElementById('listaDuvida').innerHTML = htmlD || "<div class='presenca-card'><span style='color:#7aa2f7; font-size:14px;'>Nenhuma dúvida.</span></div>";
             
             document.getElementById('countDentroGoleiros').innerText = dg.length; 
-            document.getElementById('countDentroLinha').innerText = dl.length;
+            document.getElementById('countDentroTitulares').innerText = dt.length;
+            document.getElementById('countDentroReservas').innerText = dr.length;
             document.getElementById('countFora').innerText = f.length; 
             document.getElementById('countDuvida').innerText = d.length;
         }
@@ -850,10 +917,9 @@
                 timestampConfirmacao: novoStatus !== 'duvida' ? getTimestampFormatado() : null 
             };
 
-            // Registra a ordem de chegada exata
             if (novoStatus === 'dentro') {
-                updateData.tsOrdenacao = Date.now();
-                updateData.titular = false; // Todo mundo que entra por padrão é reserva, admin que promove
+                updateData.tsOrdenacao = Date.now(); // Grava a hora exata do clique
+                updateData.titular = false; // Entra como reserva até que o Admin promova a Titular
             } else {
                 updateData.tsOrdenacao = null;
                 updateData.titular = false;
@@ -862,18 +928,23 @@
             db.collection("atletas").doc(id).update(updateData);
         }
         
-        // ATUALIZADO: WhatsApp separando Titulares e Reservas
         function compartilharListaPresenca() {
-            let dg = [], dlTitulares = [], dlReservas = [], fora = [], duvida = [];
+            let dg = [], dt = [], dr = [], fora = [], duvida = [];
             
-            // Pega a lista toda, e ordena ela inteira pela ordem de chegada para o WhatsApp ficar perfeito
             let atletasOrdenados = [...atletasFC].sort((a, b) => (a.tsOrdenacao || 0) - (b.tsOrdenacao || 0));
+            let numGoleiro = 1, numLinha = 1;
 
             atletasOrdenados.forEach(a => {
                 let status = a.statusPresenca || (a.presente ? 'dentro' : 'duvida');
                 if (status === 'dentro') {
-                    if (a.posicao === 'Goleiro' || a.posicao === 'GOL') dg.push(a.nome);
-                    else { if (a.titular) dlTitulares.push(a.nome); else dlReservas.push(a.nome); }
+                    if (a.posicao === 'Goleiro' || a.posicao === 'GOL') {
+                        dg.push(`${numGoleiro}º - ${a.nome}`);
+                        numGoleiro++;
+                    } else { 
+                        if (a.titular) dt.push(`${numLinha}º - ${a.nome}`);
+                        else dr.push(`${numLinha}º - ${a.nome}`);
+                        numLinha++;
+                    }
                 } else if (status === 'fora') { fora.push(a.nome); } else { duvida.push(a.nome); }
             });
 
@@ -882,13 +953,13 @@
             let txt = `⚽ *LISTA DE PRESENÇA - AMIGOS FC* ⚽\n📅 Data: ${d}\n\n`;
             
             txt += `🧤 *GOLEIROS (${dg.length}):*\n`;
-            if(dg.length === 0) txt += `- Nenhum\n`; else dg.forEach((n, i) => txt += `${i+1}º - ${n}\n`);
+            if(dg.length === 0) txt += `- Nenhum\n`; else dg.forEach(n => txt += `${n}\n`);
             
-            txt += `\n⭐ *TITULARES (${dlTitulares.length}):*\n`;
-            if(dlTitulares.length === 0) txt += `- Nenhum\n`; else dlTitulares.forEach((n, i) => txt += `${i+1}º - ${n}\n`);
+            txt += `\n⭐ *TITULARES (${dt.length}):*\n`;
+            if(dt.length === 0) txt += `- Nenhum\n`; else dt.forEach(n => txt += `${n}\n`);
             
-            txt += `\n🔄 *RESERVAS (${dlReservas.length}):*\n`;
-            if(dlReservas.length === 0) txt += `- Nenhum\n`; else dlReservas.forEach((n, i) => txt += `${i+1}º - ${n}\n`);
+            txt += `\n🔄 *RESERVAS (${dr.length}):*\n`;
+            if(dr.length === 0) txt += `- Nenhum\n`; else dr.forEach(n => txt += `${n}\n`);
             
             txt += `\n❌ *FORA (${fora.length}):*\n`;
             if(fora.length === 0) txt += `- Ninguém\n`; else fora.forEach(n => txt += `- ${n}\n`);
