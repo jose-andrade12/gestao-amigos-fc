@@ -6,8 +6,10 @@
     <meta name="referrer" content="no-referrer" />
     <title>Gestão Amigos FC - Pro Edition</title>
     
+    <!-- Firebase core, Firestore e Auth -->
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
@@ -61,12 +63,19 @@
         .modulo.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        .form-group { margin-bottom: 15px; }
+        .form-group { margin-bottom: 15px; width: 100%;}
         label { display: block; margin-bottom: 5px; color: var(--text-muted); font-size: 14px;}
         input, select { width: 100%; padding: 10px; background-color: #16161e; border: 1px solid #414868; color: white; border-radius: 5px; box-sizing: border-box; outline: none; }
         input:focus, select:focus { border-color: var(--cyan); }
+        input[readonly] { background-color: #24283b; color: #7aa2f7; cursor: not-allowed; }
+        
+        /* Grid para o Cadastro Completo */
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .form-section { background: #16161e; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #414868;}
+        .form-section h4 { margin-top: 0; color: var(--cyan); border-bottom: 1px solid #292e42; padding-bottom: 10px; margin-bottom: 15px;}
         
         .btn-acao { background-color: var(--accent); color: #1a1b26; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 16px; width: 100%; margin-top: 10px; font-weight: bold; transition: 0.2s; }
+        .btn-acao:hover { filter: brightness(1.1); }
         .btn-wpp { background-color: var(--wpp-color); color: #fff; margin-top: 15px; display: flex; align-items: center; justify-content: center; gap: 10px; }
         .btn-wpp:hover { background-color: #128C7E; }
         .btn-sm { padding: 5px 10px; width: auto; font-size: 12px; margin-top: 0; margin-right: 5px; border-radius: 3px; cursor: pointer; border: none; }
@@ -74,14 +83,19 @@
         /* CONTROLE DE ACESSO */
         .req-master, .req-master-flex, .req-master-cell, .req-master-grid { display: none !important; }
         .req-juiz, .req-juiz-flex, .req-juiz-cell, .req-juiz-grid { display: none !important; }
+        .req-logged, .req-logged-flex { display: none !important; }
+        
         body.is-master .req-master { display: block !important; }
         body.is-master .req-master-flex { display: flex !important; }
         body.is-master .req-master-cell { display: table-cell !important; }
         body.is-master .req-master-grid { display: grid !important; }
         body.is-master .req-juiz, body.is-master .req-juiz-flex, body.is-master .req-juiz-grid { display: flex !important; }
         body.is-juiz .req-juiz, body.is-juiz .req-juiz-flex, body.is-juiz .req-juiz-grid { display: flex !important; }
+        body.is-amigos .req-logged { display: block !important; }
+        body.is-amigos .req-logged-flex { display: flex !important; }
+
         .aviso-bloqueio { background: rgba(255, 158, 100, 0.1); color: var(--admin-color); padding: 15px; border-radius: 8px; border: 1px dashed var(--admin-color); text-align: center; margin-bottom: 20px; font-weight: bold; }
-        body.is-juiz .aviso-bloqueio-juiz, body.is-master .aviso-bloqueio-juiz, body.is-master .aviso-bloqueio-master { display: none !important; }
+        body.is-juiz .aviso-bloqueio-juiz, body.is-master .aviso-bloqueio-juiz, body.is-master .aviso-bloqueio-master, body.is-amigos .aviso-bloqueio-cadastro { display: none !important; }
         
         .caixa-data-juiz { border: 1px solid var(--cyan); border-radius: 8px; padding: 15px; margin-bottom: 20px; background-color: #16161e; }
         .caixa-data-juiz label { color: var(--cyan); font-weight: bold; font-size: 16px; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 8px;}
@@ -105,7 +119,7 @@
         .header-lista span { color: #a9b1d6; font-size: 18px; }
         
         .presenca-card { display: flex; align-items: center; padding: 12px 10px; border-bottom: 1px solid #16161e; background-color: transparent; }
-        .avatar-circle { width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, #414868, #24283b); display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold; color: #fff; margin-right: 15px; flex-shrink: 0; border: 2px solid #16161e;}
+        .avatar-circle { width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, #414868, #24283b); display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold; color: #fff; margin-right: 15px; flex-shrink: 0; border: 2px solid #16161e; object-fit: cover; }
         .avatar-circle.goleiro { border-color: var(--admin-color); }
         
         .presenca-info { flex-grow: 1; display: flex; flex-direction: column; }
@@ -127,8 +141,8 @@
         .btn-amarelo { background-color: #e0af68; color: #000; }
         .btn-vermelho { background-color: var(--red-deny); color: #fff; }
         
-        .modal-juiz { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 999; justify-content: center; align-items: center; }
-        .modal-juiz-content { background: var(--panel-bg); padding: 25px; border-radius: 10px; width: 90%; max-width: 400px; text-align: center; }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 999; justify-content: center; align-items: center; }
+        .modal-content { background: var(--panel-bg); padding: 25px; border-radius: 10px; width: 90%; max-width: 400px; text-align: center; border: 1px solid #414868; }
         .btn-jogador-juiz { display: block; width: 100%; padding: 15px; margin-bottom: 10px; background: #16161e; border: 1px solid #414868; color: white; font-size: 18px; border-radius: 8px; cursor: pointer; }
         .btn-jogador-juiz:hover { background: var(--accent); color: #000;}
 
@@ -161,6 +175,7 @@
             .main-content { padding: 15px; overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch; padding-bottom: 40px; }
             .modulo { padding: 20px; }
             #sidebarCronometro { display: none !important; }
+            .form-grid { grid-template-columns: 1fr; }
 
             .placar-container { display: grid !important; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px 10px; align-items: center; }
             .time-placar:nth-child(1) { grid-column: 1; grid-row: 1; display: flex; flex-direction: column; align-items: center; }
@@ -201,7 +216,7 @@
             </button>
             <button class="menu-btn" onclick="abrirAba('cadastro')">
                 <span class="menu-icon">📋</span>
-                <span class="menu-text">Cadastro</span>
+                <span class="menu-text">Meu Perfil</span>
             </button>
             <button class="menu-btn" onclick="abrirAba('sorteio')">
                 <span class="menu-icon">✅</span>
@@ -219,7 +234,7 @@
                 <span class="menu-icon">📊</span>
                 <span class="menu-text">Dashboard</span>
             </button>
-            <button class="menu-btn btn-login" onclick="fazerLogin()" id="btnLogin">
+            <button class="menu-btn btn-login" onclick="abrirModalLogin()" id="btnLogin">
                 <span class="menu-icon">🔑</span>
                 <span class="menu-text">Login</span>
             </button>
@@ -290,36 +305,85 @@
             <div class="log-container" id="logPartidaJuiz" style="max-height: 150px;"></div>
         </div>
 
-        <!-- MÓDULO CADASTRO -->
+        <!-- MÓDULO CADASTRO COMPLETO -->
         <div id="cadastro" class="modulo">
-            <h3>Cadastrar / Editar Atleta</h3>
-            <div class="aviso-bloqueio aviso-bloqueio-master">🔒 MODO LEITURA: Efetue o Login com a Senha Master para cadastrar ou editar atletas.</div>
-            <div class="req-master">
-                <div class="flex-row">
-                    <div class="form-group">
-                        <label>Nome do Jogador</label>
-                        <input type="text" id="cadNome" placeholder="Ex: Léo">
-                    </div>
-                    <div class="form-group">
-                        <label>Posição</label>
-                        <select id="cadPosicao">
-                            <option value="Goleiro">Goleiro (GOL)</option>
-                            <option value="Zagueiro">Zagueiro (ZAG)</option>
-                            <option value="Lateral">Lateral (LAT)</option>
-                            <option value="Volante">Volante (VOL)</option>
-                            <option value="Meio-Campo">Meio-Campo (MEI)</option>
-                            <option value="Atacante">Atacante (ATA)</option>
-                        </select>
+            
+            <div class="aviso-bloqueio aviso-bloqueio-cadastro" id="msgBloqueioCadastro">
+                🔒 Você precisa fazer <a href="#" onclick="abrirModalLogin()" style="color:var(--admin-color);">Login com sua Conta Google</a> para criar ou editar seu perfil.
+            </div>
+
+            <div class="req-logged">
+                <h3 id="tituloAbaCadastro">Meu Perfil de Jogador</h3>
+                
+                <!-- Dados Fotografia -->
+                <div class="form-section" style="display: flex; flex-direction: column; align-items: center;">
+                    <label style="cursor:pointer; display:flex; flex-direction:column; align-items:center;">
+                        <img id="previewFoto" src="https://via.placeholder.com/150/414868/FFFFFF?text=FOTO" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid var(--cyan); margin-bottom: 10px;">
+                        <span style="color:var(--accent); font-weight:bold; font-size:14px;">📸 Alterar Foto</span>
+                        <input type="file" id="cadFoto" accept="image/*" style="display:none;" onchange="handleFotoUpload(event)">
+                    </label>
+                </div>
+
+                <!-- Dados Pessoais & Login -->
+                <div class="form-section">
+                    <h4>👤 Dados Pessoais & Acesso</h4>
+                    <div class="form-grid">
+                        <div class="form-group"><label>E-mail (Vinculado via Google)</label><input type="email" id="cadEmail" readonly placeholder="Faça login para vincular"></div>
+                        <div class="form-group"><label>Nome Completo</label><input type="text" id="cadNome" placeholder="Seu nome"></div>
+                        <div class="form-group"><label>Celular / WhatsApp</label><input type="text" id="cadWhatsApp" placeholder="(00) 00000-0000"></div>
+                        <div class="form-group"><label>Data de Nascimento</label><input type="date" id="cadNascimento"></div>
+                        <div class="form-group"><label>Estado</label><input type="text" id="cadEstado" placeholder="Ex: SP"></div>
+                        <div class="form-group"><label>Cidade</label><input type="text" id="cadCidade" placeholder="Sua cidade"></div>
+                        <div class="form-group"><label>Gênero</label><select id="cadGenero"><option value="Masculino">Masculino</option><option value="Feminino">Feminino</option><option value="Outro">Outro</option></select></div>
+                        <div class="form-group"><label>Grupo Vinculado</label><select id="cadGrupo"><option value="">Selecione um grupo...</option></select></div>
                     </div>
                 </div>
-                <button id="btnSalvarAtleta" class="btn-acao" onclick="salvarAtleta()">Registrar Atleta</button>
+
+                <!-- Dados do Jogador -->
+                <div class="form-section">
+                    <h4>⚽ Dados do Atleta</h4>
+                    <div class="form-grid">
+                        <div class="form-group"><label>Posição em Campo</label>
+                            <select id="cadPosicao">
+                                <option value="Goleiro">Goleiro (GOL)</option>
+                                <option value="Zagueiro">Zagueiro (ZAG)</option>
+                                <option value="Lateral">Lateral (LAT)</option>
+                                <option value="Volante">Volante (VOL)</option>
+                                <option value="Meio-Campo">Meio-Campo (MEI)</option>
+                                <option value="Atacante">Atacante (ATA)</option>
+                            </select>
+                        </div>
+                        <div class="form-group"><label>Time do Coração</label><input type="text" id="cadTimeCoracao" placeholder="Ex: São Paulo FC"></div>
+                        <div class="form-group"><label>Altura (m)</label><input type="number" step="0.01" id="cadAltura" placeholder="1.75"></div>
+                        <div class="form-group"><label>Peso (kg)</label><input type="number" step="0.1" id="cadPeso" placeholder="80.5"></div>
+                        <div class="form-group"><label>Tamanho da Chuteira (Pé)</label><input type="number" id="cadTamanhoPe" placeholder="41"></div>
+                        <div class="form-group"><label>Pé Favorito</label><select id="cadPeFavorito"><option value="Destro">Destro</option><option value="Canhoto">Canhoto</option><option value="Ambidestro">Ambidestro</option></select></div>
+                    </div>
+                </div>
+
+                <button id="btnSalvarAtleta" class="btn-acao" onclick="salvarAtleta()" style="font-size: 18px; padding: 15px;">💾 Salvar Meu Cadastro</button>
             </div>
-            <h3 style="margin-top: 40px;">Elenco Cadastrado (A-Z)</h3>
-            <div class="table-responsive">
-                <table>
-                    <thead><tr><th>Nome</th><th>Posição</th><th class="req-master-cell">Ações</th></tr></thead>
-                    <tbody id="listaAtletas"></tbody>
-                </table>
+
+            <!-- Área Exclusiva do Administrador -->
+            <div class="req-master" style="margin-top: 40px; border-top: 2px dashed #414868; padding-top: 30px;">
+                <h3 style="color:var(--admin-color);">🛠️ Painel do Master: Gerenciamento</h3>
+                
+                <div class="form-section">
+                    <h4 style="color:var(--admin-color);">Gerenciar Grupos</h4>
+                    <div class="flex-row" style="align-items: flex-end;">
+                        <div class="form-group" style="margin-bottom:0;"><label>Novo Grupo</label><input type="text" id="novoNomeGrupo" placeholder="Ex: Veteranos Sesi"></div>
+                        <button class="btn-acao btn-sm" style="margin:0; width:120px; height: 40px;" onclick="criarGrupo()">Adicionar</button>
+                    </div>
+                    <ul id="listaGruposAdmin" style="margin-top:15px; color:white; list-style:none; padding:0;"></ul>
+                </div>
+
+                <h3 style="margin-top: 40px;">Elenco Geral Cadastrado (A-Z)</h3>
+                <div class="table-responsive">
+                    <table>
+                        <thead><tr><th>Nome</th><th>Posição</th><th>Grupo</th><th class="req-master-cell">Ações</th></tr></thead>
+                        <tbody id="listaAtletas"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
@@ -424,13 +488,12 @@
                     <div class="form-group"><label>Time:</label><select id="timeAcao"><option>Real Madrid</option><option>Milan</option></select></div>
                     <div class="form-group"><label>Jogador:</label><select id="jogadorAcao" class="select-jogadores"></select></div>
                 </div>
-                <div class="botoes-jogo">
-                    <button class="btn-acao btn-gol" onclick="registrarScout('Gol')">⚽ GOL</button>
-                    <button class="btn-acao btn-assist" onclick="registrarScout('Assistência')">👟 ASSIST</button>
-                    <button class="btn-acao btn-amarelo" onclick="registrarScout('Amarelo')">🟨 AMARELO</button>
-                    <button class="btn-acao btn-vermelho" onclick="registrarScout('Vermelho')">🟥 VERMELHO</button>
+                <div class="botoes-jogo" style="display:flex; gap:10px; flex-wrap:wrap;">
+                    <button class="btn-acao btn-gol" style="flex:1;" onclick="registrarScout('Gol')">⚽ GOL</button>
+                    <button class="btn-acao btn-assist" style="flex:1;" onclick="registrarScout('Assistência')">👟 ASSIST</button>
+                    <button class="btn-acao btn-amarelo" style="flex:1;" onclick="registrarScout('Amarelo')">🟨 AMARELO</button>
+                    <button class="btn-acao btn-vermelho" style="flex:1;" onclick="registrarScout('Vermelho')">🟥 VERMELHO</button>
                 </div>
-                <button onclick="cancelarEdicaoScout()" style="margin-top: 15px; background: #292e42; color: white; border: none; padding: 10px; border-radius: 5px; width: 100%;">❌ Cancelar Edição (Apenas recarrega a página)</button>
             </div>
 
             <button class="btn-acao btn-wpp" onclick="compartilharJogo()" style="margin-top: 25px;">📲 Enviar Resumo (WhatsApp)</button>
@@ -515,8 +578,31 @@
 
     </div>
 
-    <div id="modalJuiz" class="modal-juiz">
-        <div class="modal-juiz-content">
+    <!-- MODAL ESCOLHA DE LOGIN -->
+    <div id="modalAuthSelector" class="modal-overlay">
+        <div class="modal-content" style="max-width: 350px;">
+            <h2 style="color: var(--cyan); margin-top: 0;">Acesso ao Sistema</h2>
+            <p style="color: #a9b1d6; font-size: 14px; margin-bottom: 20px;">Escolha como deseja entrar:</p>
+            
+            <button class="btn-acao" onclick="fazerLoginGoogle()" style="background: white; color: #444; border: 1px solid #ddd; display:flex; align-items:center; justify-content:center; gap:10px;">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" width="20"> Login do Jogador (Google)
+            </button>
+            
+            <div style="margin: 20px 0; border-bottom: 1px solid #414868; position: relative;">
+                <span style="position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: var(--panel-bg); padding: 0 10px; color: #7aa2f7; font-size: 12px;">OU</span>
+            </div>
+
+            <button class="btn-acao" onclick="fazerLoginSenha()" style="background: #16161e; color: var(--admin-color); border: 1px dashed var(--admin-color);">
+                🔑 Acesso Restrito (Admin/Juiz)
+            </button>
+
+            <button class="btn-acao" style="background: transparent; color: #7aa2f7; margin-top: 15px; font-weight: normal;" onclick="fecharModalLogin()">Cancelar</button>
+        </div>
+    </div>
+
+    <!-- MODAL EVENTO JUIZ -->
+    <div id="modalJuiz" class="modal-overlay">
+        <div class="modal-content">
             <h2 id="modalJuizTitulo" style="margin-top: 0; color: var(--accent);">Ação</h2>
             <p id="modalJuizAcao" style="font-size: 20px; font-weight: bold; margin-bottom: 20px;"></p>
             <div id="listaJogadoresJuiz" style="max-height: 50vh; overflow-y: auto;"></div>
@@ -525,6 +611,7 @@
     </div>
 
     <script>
+        // MANTENHA A SUA CONFIGURAÇÃO EXATA DO FIREBASE AQUI
         const firebaseConfig = {
             apiKey: "AIzaSyBE7HbmYhdnUnbi_PvY27pBNgfiWoh4I9w",
             authDomain: "amigos-fc-gestao.firebaseapp.com",
@@ -535,71 +622,123 @@
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
+        const auth = firebase.auth();
 
-        function verificarSenha(input, hashEsperado) {
-            try { return btoa(input.split('').reverse().join('')) === hashEsperado; } catch(e) { return false; }
-        }
-
+        // Variáveis Globais
         let isMaster = false, isJuiz = false, isAmigos = false;
+        let authUserEmail = null;
+        let fotoBase64Atual = null;
 
-        async function fazerLogin() {
-            if (isMaster || isJuiz || isAmigos) {
-                isMaster = false; isJuiz = false; isAmigos = false;
-                document.getElementById('btnLogin').innerHTML = `<span class="menu-icon">🔑</span><span class="menu-text">Login</span>`;
-                document.body.classList.remove('is-master', 'is-juiz', 'is-amigos');
-                alert("Logout realizado com sucesso. Modo Leitura ativado.");
-                atualizarListaSorteio(); refreshTelas();
-            } else {
-                let s = prompt("ACESSO RESTRITO:\nDigite a Senha:");
-                if (!s) return;
-                
-                try {
-                    const doc = await db.collection("sistema").doc("senhas").get();
-                    if (doc.exists) {
-                        const senhasDB = doc.data();
-                        if (verificarSenha(s, senhasDB.master)) {
-                            isMaster = true; isJuiz = true; isAmigos = true; 
-                            document.getElementById('btnLogin').innerHTML = `<span class="menu-icon">🔓</span><span class="menu-text">Sair (Master)</span>`;
-                            document.body.classList.add('is-master', 'is-juiz', 'is-amigos');
-                            alert("Acesso MASTER Liberado!"); atualizarListaSorteio(); refreshTelas();
-                        } 
-                        else if (verificarSenha(s, senhasDB.juiz)) {
-                            isJuiz = true; isAmigos = true;
-                            document.getElementById('btnLogin').innerHTML = `<span class="menu-icon">🔓</span><span class="menu-text">Sair (Juiz)</span>`;
-                            document.body.classList.add('is-juiz', 'is-amigos');
-                            alert("Acesso JUIZ Liberado!"); atualizarListaSorteio(); refreshTelas();
-                        }
-                        else if (verificarSenha(s, senhasDB.amigos)) {
-                            isAmigos = true;
-                            document.getElementById('btnLogin').innerHTML = `<span class="menu-icon">🔓</span><span class="menu-text">Sair (Amigos)</span>`;
-                            document.body.classList.add('is-amigos');
-                            alert("Acesso AMIGOS Liberado! Modo Visualização Autenticada ativado."); atualizarListaSorteio(); refreshTelas();
-                        } else { 
-                            alert("Senha Incorreta!"); 
-                        }
-                    } else {
-                        alert("Erro: Configuração de senhas não encontrada no banco.");
-                    }
-                } catch (error) {
-                    alert("Erro ao conectar com o banco de dados.");
-                }
-            }
-        }
-
-        let atletasFC = [], scoutsFC = [], premiacoesFC = [], escalacoesFC = [];
+        let atletasFC = [], scoutsFC = [], premiacoesFC = [], escalacoesFC = [], gruposFC = [];
         let atletaEditandoId = null;
         let filtroDataGlobal = "", chartInstancia = null, sorteioEquipasAtuais = { real: [], milan: [] };
         let modoManualAtivo = false, juizTimeAtual = "", juizAcaoAtual = "";
         let configSistema = { dataProximaPartida: "", presencaLiberada: false };
 
-        function mudarDataGlobal(novaData) {
-            filtroDataGlobal = novaData;
-            document.getElementById('dataJogo').value = novaData;
-            document.getElementById('dataPremio').value = novaData;
-            document.getElementById('dataJuiz').value = novaData;
+        /* === SISTEMA DE LOGIN E AUTENTICAÇÃO === */
+        
+        // Listener de Estado de Autenticação (Mantém o jogador logado)
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                authUserEmail = user.email;
+                isAmigos = true; // Habilita permissão básica de jogador
+                document.body.classList.add('is-amigos');
+                document.getElementById('cadEmail').value = user.email;
+                document.getElementById('btnLogin').innerHTML = `<span class="menu-icon">🚪</span><span class="menu-text">Sair (Logado)</span>`;
+                
+                // Tenta vincular e achar o jogador pelo email
+                verificarVinculoJogador(user.email);
+            } else {
+                authUserEmail = null;
+                // Só reseta se não for Admin logado por senha na mesma sessão
+                if(!isMaster && !isJuiz) resetarAcessos();
+            }
+        });
+
+        function abrirModalLogin() {
+            if (isMaster || isJuiz || isAmigos) {
+                if(confirm("Deseja encerrar sua sessão?")) {
+                    isMaster = false; isJuiz = false; isAmigos = false;
+                    localStorage.removeItem('meuJogadorId');
+                    auth.signOut().then(() => {
+                        resetarAcessos();
+                        alert("Logout realizado com sucesso.");
+                    });
+                }
+            } else {
+                document.getElementById('modalAuthSelector').style.display = 'flex';
+            }
+        }
+
+        function fecharModalLogin() { document.getElementById('modalAuthSelector').style.display = 'none'; }
+
+        function resetarAcessos() {
+            document.body.classList.remove('is-master', 'is-juiz', 'is-amigos');
+            document.getElementById('btnLogin').innerHTML = `<span class="menu-icon">🔑</span><span class="menu-text">Login</span>`;
+            atualizarListaSorteio(); refreshTelas();
+        }
+
+        // Login Google (Jogadores)
+        function fazerLoginGoogle() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            auth.signInWithPopup(provider).then((result) => {
+                fecharModalLogin();
+                // O onAuthStateChanged vai capturar e chamar verificarVinculoJogador
+            }).catch((error) => {
+                alert("Erro ao logar com Google: " + error.message);
+            });
+        }
+
+        function verificarVinculoJogador(email) {
+            const atleta = atletasFC.find(a => a.email === email);
+            if (atleta) {
+                localStorage.setItem('meuJogadorId', atleta.id);
+                // Preenche o perfil para ele poder editar
+                preencherFormularioPerfil(atleta);
+            } else {
+                // É um usuário novo! Abre a aba cadastro para ele se registrar.
+                abrirAba('cadastro');
+                alert("Olá! Vimos que é seu primeiro acesso. Por favor, preencha seus dados abaixo e escolha seu grupo para criar seu perfil de jogador.");
+                document.getElementById('cadEmail').value = email;
+            }
+            atualizarListaSorteio(); 
             refreshTelas();
         }
 
+        // Login Senha (Admin / Juiz)
+        async function fazerLoginSenha() {
+            fecharModalLogin();
+            let s = prompt("ACESSO RESTRITO:\nDigite a Senha:");
+            if (!s) return;
+            
+            try {
+                const doc = await db.collection("sistema").doc("senhas").get();
+                if (doc.exists) {
+                    const senhasDB = doc.data();
+                    if (verificarSenha(s, senhasDB.master)) {
+                        isMaster = true; isJuiz = true; isAmigos = true; 
+                        document.getElementById('btnLogin').innerHTML = `<span class="menu-icon">🔓</span><span class="menu-text">Sair (Master)</span>`;
+                        document.body.classList.add('is-master', 'is-juiz', 'is-amigos');
+                        alert("Acesso MASTER Liberado!"); atualizarListaSorteio(); refreshTelas();
+                    } 
+                    else if (verificarSenha(s, senhasDB.juiz)) {
+                        isJuiz = true; isAmigos = true;
+                        document.getElementById('btnLogin').innerHTML = `<span class="menu-icon">🔓</span><span class="menu-text">Sair (Juiz)</span>`;
+                        document.body.classList.add('is-juiz', 'is-amigos');
+                        alert("Acesso JUIZ Liberado!"); atualizarListaSorteio(); refreshTelas();
+                    } else { 
+                        alert("Senha Incorreta!"); 
+                    }
+                }
+            } catch (error) { alert("Erro ao conectar com o banco de dados."); }
+        }
+
+        function verificarSenha(input, hashEsperado) {
+            try { return btoa(input.split('').reverse().join('')) === hashEsperado; } catch(e) { return false; }
+        }
+
+        /* === SISTEMA DE DADOS (FIRESTORE) === */
+        
         db.collection("sistema").doc("config").onSnapshot(doc => {
             if (doc.exists) {
                 configSistema = doc.data();
@@ -611,19 +750,190 @@
             }
         });
 
+        db.collection("sistema").doc("grupos").onSnapshot(doc => {
+            if(doc.exists) {
+                gruposFC = doc.data().lista || [];
+                renderizarSelectGrupos();
+            }
+        });
+
         db.collection("atletas").onSnapshot(snap => { 
             atletasFC = snap.docs.map(doc => ({id: doc.id, ...doc.data()})).sort((a, b) => a.nome.localeCompare(b.nome)); 
-            atualizarListaSorteio(); if(modoManualAtivo) atualizarPainelManual(); refreshTelas(); 
+            atualizarListaSorteio(); 
+            if(modoManualAtivo) atualizarPainelManual(); 
+            refreshTelas(); 
+            
+            // Se logado e atualizou os dados, repreencha
+            if(authUserEmail) {
+                let eu = atletasFC.find(a => a.email === authUserEmail);
+                if(eu && !isMaster) preencherFormularioPerfil(eu);
+            }
         });
+        
         db.collection("scouts").onSnapshot(snap => { scoutsFC = snap.docs.map(doc => ({id: doc.id, ...doc.data()})).sort((a,b) => a.timestamp - b.timestamp); refreshTelas(); });
         db.collection("premiacoes").onSnapshot(snap => { premiacoesFC = snap.docs.map(doc => ({id: doc.id, ...doc.data()})).sort((a,b) => b.timestamp - a.timestamp); refreshTelas(); });
         db.collection("escalacoes").onSnapshot(snap => { escalacoesFC = snap.docs.map(doc => ({id: doc.id, ...doc.data()})); refreshTelas(); });
 
+        /* === FUNÇÕES DE CADASTRO E FOTO === */
+
+        function handleFotoUpload(e) {
+            const file = e.target.files[0];
+            if(file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    fotoBase64Atual = event.target.result;
+                    document.getElementById('previewFoto').src = fotoBase64Atual;
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function renderizarSelectGrupos() {
+            let options = '<option value="">Selecione um grupo...</option>';
+            gruposFC.forEach(g => options += `<option value="${g}">${g}</option>`);
+            if(document.getElementById('cadGrupo')) document.getElementById('cadGrupo').innerHTML = options;
+            
+            if(isMaster && document.getElementById('listaGruposAdmin')) {
+                document.getElementById('listaGruposAdmin').innerHTML = gruposFC.map(g => `<li style="background:#24283b; padding:10px; border-radius:5px; margin-bottom:5px; display:flex; justify-content:space-between;">${g} <button onclick="excluirGrupo('${g}')" style="background:transparent; border:none; color:var(--red-deny); cursor:pointer;">❌</button></li>`).join('');
+            }
+        }
+
+        function criarGrupo() {
+            let novo = document.getElementById('novoNomeGrupo').value.trim();
+            if(!novo) return;
+            let atualizados = [...gruposFC, novo];
+            db.collection("sistema").doc("grupos").set({ lista: atualizados }, {merge: true}).then(()=>{
+                document.getElementById('novoNomeGrupo').value = "";
+                alert("Grupo criado!");
+            });
+        }
+
+        function excluirGrupo(nome) {
+            if(confirm("Excluir este grupo?")) {
+                let atualizados = gruposFC.filter(g => g !== nome);
+                db.collection("sistema").doc("grupos").set({ lista: atualizados }, {merge: true});
+            }
+        }
+
+        function preencherFormularioPerfil(atleta) {
+            document.getElementById('cadNome').value = atleta.nome || '';
+            document.getElementById('cadEmail').value = atleta.email || authUserEmail || '';
+            document.getElementById('cadWhatsApp').value = atleta.celular || '';
+            document.getElementById('cadNascimento').value = atleta.dataNascimento || '';
+            document.getElementById('cadEstado').value = atleta.estado || '';
+            document.getElementById('cadCidade').value = atleta.cidade || '';
+            document.getElementById('cadGenero').value = atleta.genero || 'Masculino';
+            document.getElementById('cadGrupo').value = atleta.grupo || '';
+            
+            document.getElementById('cadPosicao').value = atleta.posicao || 'Goleiro';
+            document.getElementById('cadTimeCoracao').value = atleta.timeCoracao || '';
+            document.getElementById('cadAltura').value = atleta.altura || '';
+            document.getElementById('cadPeso').value = atleta.peso || '';
+            document.getElementById('cadTamanhoPe').value = atleta.tamanhoPe || '';
+            document.getElementById('cadPeFavorito').value = atleta.peFavorito || 'Destro';
+
+            if(atleta.foto) {
+                fotoBase64Atual = atleta.foto;
+                document.getElementById('previewFoto').src = atleta.foto;
+            } else {
+                fotoBase64Atual = null;
+                document.getElementById('previewFoto').src = "https://via.placeholder.com/150/414868/FFFFFF?text=FOTO";
+            }
+        }
+
+        function limparFormularioPerfil() {
+            // Limpa tudo exceto o email se estiver logado
+            const emailBackup = document.getElementById('cadEmail').value;
+            document.querySelectorAll('#cadastro input:not(#cadEmail), #cadastro select').forEach(el => el.value = '');
+            document.getElementById('cadEmail').value = emailBackup;
+            fotoBase64Atual = null;
+            document.getElementById('previewFoto').src = "https://via.placeholder.com/150/414868/FFFFFF?text=FOTO";
+        }
+
+        function salvarAtleta() {
+            // Se não é master, e não está logado no auth, não pode salvar
+            if(!isMaster && !authUserEmail) return alert("Você precisa fazer login para salvar seu perfil.");
+            
+            const dados = {
+                nome: document.getElementById('cadNome').value,
+                email: document.getElementById('cadEmail').value,
+                celular: document.getElementById('cadWhatsApp').value,
+                dataNascimento: document.getElementById('cadNascimento').value,
+                estado: document.getElementById('cadEstado').value,
+                cidade: document.getElementById('cadCidade').value,
+                genero: document.getElementById('cadGenero').value,
+                grupo: document.getElementById('cadGrupo').value,
+                posicao: document.getElementById('cadPosicao').value,
+                timeCoracao: document.getElementById('cadTimeCoracao').value,
+                altura: document.getElementById('cadAltura').value,
+                peso: document.getElementById('cadPeso').value,
+                tamanhoPe: document.getElementById('cadTamanhoPe').value,
+                peFavorito: document.getElementById('cadPeFavorito').value,
+                foto: fotoBase64Atual,
+                timestampUpdate: Date.now()
+            };
+
+            if(!dados.nome) return alert("O Nome é obrigatório!");
+            if(!dados.grupo) return alert("Selecione a qual grupo/pelada você pertence!");
+
+            // Lógica de Identificação: Se Master está editando alguém, ou se é o próprio jogador
+            let idAlvo = null;
+            
+            if (isMaster && atletaEditandoId) {
+                idAlvo = atletaEditandoId; // Master editando registro de terceiro
+            } else if (authUserEmail) {
+                // Auto-registro ou auto-edição do jogador
+                const atletaExistente = atletasFC.find(a => a.email === authUserEmail);
+                if(atletaExistente) idAlvo = atletaExistente.id;
+            }
+
+            if(idAlvo) {
+                db.collection("atletas").doc(idAlvo).update(dados).then(()=>{
+                    alert("Perfil atualizado com sucesso!");
+                    if(isMaster) { cancelarEdicaoAtleta(); }
+                });
+            } else {
+                // É um cadastro totalmente novo
+                dados.presente = false;
+                dados.statusPresenca = 'duvida';
+                dados.timestampConfirmacao = null;
+                dados.tsOrdenacao = null;
+                dados.titular = false;
+                dados.timestampCriacao = Date.now();
+
+                db.collection("atletas").add(dados).then((docRef)=>{
+                    alert("Cadastro realizado com sucesso!");
+                    if(!isMaster) {
+                        localStorage.setItem('meuJogadorId', docRef.id);
+                        alert("Seu e-mail foi vinculado com sucesso à presença do jogo.");
+                    } else {
+                        limparFormularioPerfil();
+                    }
+                });
+            }
+        }
+
+        function editarAtleta(id) { 
+            if(!isMaster) return; 
+            const a = atletasFC.find(i => i.id === id); 
+            preencherFormularioPerfil(a);
+            atletaEditandoId = id; 
+            document.getElementById('tituloAbaCadastro').innerText = "✏️ Editando: " + a.nome;
+            document.getElementById('btnSalvarAtleta').innerText = "💾 Salvar Alterações (Master)"; 
+            window.scrollTo(0, 0); 
+        }
+
+        function cancelarEdicaoAtleta() { 
+            atletaEditandoId = null; 
+            document.getElementById('tituloAbaCadastro').innerText = "Novo Cadastro / Meu Perfil";
+            document.getElementById('btnSalvarAtleta').innerText = "💾 Salvar Cadastro"; 
+            limparFormularioPerfil();
+        }
+
+        function excluirDoc(coll, id) { if(!isMaster) return; if(confirm("Excluir permanentemente?")) db.collection(coll).doc(id).delete(); }
+
         /* === SISTEMA DE CRONÔMETRO ABSOLUTO === */
-        let tempoRodando = false;
-        let tempoInicio = 0;
-        let tempoPausadoTotal = 0;
-        let cInt = null;
+        let tempoRodando = false, tempoInicio = 0, tempoPausadoTotal = 0, cInt = null;
 
         function updateC() { 
             if (!tempoRodando && tempoInicio === 0 && tempoPausadoTotal === 0) {
@@ -653,26 +963,21 @@
                 updateC();
             }
         }
-
         function pausarCronometro() { 
             if(!isJuiz) return; 
-            if(tempoRodando) {
-                tempoPausadoTotal = Date.now() - tempoInicio;
-                tempoRodando = false;
-                clearInterval(cInt);
-                cInt = null;
-                updateC();
-            }
+            if(tempoRodando) { tempoPausadoTotal = Date.now() - tempoInicio; tempoRodando = false; clearInterval(cInt); cInt = null; updateC(); }
         }
-
         function zerarCronometro() { 
             if(!isJuiz) return; 
-            tempoRodando = false;
-            tempoPausadoTotal = 0;
-            tempoInicio = 0;
-            if(cInt) clearInterval(cInt);
-            cInt = null;
-            updateC(); 
+            tempoRodando = false; tempoPausadoTotal = 0; tempoInicio = 0; if(cInt) clearInterval(cInt); cInt = null; updateC(); 
+        }
+
+        function mudarDataGlobal(novaData) {
+            filtroDataGlobal = novaData;
+            document.getElementById('dataJogo').value = novaData;
+            document.getElementById('dataPremio').value = novaData;
+            document.getElementById('dataJuiz').value = novaData;
+            refreshTelas();
         }
 
         function getTimestampFormatado() {
@@ -682,96 +987,10 @@
             return `${dia}/${mes} às ${h}:${m}`;
         }
 
-        // --- DASHBOARD FILTROS ---
-        function limparFiltroDashboard() {
-            document.getElementById('dashDataInicio').value = ''; document.getElementById('dashDataFim').value = ''; atualizarDashboard();
-        }
+        /* === SISTEMA DE PRESENÇA === */
 
-        function getScoutsFiltrados() {
-            let dataInicio = document.getElementById('dashDataInicio') ? document.getElementById('dashDataInicio').value : '';
-            let dataFim = document.getElementById('dashDataFim') ? document.getElementById('dashDataFim').value : '';
-            let filtrados = scoutsFC;
-            if(dataInicio) filtrados = filtrados.filter(s => s.data >= dataInicio);
-            if(dataFim) filtrados = filtrados.filter(s => s.data <= dataFim);
-            return filtrados;
-        }
-
-        function atualizarDashboard() {
-            if(!document.getElementById('tabelaArtilharia')) return;
-            let stats = {};
-            let scoutsFiltradosParaDash = getScoutsFiltrados();
-            atletasFC.forEach(a => { stats[a.nome] = { gols: 0, assists: 0, amarelos: 0, vermelhos: 0 }; });
-            scoutsFiltradosParaDash.forEach(s => {
-                if(!stats[s.jogador]) stats[s.jogador] = { gols: 0, assists: 0, amarelos: 0, vermelhos: 0 };
-                if (s.acao === 'Gol') stats[s.jogador].gols++;
-                if (s.acao === 'Assistência') stats[s.jogador].assists++;
-                if (s.acao === 'Amarelo') stats[s.jogador].amarelos++;
-                if (s.acao === 'Vermelho') stats[s.jogador].vermelhos++;
-            });
-            let arrStats = Object.keys(stats).map(nome => ({
-                nome: nome, ...stats[nome], total: stats[nome].gols + stats[nome].assists
-            })).filter(s => s.total > 0 || s.amarelos > 0 || s.vermelhos > 0).sort((a, b) => b.gols - a.gols || b.assists - a.assists);
-
-            document.getElementById('tabelaArtilharia').innerHTML = arrStats.length === 0 ? '<tr><td colspan="5" style="text-align:center; color:#7aa2f7;">Nenhuma estatística no período.</td></tr>' : arrStats.map(s => `<tr><td>${s.nome}</td><td>${s.gols}</td><td>${s.assists}</td><td>${s.amarelos}</td><td>${s.vermelhos}</td></tr>`).join('');
-            atualizarGrafico(); 
-        }
-
-        function toggleGrafico() {
-            let container = document.getElementById('graficoContainer');
-            container.style.display = container.style.display === 'none' ? 'block' : 'none';
-            if(container.style.display === 'block') atualizarGrafico();
-        }
-
-        function atualizarGrafico() {
-            if(document.getElementById('graficoContainer').style.display === 'none') return;
-            const ctx = document.getElementById('meuGrafico').getContext('2d');
-            const metrica = document.getElementById('graficoMetrica').value;
-            const tipo = document.getElementById('graficoTipo').value;
-            let scoutsFiltradosParaDash = getScoutsFiltrados();
-
-            if(chartInstancia) chartInstancia.destroy();
-            let labels = [], dados = [], cores = [];
-
-            if (tipo === 'times') {
-                labels = ['Real Madrid', 'Milan'];
-                let valReal = 0, valMilan = 0;
-                let acaoFiltro = metrica === 'gols' ? 'Gol' : metrica === 'assists' ? 'Assistência' : metrica === 'amarelos' ? 'Amarelo' : 'Vermelho';
-                scoutsFiltradosParaDash.forEach(s => {
-                    if(s.acao === acaoFiltro) { if(s.time === 'Real Madrid') valReal++; if(s.time === 'Milan') valMilan++; }
-                });
-                dados = [valReal, valMilan]; cores = ['#ffffff', '#f7768e'];
-            } else {
-                let stats = {};
-                let acaoFiltro = metrica === 'gols' ? 'Gol' : metrica === 'assists' ? 'Assistência' : metrica === 'amarelos' ? 'Amarelo' : 'Vermelho';
-                scoutsFiltradosParaDash.forEach(s => { if(s.acao === acaoFiltro) { stats[s.jogador] = (stats[s.jogador] || 0) + 1; } });
-                let arr = Object.keys(stats).map(k => ({nome: k, val: stats[k]})).sort((a,b)=>b.val - a.val).slice(0,5); 
-                labels = arr.map(i => i.nome); dados = arr.map(i => i.val);
-                cores = ['#0db9d7', '#bb9af7', '#00d65f', '#e0af68', '#f7768e'];
-            }
-            chartInstancia = new Chart(ctx, {
-                type: 'bar', data: { labels: labels, datasets: [{ label: metrica.toUpperCase(), data: dados, backgroundColor: cores }] },
-                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { color: '#c0caf5', stepSize: 1 } }, x: { ticks: { color: '#c0caf5' } } }, plugins: { legend: { display: false } } }
-            });
-        }
-
-        function compartilharEstatisticas() {
-            let inicio = document.getElementById('dashDataInicio') ? document.getElementById('dashDataInicio').value : '';
-            let fim = document.getElementById('dashDataFim') ? document.getElementById('dashDataFim').value : '';
-            let scoutsFiltradosParaDash = getScoutsFiltrados();
-
-            let txt = `📈 *ESTATÍSTICAS - AMIGOS FC* 📈\n`;
-            if(inicio || fim) { txt += `Período: ${inicio ? inicio.split('-').reverse().join('/') : 'Sempre'} até ${fim ? fim.split('-').reverse().join('/') : 'Hoje'}\n`; }
-            txt += `\n_Artilharia_\n`;
-            let stats = {}; scoutsFiltradosParaDash.forEach(s => { if(s.acao === 'Gol') stats[s.jogador] = (stats[s.jogador] || 0) + 1; });
-            let topGols = Object.keys(stats).map(k => ({nome:k, gols:stats[k]})).sort((a,b)=>b.gols-a.gols).slice(0,10);
-            
-            if(topGols.length === 0) { txt += "Nenhum gol registrado no período."; } else { topGols.forEach((t, i) => txt += `${i+1}º - ${t.nome} (${t.gols} gols)\n`); }
-            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(txt)}`, '_blank');
-        }
-
-        // --- SISTEMA CORE ---
         function agendarPartida() {
-            if(!isMaster) return alert("Ação bloqueada. Necessário senha Master.");
+            if(!isMaster) return alert("Ação bloqueada.");
             let dataEscolhida = document.getElementById('dataAgendamento').value;
             if(!dataEscolhida) return alert("Selecione uma data para agendar a partida!");
             
@@ -779,8 +998,7 @@
                 atletasFC.forEach(a => db.collection("atletas").doc(a.id).update({ 
                     presente: false, statusPresenca: 'duvida', timestampConfirmacao: null, tsOrdenacao: null, titular: false
                 }));
-                localStorage.removeItem('meuJogadorId');
-                db.collection("sistema").doc("config").set({ dataProximaPartida: dataEscolhida, presencaLiberada: true });
+                db.collection("sistema").doc("config").set({ dataProximaPartida: dataEscolhida, presencaLiberada: true }, {merge: true});
                 mudarDataGlobal(dataEscolhida); alert("Partida Agendada! A lista está aberta e todos estão na Dúvida.");
             }
         }
@@ -805,6 +1023,8 @@
             let podeDesfazer = (isMaster || isJuiz || isMeuJogador) && !isBloqueado;
             let htmlAcoes = '', labelTempo = '';
 
+            let avatarHTML = a.foto ? `<img src="${a.foto}" class="${avatarClass}">` : `<div class="${avatarClass}">${initial}</div>`;
+            
             let nomeDisplay = a.nome;
             if (isDentro && a.displayIndex) { 
                 nomeDisplay = `<span style="color:var(--text-muted); font-size:12px; margin-right:5px;">${a.displayIndex}º</span> ` + a.nome; 
@@ -820,9 +1040,7 @@
                         htmlSeloToggle = `<button onclick="toggleTitular('${a.id}', ${!a.titular})" style="background:${bgBtn}; color:${corBtn}; border:1px solid ${corBtn}; border-radius:4px; font-size:10px; font-weight:bold; padding:3px 8px; cursor:pointer; margin-right:8px;" title="Clique para alterar">${txtBtn}</button>`;
                     }
                 }
-
                 labelTempo = htmlSeloToggle + (a.timestampConfirmacao ? ` Confirmou ${a.timestampConfirmacao}` : 'Confirmado');
-
                 if(podeDesfazer) { 
                     htmlAcoes += `<button onclick="marcarPresenca('${a.id}', 'duvida')" class="btn-desfazer" title="Voltar para Dúvida">❌</button>`; 
                 } else {
@@ -842,7 +1060,7 @@
                 } 
             }
 
-            return `<div class="presenca-card"><div class="${avatarClass}">${initial}</div><div class="presenca-info"><div class="presenca-nome">${nomeDisplay}</div><div class="presenca-pos">${a.posicao || 'Jogador'}</div>${labelTempo ? `<div class="presenca-tempo" style="color: ${status==='fora'? 'var(--red-deny)' : 'var(--cyan)'}">${labelTempo}</div>` : ''}</div><div class="presenca-acoes">${htmlAcoes}</div></div>`;
+            return `<div class="presenca-card">${avatarHTML}<div class="presenca-info"><div class="presenca-nome">${nomeDisplay}</div><div class="presenca-pos">${a.posicao || 'Jogador'} ${a.grupo ? `| <small style="color:var(--text-muted)">${a.grupo}</small>` : ''}</div>${labelTempo ? `<div class="presenca-tempo" style="color: ${status==='fora'? 'var(--red-deny)' : 'var(--cyan)'}">${labelTempo}</div>` : ''}</div><div class="presenca-acoes">${htmlAcoes}</div></div>`;
         }
 
         function atualizarListaSorteio() {
@@ -859,9 +1077,7 @@
                 let status = a.statusPresenca || (a.presente ? 'dentro' : 'duvida');
                 if (status === 'dentro') {
                     if (a.posicao === 'Goleiro' || a.posicao === 'GOL') dg.push(a); 
-                    else {
-                        if (a.titular) dt.push(a); else dr.push(a);
-                    }
+                    else { if (a.titular) dt.push(a); else dr.push(a); }
                 } else if (status === 'fora') { f.push(a); } else { d.push(a); }
             });
 
@@ -871,25 +1087,19 @@
                 return tsA - tsB; 
             };
 
-            dg.sort(sortChegada);
-            dg.forEach((a, i) => a.displayIndex = i + 1);
-
-            let linhaGlobal = dt.concat(dr).sort(sortChegada);
-            linhaGlobal.forEach((a, i) => a.displayIndex = i + 1);
-
+            dg.sort(sortChegada); dg.forEach((a, i) => a.displayIndex = i + 1);
+            let linhaGlobal = dt.concat(dr).sort(sortChegada); linhaGlobal.forEach((a, i) => a.displayIndex = i + 1);
             dt.sort(sortChegada); dr.sort(sortChegada);
 
             let htmlDG = dg.map(a => gerarCardAtleta(a, (meuJogadorId !== null && a.id !== meuJogadorId && !isMaster && !isJuiz) || (travadoPorHorario && !isMaster && !isJuiz), true)).join('');
             let htmlDT = dt.map(a => gerarCardAtleta(a, (meuJogadorId !== null && a.id !== meuJogadorId && !isMaster && !isJuiz) || (travadoPorHorario && !isMaster && !isJuiz), true)).join('');
             let htmlDR = dr.map(a => gerarCardAtleta(a, (meuJogadorId !== null && a.id !== meuJogadorId && !isMaster && !isJuiz) || (travadoPorHorario && !isMaster && !isJuiz), true)).join('');
-            
             let htmlF = f.map(a => gerarCardAtleta(a, (meuJogadorId !== null && a.id !== meuJogadorId && !isMaster && !isJuiz) || (travadoPorHorario && !isMaster && !isJuiz))).join('');
             let htmlD = d.map(a => gerarCardAtleta(a, (meuJogadorId !== null && a.id !== meuJogadorId && !isMaster && !isJuiz) || (travadoPorHorario && !isMaster && !isJuiz))).join('');
 
             document.getElementById('listaDentroGoleiros').innerHTML = htmlDG || "<div class='presenca-card'><span style='color:#7aa2f7; font-size:14px;'>Nenhum goleiro confirmado.</span></div>";
             document.getElementById('listaDentroTitulares').innerHTML = htmlDT || "<div class='presenca-card'><span style='color:#7aa2f7; font-size:14px;'>Nenhum titular definido pelo Admin.</span></div>";
             document.getElementById('listaDentroReservas').innerHTML = htmlDR || "<div class='presenca-card'><span style='color:#7aa2f7; font-size:14px;'>Nenhum jogador na reserva.</span></div>";
-            
             document.getElementById('listaFora').innerHTML = htmlF || "<div class='presenca-card'><span style='color:#7aa2f7; font-size:14px;'>Ninguém de fora.</span></div>";
             document.getElementById('listaDuvida').innerHTML = htmlD || "<div class='presenca-card'><span style='color:#7aa2f7; font-size:14px;'>Nenhuma dúvida.</span></div>";
             
@@ -902,8 +1112,14 @@
 
         function marcarPresenca(id, novoStatus) {
             if (isListaBloqueadaPorHorario() && !isMaster && !isJuiz) return alert("A lista encerrou às 07:00 da manhã!");
-            if (novoStatus === 'dentro' || novoStatus === 'fora') { if (!isMaster && !isJuiz) localStorage.setItem('meuJogadorId', id); } 
-            else if (novoStatus === 'duvida') { if (!isMaster && !isJuiz) { if (localStorage.getItem('meuJogadorId') === id) localStorage.removeItem('meuJogadorId'); else return alert("Você só pode desmarcar a sua própria presença."); } }
+            let meuId = localStorage.getItem('meuJogadorId');
+            if (novoStatus === 'dentro' || novoStatus === 'fora') { 
+                // Se não for master/juiz, ele só pode marcar a si mesmo (o sistema esconde o botão pros outros, mas validamos aqui)
+                if (!isMaster && !isJuiz && meuId !== id) return alert("Apenas marque a sua própria presença.");
+            } 
+            else if (novoStatus === 'duvida') { 
+                if (!isMaster && !isJuiz && meuId !== id) return alert("Você só pode desmarcar a sua própria presença."); 
+            }
             
             let updateData = { 
                 statusPresenca: novoStatus, 
@@ -923,7 +1139,6 @@
         
         function compartilharListaPresenca() {
             let dg = [], dt = [], dr = [], fora = [], duvida = [];
-            
             let atletasOrdenados = [...atletasFC].sort((a, b) => (a.tsOrdenacao || 0) - (b.tsOrdenacao || 0));
             let numGoleiro = 1, numLinha = 1;
 
@@ -947,6 +1162,7 @@
             window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(txt)}`, '_blank');
         }
 
+        // Funções de Histórico e Sorteio (Mantidas intactas)
         function executarSorteio() {
             if(!isMaster) return alert("Faça login com a senha Master para escalar.");
             let presentes = atletasFC.filter(a => a.presente === true).map(a => a.nome);
@@ -989,6 +1205,7 @@
             lMilan.innerHTML = sorteioEquipasAtuais.milan.map(j => `<li style="display:flex; justify-content:space-between; margin-bottom:5px;">${j} ${modoManualAtivo && isMaster ? `<button onclick="removerDoTimeManual('${j}')" style="background:transparent; color:var(--red-deny); border:none; cursor:pointer;">❌</button>` : ''}</li>`).join('');
         }
 
+        // Funções de Registro de Jogo
         function abrirModalJuiz(time, acao) {
             if(!isJuiz) return alert("Faça login de Juiz."); juizTimeAtual = time; juizAcaoAtual = acao;
             document.getElementById('modalJuizTitulo').innerText = `Time: ${time}`;
@@ -1006,39 +1223,24 @@
             db.collection("scouts").add({data: dataEscolhida, time: juizTimeAtual, jogador: jogador, acao: juizAcaoAtual, timestamp: Date.now()}); fecharModalJuiz();
         }
 
-        /* === NOVAS FUNÇÕES DO HISTÓRICO E RESENHA (REINCLUÍDAS) === */
-        
         function registrarScout(acao) {
             if(!isMaster) return alert("Apenas Master.");
             let time = document.getElementById('timeAcao').value;
             let jogador = document.getElementById('jogadorAcao').value;
             let dataAcao = filtroDataGlobal;
-            
             if(!dataAcao) return alert("Selecione uma data no Histórico primeiro!");
-            
-            db.collection("scouts").add({ 
-                data: dataAcao, time: time, jogador: jogador, acao: acao, timestamp: Date.now() 
-            });
-            alert(`${acao} registrado com sucesso para ${jogador}!`);
-        }
-
-        function cancelarEdicaoScout() {
-            alert("Edição cancelada/Atualizada.");
+            db.collection("scouts").add({ data: dataAcao, time: time, jogador: jogador, acao: acao, timestamp: Date.now() });
+            alert(`${acao} registrado para ${jogador}!`);
         }
 
         function salvarPremiacao() {
             if(!isMaster) return alert("Apenas Master.");
             let data = document.getElementById('dataPremio').value;
             if(!data) return alert("Selecione a data da partida!");
+            let craque = document.getElementById('premioCraque').value; let paredao = document.getElementById('premioParedao').value;
+            let xerifao = document.getElementById('premioXerifao').value; let bolaMurcha = document.getElementById('premioBolaMurcha').value;
             
-            let craque = document.getElementById('premioCraque').value;
-            let paredao = document.getElementById('premioParedao').value;
-            let xerifao = document.getElementById('premioXerifao').value;
-            let bolaMurcha = document.getElementById('premioBolaMurcha').value;
-            
-            db.collection("premiacoes").doc(data).set({
-                data: data, craque: craque, paredao: paredao, xerifao: xerifao, bolaMurcha: bolaMurcha, timestamp: Date.now()
-            }).then(() => alert("Resenha salva no histórico com sucesso!"));
+            db.collection("premiacoes").doc(data).set({ data: data, craque: craque, paredao: paredao, xerifao: xerifao, bolaMurcha: bolaMurcha, timestamp: Date.now() }).then(() => alert("Resenha salva!"));
         }
 
         function compartilharJogo() {
@@ -1062,44 +1264,103 @@
                 let amarelos = scoutsDia.filter(s => s.acao === 'Amarelo');
                 let vermelhos = scoutsDia.filter(s => s.acao === 'Vermelho');
 
-                if(gols.length > 0) {
-                    txt += `⚽ *Gols:*\n`;
-                    gols.forEach(g => txt += `- ${g.jogador} (${g.time})\n`);
-                    txt += `\n`;
-                }
-                if(assists.length > 0) {
-                    txt += `👟 *Assistências:*\n`;
-                    assists.forEach(a => txt += `- ${a.jogador} (${a.time})\n`);
-                    txt += `\n`;
-                }
-                if(amarelos.length > 0) {
-                    txt += `🟨 *Cartões Amarelos:*\n`;
-                    amarelos.forEach(c => txt += `- ${c.jogador} (${c.time})\n`);
-                    txt += `\n`;
-                }
-                if(vermelhos.length > 0) {
-                    txt += `🟥 *Cartões Vermelhos:*\n`;
-                    vermelhos.forEach(c => txt += `- ${c.jogador} (${c.time})\n`);
-                    txt += `\n`;
-                }
+                if(gols.length > 0) { txt += `⚽ *Gols:*\n`; gols.forEach(g => txt += `- ${g.jogador} (${g.time})\n`); txt += `\n`; }
+                if(assists.length > 0) { txt += `👟 *Assistências:*\n`; assists.forEach(a => txt += `- ${a.jogador} (${a.time})\n`); txt += `\n`; }
+                if(amarelos.length > 0) { txt += `🟨 *Cartões Amarelos:*\n`; amarelos.forEach(c => txt += `- ${c.jogador} (${c.time})\n`); txt += `\n`; }
+                if(vermelhos.length > 0) { txt += `🟥 *Cartões Vermelhos:*\n`; vermelhos.forEach(c => txt += `- ${c.jogador} (${c.time})\n`); txt += `\n`; }
             }
             
-            // Adiciona as premiações da resenha, se existirem para a data
             let premioDia = premiacoesFC.find(p => p.data === data);
             if (premioDia) {
-                txt += `🏆 *PREMIAÇÕES (RESENHA):*\n`;
-                txt += `⭐ Craque: ${premioDia.craque}\n`;
-                txt += `🧱 Paredão: ${premioDia.paredao}\n`;
-                txt += `🛡️ Xerifão: ${premioDia.xerifao}\n`;
-                txt += `🎈 Bola Murcha: ${premioDia.bolaMurcha}\n`;
+                txt += `🏆 *PREMIAÇÕES (RESENHA):*\n⭐ Craque: ${premioDia.craque}\n🧱 Paredão: ${premioDia.paredao}\n🛡️ Xerifão: ${premioDia.xerifao}\n🎈 Bola Murcha: ${premioDia.bolaMurcha}\n`;
             }
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(txt)}`, '_blank');
+        }
 
+        // Dashboard Analytics
+        function limparFiltroDashboard() { document.getElementById('dashDataInicio').value = ''; document.getElementById('dashDataFim').value = ''; atualizarDashboard(); }
+        function getScoutsFiltrados() {
+            let dataInicio = document.getElementById('dashDataInicio') ? document.getElementById('dashDataInicio').value : '';
+            let dataFim = document.getElementById('dashDataFim') ? document.getElementById('dashDataFim').value : '';
+            let filtrados = scoutsFC;
+            if(dataInicio) filtrados = filtrados.filter(s => s.data >= dataInicio);
+            if(dataFim) filtrados = filtrados.filter(s => s.data <= dataFim);
+            return filtrados;
+        }
+
+        function atualizarDashboard() {
+            if(!document.getElementById('tabelaArtilharia')) return;
+            let stats = {}; let scoutsFiltradosParaDash = getScoutsFiltrados();
+            atletasFC.forEach(a => { stats[a.nome] = { gols: 0, assists: 0, amarelos: 0, vermelhos: 0 }; });
+            scoutsFiltradosParaDash.forEach(s => {
+                if(!stats[s.jogador]) stats[s.jogador] = { gols: 0, assists: 0, amarelos: 0, vermelhos: 0 };
+                if (s.acao === 'Gol') stats[s.jogador].gols++;
+                if (s.acao === 'Assistência') stats[s.jogador].assists++;
+                if (s.acao === 'Amarelo') stats[s.jogador].amarelos++;
+                if (s.acao === 'Vermelho') stats[s.jogador].vermelhos++;
+            });
+            let arrStats = Object.keys(stats).map(nome => ({
+                nome: nome, ...stats[nome], total: stats[nome].gols + stats[nome].assists
+            })).filter(s => s.total > 0 || s.amarelos > 0 || s.vermelhos > 0).sort((a, b) => b.gols - a.gols || b.assists - a.assists);
+
+            document.getElementById('tabelaArtilharia').innerHTML = arrStats.length === 0 ? '<tr><td colspan="5" style="text-align:center; color:#7aa2f7;">Nenhuma estatística no período.</td></tr>' : arrStats.map(s => `<tr><td>${s.nome}</td><td>${s.gols}</td><td>${s.assists}</td><td>${s.amarelos}</td><td>${s.vermelhos}</td></tr>`).join('');
+            atualizarGrafico(); 
+        }
+
+        function toggleGrafico() {
+            let container = document.getElementById('graficoContainer');
+            container.style.display = container.style.display === 'none' ? 'block' : 'none';
+            if(container.style.display === 'block') atualizarGrafico();
+        }
+
+        function atualizarGrafico() {
+            if(document.getElementById('graficoContainer').style.display === 'none') return;
+            const ctx = document.getElementById('meuGrafico').getContext('2d');
+            const metrica = document.getElementById('graficoMetrica').value;
+            const tipo = document.getElementById('graficoTipo').value;
+            let scoutsFiltradosParaDash = getScoutsFiltrados();
+
+            if(chartInstancia) chartInstancia.destroy();
+            let labels = [], dados = [], cores = [];
+
+            if (tipo === 'times') {
+                labels = ['Real Madrid', 'Milan'];
+                let valReal = 0, valMilan = 0;
+                let acaoFiltro = metrica === 'gols' ? 'Gol' : metrica === 'assists' ? 'Assistência' : metrica === 'amarelos' ? 'Amarelo' : 'Vermelho';
+                scoutsFiltradosParaDash.forEach(s => { if(s.acao === acaoFiltro) { if(s.time === 'Real Madrid') valReal++; if(s.time === 'Milan') valMilan++; } });
+                dados = [valReal, valMilan]; cores = ['#ffffff', '#f7768e'];
+            } else {
+                let stats = {};
+                let acaoFiltro = metrica === 'gols' ? 'Gol' : metrica === 'assists' ? 'Assistência' : metrica === 'amarelos' ? 'Amarelo' : 'Vermelho';
+                scoutsFiltradosParaDash.forEach(s => { if(s.acao === acaoFiltro) { stats[s.jogador] = (stats[s.jogador] || 0) + 1; } });
+                let arr = Object.keys(stats).map(k => ({nome: k, val: stats[k]})).sort((a,b)=>b.val - a.val).slice(0,5); 
+                labels = arr.map(i => i.nome); dados = arr.map(i => i.val);
+                cores = ['#0db9d7', '#bb9af7', '#00d65f', '#e0af68', '#f7768e'];
+            }
+            chartInstancia = new Chart(ctx, {
+                type: 'bar', data: { labels: labels, datasets: [{ label: metrica.toUpperCase(), data: dados, backgroundColor: cores }] },
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { color: '#c0caf5', stepSize: 1 } }, x: { ticks: { color: '#c0caf5' } } }, plugins: { legend: { display: false } } }
+            });
+        }
+
+        function compartilharEstatisticas() {
+            let inicio = document.getElementById('dashDataInicio') ? document.getElementById('dashDataInicio').value : '';
+            let fim = document.getElementById('dashDataFim') ? document.getElementById('dashDataFim').value : '';
+            let scoutsFiltradosParaDash = getScoutsFiltrados();
+
+            let txt = `📈 *ESTATÍSTICAS - AMIGOS FC* 📈\n`;
+            if(inicio || fim) { txt += `Período: ${inicio ? inicio.split('-').reverse().join('/') : 'Sempre'} até ${fim ? fim.split('-').reverse().join('/') : 'Hoje'}\n`; }
+            txt += `\n_Artilharia_\n`;
+            let stats = {}; scoutsFiltradosParaDash.forEach(s => { if(s.acao === 'Gol') stats[s.jogador] = (stats[s.jogador] || 0) + 1; });
+            let topGols = Object.keys(stats).map(k => ({nome:k, gols:stats[k]})).sort((a,b)=>b.gols-a.gols).slice(0,10);
+            
+            if(topGols.length === 0) { txt += "Nenhum gol registrado no período."; } else { topGols.forEach((t, i) => txt += `${i+1}º - ${t.nome} (${t.gols} gols)\n`); }
             window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(txt)}`, '_blank');
         }
 
         function refreshTelas() {
             if(document.getElementById('listaAtletas')){
-                document.getElementById('listaAtletas').innerHTML = atletasFC.map(a => `<tr><td>${a.nome}</td><td>${a.posicao}</td><td class="req-master-cell"><button class="btn-sm" style="background:var(--admin-color); color:#000;" onclick="editarAtleta('${a.id}')">✏️</button><button class="btn-sm" style="background:var(--red-deny); color:#fff;" onclick="excluirDoc('atletas','${a.id}')">🗑️</button></td></tr>`).join('');
+                document.getElementById('listaAtletas').innerHTML = atletasFC.map(a => `<tr><td>${a.nome}</td><td>${a.posicao}</td><td>${a.grupo || '-'}</td><td class="req-master-cell"><button class="btn-sm" style="background:var(--admin-color); color:#000;" onclick="editarAtleta('${a.id}')">✏️</button><button class="btn-sm" style="background:var(--red-deny); color:#fff;" onclick="excluirDoc('atletas','${a.id}')">🗑️</button></td></tr>`).join('');
             }
             document.querySelectorAll('.select-jogadores').forEach(sel => { const val = sel.value; sel.innerHTML = atletasFC.map(a => `<option value="${a.nome}">${a.nome}</option>`).join(''); if(val) sel.value = val; });
 
@@ -1142,7 +1403,6 @@
             if(document.getElementById('logPartida')) document.getElementById('logPartida').innerHTML = logsHTML;
             if(document.getElementById('logPartidaJuiz')) document.getElementById('logPartidaJuiz').innerHTML = logsHTML;
 
-            // Preenche os selects da Resenha com os dados já salvos
             const premioDoDia = premiacoesFC.find(p => p.data === data);
             if(premioDoDia) {
                 if(document.getElementById('premioCraque')) document.getElementById('premioCraque').value = premioDoDia.craque;
@@ -1153,18 +1413,6 @@
 
             atualizarDashboard(); 
         }
-
-        function salvarAtleta() {
-            if(!isMaster) return alert("Ação bloqueada.");
-            const n = document.getElementById('cadNome').value; const p = document.getElementById('cadPosicao').value;
-            if(!n) return alert("Digite o nome!");
-            if(atletaEditandoId) { db.collection("atletas").doc(atletaEditandoId).update({nome:n, posicao:p}); cancelarEdicaoAtleta(); alert("Atualizado!"); } 
-            else { db.collection("atletas").add({nome:n, posicao:p, presente: false, statusPresenca: 'duvida', timestampConfirmacao: null, timestamp: Date.now(), tsOrdenacao: null, titular: false}); document.getElementById('cadNome').value = ""; alert("Cadastrado!"); }
-        }
-
-        function editarAtleta(id) { if(!isMaster) return; const a = atletasFC.find(i => i.id === id); document.getElementById('cadNome').value = a.nome; document.getElementById('cadPosicao').value = a.posicao; atletaEditandoId = id; document.getElementById('btnSalvarAtleta').innerText = "💾 Confirmar Edição"; window.scrollTo(0, 0); }
-        function cancelarEdicaoAtleta() { atletaEditandoId = null; if(document.getElementById('btnSalvarAtleta')) document.getElementById('btnSalvarAtleta').innerText = "Registrar Atleta"; if(document.getElementById('cadNome')) document.getElementById('cadNome').value = ""; }
-        function excluirDoc(coll, id) { if(!isMaster) return; if(confirm("Excluir permanentemente?")) db.collection(coll).doc(id).delete(); }
 
         function abrirAba(id) {
             document.querySelectorAll('.modulo').forEach(m => m.classList.remove('active')); 
