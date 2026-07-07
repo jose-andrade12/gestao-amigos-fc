@@ -611,7 +611,6 @@
     </div>
 
     <script>
-        // MANTENHA A SUA CONFIGURAÇÃO EXATA DO FIREBASE AQUI
         const firebaseConfig = {
             apiKey: "AIzaSyBE7HbmYhdnUnbi_PvY27pBNgfiWoh4I9w",
             authDomain: "amigos-fc-gestao.firebaseapp.com",
@@ -637,20 +636,16 @@
 
         /* === SISTEMA DE LOGIN E AUTENTICAÇÃO === */
         
-        // Listener de Estado de Autenticação (Mantém o jogador logado)
         auth.onAuthStateChanged((user) => {
             if (user) {
                 authUserEmail = user.email;
-                isAmigos = true; // Habilita permissão básica de jogador
+                isAmigos = true; 
                 document.body.classList.add('is-amigos');
                 document.getElementById('cadEmail').value = user.email;
                 document.getElementById('btnLogin').innerHTML = `<span class="menu-icon">🚪</span><span class="menu-text">Sair (Logado)</span>`;
-                
-                // Tenta vincular e achar o jogador pelo email
                 verificarVinculoJogador(user.email);
             } else {
                 authUserEmail = null;
-                // Só reseta se não for Admin logado por senha na mesma sessão
                 if(!isMaster && !isJuiz) resetarAcessos();
             }
         });
@@ -678,12 +673,10 @@
             atualizarListaSorteio(); refreshTelas();
         }
 
-        // Login Google (Jogadores)
         function fazerLoginGoogle() {
             const provider = new firebase.auth.GoogleAuthProvider();
             auth.signInWithPopup(provider).then((result) => {
                 fecharModalLogin();
-                // O onAuthStateChanged vai capturar e chamar verificarVinculoJogador
             }).catch((error) => {
                 alert("Erro ao logar com Google: " + error.message);
             });
@@ -693,10 +686,8 @@
             const atleta = atletasFC.find(a => a.email === email);
             if (atleta) {
                 localStorage.setItem('meuJogadorId', atleta.id);
-                // Preenche o perfil para ele poder editar
                 preencherFormularioPerfil(atleta);
             } else {
-                // É um usuário novo! Abre a aba cadastro para ele se registrar.
                 abrirAba('cadastro');
                 alert("Olá! Vimos que é seu primeiro acesso. Por favor, preencha seus dados abaixo e escolha seu grupo para criar seu perfil de jogador.");
                 document.getElementById('cadEmail').value = email;
@@ -705,7 +696,6 @@
             refreshTelas();
         }
 
-        // Login Senha (Admin / Juiz)
         async function fazerLoginSenha() {
             fecharModalLogin();
             let s = prompt("ACESSO RESTRITO:\nDigite a Senha:");
@@ -763,7 +753,6 @@
             if(modoManualAtivo) atualizarPainelManual(); 
             refreshTelas(); 
             
-            // Se logado e atualizou os dados, repreencha
             if(authUserEmail) {
                 let eu = atletasFC.find(a => a.email === authUserEmail);
                 if(eu && !isMaster) preencherFormularioPerfil(eu);
@@ -842,7 +831,6 @@
         }
 
         function limparFormularioPerfil() {
-            // Limpa tudo exceto o email se estiver logado
             const emailBackup = document.getElementById('cadEmail').value;
             document.querySelectorAll('#cadastro input:not(#cadEmail), #cadastro select').forEach(el => el.value = '');
             document.getElementById('cadEmail').value = emailBackup;
@@ -851,7 +839,6 @@
         }
 
         function salvarAtleta() {
-            // Se não é master, e não está logado no auth, não pode salvar
             if(!isMaster && !authUserEmail) return alert("Você precisa fazer login para salvar seu perfil.");
             
             const dados = {
@@ -876,13 +863,11 @@
             if(!dados.nome) return alert("O Nome é obrigatório!");
             if(!dados.grupo) return alert("Selecione a qual grupo/pelada você pertence!");
 
-            // Lógica de Identificação: Se Master está editando alguém, ou se é o próprio jogador
             let idAlvo = null;
             
             if (isMaster && atletaEditandoId) {
-                idAlvo = atletaEditandoId; // Master editando registro de terceiro
+                idAlvo = atletaEditandoId; 
             } else if (authUserEmail) {
-                // Auto-registro ou auto-edição do jogador
                 const atletaExistente = atletasFC.find(a => a.email === authUserEmail);
                 if(atletaExistente) idAlvo = atletaExistente.id;
             }
@@ -893,7 +878,6 @@
                     if(isMaster) { cancelarEdicaoAtleta(); }
                 });
             } else {
-                // É um cadastro totalmente novo
                 dados.presente = false;
                 dados.statusPresenca = 'duvida';
                 dados.timestampConfirmacao = null;
@@ -1114,7 +1098,6 @@
             if (isListaBloqueadaPorHorario() && !isMaster && !isJuiz) return alert("A lista encerrou às 07:00 da manhã!");
             let meuId = localStorage.getItem('meuJogadorId');
             if (novoStatus === 'dentro' || novoStatus === 'fora') { 
-                // Se não for master/juiz, ele só pode marcar a si mesmo (o sistema esconde o botão pros outros, mas validamos aqui)
                 if (!isMaster && !isJuiz && meuId !== id) return alert("Apenas marque a sua própria presença.");
             } 
             else if (novoStatus === 'duvida') { 
@@ -1162,7 +1145,7 @@
             window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(txt)}`, '_blank');
         }
 
-        // Funções de Histórico e Sorteio (Mantidas intactas)
+        // Funções de Histórico e Sorteio
         function executarSorteio() {
             if(!isMaster) return alert("Faça login com a senha Master para escalar.");
             let presentes = atletasFC.filter(a => a.presente === true).map(a => a.nome);
@@ -1243,6 +1226,7 @@
             db.collection("premiacoes").doc(data).set({ data: data, craque: craque, paredao: paredao, xerifao: xerifao, bolaMurcha: bolaMurcha, timestamp: Date.now() }).then(() => alert("Resenha salva!"));
         }
 
+        // Nova formatação para compartilhar Histórico no WhatsApp
         function compartilharJogo() {
             const data = filtroDataGlobal || (document.getElementById('dataJogo') ? document.getElementById('dataJogo').value : "");
             if (!data) return alert("Selecione uma data no histórico primeiro!");
@@ -1252,28 +1236,59 @@
             const golsM = document.getElementById('placarMilan').innerText;
 
             let txt = `⚽ *RESUMO DA PARTIDA - AMIGOS FC* ⚽\n📅 Data: ${dFormatada}\n\n`;
-            txt += `⚪ *REAL MADRID*  ${golsR} x ${golsM}  *MILAN* 🔴\n\n`;
+            
+            // 1. PLACAR NO TOPO
+            txt += `*PLACAR*\n⚪ REAL MADRID  ${golsR} x ${golsM}  MILAN 🔴\n\n`;
 
+            // 2. JOGADORES EM CAMPO (Separados por Time)
+            const escalacaoDoDia = escalacoesFC.find(e => e.data === data);
+            if (escalacaoDoDia) {
+                txt += `👥 *JOGADORES EM CAMPO*\n`;
+                txt += `⚪ *Real Madrid:* ${escalacaoDoDia.real.length > 0 ? escalacaoDoDia.real.join(', ') : 'Nenhum'}\n`;
+                txt += `🔴 *Milan:* ${escalacaoDoDia.milan.length > 0 ? escalacaoDoDia.milan.join(', ') : 'Nenhum'}\n\n`;
+            }
+
+            // 3. SÚMULA GERAL (Eventos separados por Time)
             const scoutsDia = scoutsFC.filter(s => s.data === data);
+            txt += `📜 *SÚMULA GERAL*\n`;
             
             if (scoutsDia.length === 0) {
-                txt += "Nenhum evento registrado nesta partida.\n";
+                txt += "Nenhum evento registrado nesta partida.\n\n";
             } else {
-                let gols = scoutsDia.filter(s => s.acao === 'Gol');
-                let assists = scoutsDia.filter(s => s.acao === 'Assistência');
-                let amarelos = scoutsDia.filter(s => s.acao === 'Amarelo');
-                let vermelhos = scoutsDia.filter(s => s.acao === 'Vermelho');
+                // Função auxiliar para agrupar e formatar eventos de um time específico
+                const formatarEventos = (timeScouts) => {
+                    let txtTime = "";
+                    let gols = timeScouts.filter(s => s.acao === 'Gol');
+                    let assists = timeScouts.filter(s => s.acao === 'Assistência');
+                    let amarelos = timeScouts.filter(s => s.acao === 'Amarelo');
+                    let vermelhos = timeScouts.filter(s => s.acao === 'Vermelho');
 
-                if(gols.length > 0) { txt += `⚽ *Gols:*\n`; gols.forEach(g => txt += `- ${g.jogador} (${g.time})\n`); txt += `\n`; }
-                if(assists.length > 0) { txt += `👟 *Assistências:*\n`; assists.forEach(a => txt += `- ${a.jogador} (${a.time})\n`); txt += `\n`; }
-                if(amarelos.length > 0) { txt += `🟨 *Cartões Amarelos:*\n`; amarelos.forEach(c => txt += `- ${c.jogador} (${c.time})\n`); txt += `\n`; }
-                if(vermelhos.length > 0) { txt += `🟥 *Cartões Vermelhos:*\n`; vermelhos.forEach(c => txt += `- ${c.jogador} (${c.time})\n`); txt += `\n`; }
+                    if(gols.length > 0) { txtTime += `  ⚽ *Gols:* ${gols.map(g => g.jogador).join(', ')}\n`; }
+                    if(assists.length > 0) { txtTime += `  👟 *Assistências:* ${assists.map(a => a.jogador).join(', ')}\n`; }
+                    if(amarelos.length > 0) { txtTime += `  🟨 *Amarelos:* ${amarelos.map(a => a.jogador).join(', ')}\n`; }
+                    if(vermelhos.length > 0) { txtTime += `  🟥 *Vermelhos:* ${vermelhos.map(v => v.jogador).join(', ')}\n`; }
+                    return txtTime || "  Nenhum evento.\n";
+                };
+
+                // Filtra os eventos do Real Madrid e do Milan
+                let scoutsReal = scoutsDia.filter(s => s.time === 'Real Madrid');
+                let scoutsMilan = scoutsDia.filter(s => s.time === 'Milan');
+
+                txt += `⚪ *Real Madrid:*\n`;
+                txt += formatarEventos(scoutsReal);
+                
+                txt += `\n🔴 *Milan:*\n`;
+                txt += formatarEventos(scoutsMilan);
+                txt += `\n`;
             }
             
+            // 4. PREMIAÇÕES (Resenha)
             let premioDia = premiacoesFC.find(p => p.data === data);
             if (premioDia) {
-                txt += `🏆 *PREMIAÇÕES (RESENHA):*\n⭐ Craque: ${premioDia.craque}\n🧱 Paredão: ${premioDia.paredao}\n🛡️ Xerifão: ${premioDia.xerifao}\n🎈 Bola Murcha: ${premioDia.bolaMurcha}\n`;
+                txt += `🏆 *PREMIAÇÕES (RESENHA)*\n⭐ Craque: ${premioDia.craque}\n🧱 Paredão: ${premioDia.paredao}\n🛡️ Xerifão: ${premioDia.xerifao}\n🎈 Bola Murcha: ${premioDia.bolaMurcha}\n`;
             }
+
+            // Envia para o WhatsApp
             window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(txt)}`, '_blank');
         }
 
