@@ -1226,7 +1226,6 @@
             db.collection("premiacoes").doc(data).set({ data: data, craque: craque, paredao: paredao, xerifao: xerifao, bolaMurcha: bolaMurcha, timestamp: Date.now() }).then(() => alert("Resenha salva!"));
         }
 
-        // Nova formatação para compartilhar Histórico no WhatsApp
         function compartilharJogo() {
             const data = filtroDataGlobal || (document.getElementById('dataJogo') ? document.getElementById('dataJogo').value : "");
             if (!data) return alert("Selecione uma data no histórico primeiro!");
@@ -1358,18 +1357,62 @@
             });
         }
 
+        // Função do Dashboard Refatorada conforme solicitado
         function compartilharEstatisticas() {
             let inicio = document.getElementById('dashDataInicio') ? document.getElementById('dashDataInicio').value : '';
             let fim = document.getElementById('dashDataFim') ? document.getElementById('dashDataFim').value : '';
             let scoutsFiltradosParaDash = getScoutsFiltrados();
 
-            let txt = `📈 *ESTATÍSTICAS - AMIGOS FC* 📈\n`;
-            if(inicio || fim) { txt += `Período: ${inicio ? inicio.split('-').reverse().join('/') : 'Sempre'} até ${fim ? fim.split('-').reverse().join('/') : 'Hoje'}\n`; }
-            txt += `\n_Artilharia_\n`;
-            let stats = {}; scoutsFiltradosParaDash.forEach(s => { if(s.acao === 'Gol') stats[s.jogador] = (stats[s.jogador] || 0) + 1; });
-            let topGols = Object.keys(stats).map(k => ({nome:k, gols:stats[k]})).sort((a,b)=>b.gols-a.gols).slice(0,10);
+            let txt = `📈 *ESTATÍSTICAS GERAIS - AMIGOS FC* 📈\n`;
+            if(inicio || fim) {
+                let dataInFormatada = inicio ? inicio.split('-').reverse().join('/') : 'Sempre';
+                let dataFimFormatada = fim ? fim.split('-').reverse().join('/') : 'Hoje';
+                txt += `📅 Período: ${dataInFormatada} até ${dataFimFormatada}\n\n`;
+            } else {
+                txt += `📅 Período: Todo o Histórico\n\n`;
+            }
+
+            txt += `📜 *SÚMULA GERAL (AGREGADA)*\n`;
+
+            const formatarEventosDashboard = (timeScouts) => {
+                let txtTime = "";
+                let statsGols = {}, statsAssists = {}, statsAmarelos = {}, statsVermelhos = {};
+
+                // Agrega a quantidade de ocorrências por jogador
+                timeScouts.forEach(s => {
+                    if(s.acao === 'Gol') statsGols[s.jogador] = (statsGols[s.jogador] || 0) + 1;
+                    if(s.acao === 'Assistência') statsAssists[s.jogador] = (statsAssists[s.jogador] || 0) + 1;
+                    if(s.acao === 'Amarelo') statsAmarelos[s.jogador] = (statsAmarelos[s.jogador] || 0) + 1;
+                    if(s.acao === 'Vermelho') statsVermelhos[s.jogador] = (statsVermelhos[s.jogador] || 0) + 1;
+                });
+
+                const montarLinha = (obj, icone, label) => {
+                    let arr = Object.keys(obj).map(k => ({nome: k, val: obj[k]})).sort((a,b) => b.val - a.val);
+                    if(arr.length === 0) return "";
+                    
+                    // Mostra o nome, e se for maior que 1 ocorrência, mostra a quantidade em parênteses.
+                    let formatado = arr.map(i => i.val > 1 ? `${i.nome} (${i.val})` : i.nome).join(', ');
+                    return `  ${icone} *${label}:* ${formatado}\n`;
+                };
+
+                txtTime += montarLinha(statsGols, '⚽', 'Gols');
+                txtTime += montarLinha(statsAssists, '👟', 'Assistências');
+                txtTime += montarLinha(statsAmarelos, '🟨', 'Amarelos');
+                txtTime += montarLinha(statsVermelhos, '🟥', 'Vermelhos');
+
+                return txtTime || "  Nenhum evento registrado.\n";
+            };
+
+            // Filtra os registros consolidados de cada equipe para o período
+            let scoutsReal = scoutsFiltradosParaDash.filter(s => s.time === 'Real Madrid');
+            let scoutsMilan = scoutsFiltradosParaDash.filter(s => s.time === 'Milan');
+
+            txt += `⚪ *Real Madrid:*\n`;
+            txt += formatarEventosDashboard(scoutsReal);
             
-            if(topGols.length === 0) { txt += "Nenhum gol registrado no período."; } else { topGols.forEach((t, i) => txt += `${i+1}º - ${t.nome} (${t.gols} gols)\n`); }
+            txt += `\n🔴 *Milan:*\n`;
+            txt += formatarEventosDashboard(scoutsMilan);
+
             window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(txt)}`, '_blank');
         }
 
