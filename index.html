@@ -600,6 +600,19 @@
         </div>
     </div>
 
+    <!-- MODAL SENHA RESTRITA -->
+    <div id="modalSenha" class="modal-overlay">
+        <div class="modal-content" style="max-width: 350px;">
+            <h2 style="color: var(--admin-color); margin-top: 0;">Acesso Restrito</h2>
+            <p style="color: #a9b1d6; font-size: 14px; margin-bottom: 20px;">Digite a senha de Master ou Juiz:</p>
+            
+            <input type="password" id="inputSenhaAcesso" placeholder="Sua senha..." style="width: 100%; padding: 15px; margin-bottom: 20px; background: #16161e; border: 1px solid #414868; color: white; border-radius: 8px; text-align: center; font-size: 18px; letter-spacing: 2px;">
+            
+            <button class="btn-acao" onclick="confirmarLoginSenha()" style="background: var(--admin-color); color: #16161e;">Entrar</button>
+            <button class="btn-acao" style="background: transparent; color: #7aa2f7; margin-top: 15px; font-weight: normal;" onclick="fecharModalSenha()">Cancelar</button>
+        </div>
+    </div>
+
     <!-- MODAL EVENTO JUIZ -->
     <div id="modalJuiz" class="modal-overlay">
         <div class="modal-content">
@@ -696,10 +709,22 @@
             refreshTelas();
         }
 
-        async function fazerLoginSenha() {
+        function fazerLoginSenha() {
             fecharModalLogin();
-            let s = prompt("ACESSO RESTRITO:\nDigite a Senha:");
+            document.getElementById('modalSenha').style.display = 'flex';
+            document.getElementById('inputSenhaAcesso').value = ''; 
+            setTimeout(() => document.getElementById('inputSenhaAcesso').focus(), 100);
+        }
+
+        function fecharModalSenha() {
+            document.getElementById('modalSenha').style.display = 'none';
+        }
+
+        async function confirmarLoginSenha() {
+            let s = document.getElementById('inputSenhaAcesso').value;
             if (!s) return;
+            
+            fecharModalSenha();
             
             try {
                 const doc = await db.collection("sistema").doc("senhas").get();
