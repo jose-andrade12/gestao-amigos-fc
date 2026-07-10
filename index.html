@@ -788,18 +788,56 @@
         db.collection("premiacoes").onSnapshot(snap => { premiacoesFC = snap.docs.map(doc => ({id: doc.id, ...doc.data()})).sort((a,b) => b.timestamp - a.timestamp); refreshTelas(); });
         db.collection("escalacoes").onSnapshot(snap => { escalacoesFC = snap.docs.map(doc => ({id: doc.id, ...doc.data()})); refreshTelas(); });
 
-        /* === FUNÇÕES DE CADASTRO E FOTO === */
+        /* === FUNÇÕES DE CADASTRO E FOTO (ATUALIZADO COM COMPRESSÃO) === */
 
         function handleFotoUpload(e) {
             const file = e.target.files[0];
-            if(file) {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    fotoBase64Atual = event.target.result;
+            if (!file) return;
+
+            if (!file.type.match(/image.*/)) {
+                alert("Por favor, selecione apenas arquivos de imagem.");
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(readerEvent) {
+                const img = new Image();
+                img.onload = function() {
+                    // Define o tamanho máximo desejado
+                    const MAX_WIDTH = 400;
+                    const MAX_HEIGHT = 400;
+                    let width = img.width;
+                    let height = img.height;
+
+                    // Calcula a proporção mantendo o aspecto da foto
+                    if (width > height) {
+                        if (width > MAX_WIDTH) {
+                            height *= MAX_WIDTH / width;
+                            width = MAX_WIDTH;
+                        }
+                    } else {
+                        if (height > MAX_HEIGHT) {
+                            width *= MAX_HEIGHT / height;
+                            height = MAX_HEIGHT;
+                        }
+                    }
+
+                    // Cria o canvas para redimensionar a imagem
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    // Exporta a imagem comprimida para JPEG com 60% de qualidade
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
+                    
+                    fotoBase64Atual = dataUrl;
                     document.getElementById('previewFoto').src = fotoBase64Atual;
                 }
-                reader.readAsDataURL(file);
+                img.src = readerEvent.target.result;
             }
+            reader.readAsDataURL(file);
         }
 
         function renderizarSelectGrupos() {
@@ -901,6 +939,8 @@
                 db.collection("atletas").doc(idAlvo).update(dados).then(()=>{
                     alert("Perfil atualizado com sucesso!");
                     if(isMaster) { cancelarEdicaoAtleta(); }
+                }).catch((error) => {
+                    alert("Erro ao atualizar o perfil: " + error.message);
                 });
             } else {
                 dados.presente = false;
@@ -918,6 +958,8 @@
                     } else {
                         limparFormularioPerfil();
                     }
+                }).catch((error) => {
+                    alert("Erro ao cadastrar o atleta. Erro: " + error.message);
                 });
             }
         }
