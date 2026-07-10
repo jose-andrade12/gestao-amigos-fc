@@ -730,12 +730,19 @@
                 const doc = await db.collection("sistema").doc("senhas").get();
                 if (doc.exists) {
                     const senhasDB = doc.data();
+                    
                     if (verificarSenha(s, senhasDB.master)) {
                         isMaster = true; isJuiz = true; isAmigos = true; 
                         document.getElementById('btnLogin').innerHTML = `<span class="menu-icon">🔓</span><span class="menu-text">Sair (Master)</span>`;
                         document.body.classList.add('is-master', 'is-juiz', 'is-amigos');
                         alert("Acesso MASTER Liberado!"); atualizarListaSorteio(); refreshTelas();
                     } 
+                    else if (senhasDB.amigos && verificarSenha(s, senhasDB.amigos)) {
+                        isMaster = true; isJuiz = true; isAmigos = true; 
+                        document.getElementById('btnLogin').innerHTML = `<span class="menu-icon">🔓</span><span class="menu-text">Sair (Amigos)</span>`;
+                        document.body.classList.add('is-master', 'is-juiz', 'is-amigos');
+                        alert("Acesso AMIGOS (Privilégio Master) Liberado!"); atualizarListaSorteio(); refreshTelas();
+                    }
                     else if (verificarSenha(s, senhasDB.juiz)) {
                         isJuiz = true; isAmigos = true;
                         document.getElementById('btnLogin').innerHTML = `<span class="menu-icon">🔓</span><span class="menu-text">Sair (Juiz)</span>`;
