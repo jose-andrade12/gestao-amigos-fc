@@ -157,6 +157,10 @@
         tr:hover { background-color: #16161e; }
         .flex-row { display: flex; gap: 15px; }
         .flex-row > div { flex: 1; }
+        
+        /* ADIÇÃO DO GRID-SORTEIO PARA LAYOUT DESKTOP LADO A LADO */
+        .grid-sorteio { display: flex; gap: 15px; }
+        
         .log-container { background-color: #16161e; border: 1px solid #414868; border-radius: 5px; max-height: 250px; overflow-y: auto; margin-top: 15px; }
         .log-item { display: flex; align-items: center; padding: 10px 15px; border-bottom: 1px solid #292e42; }
         .log-item:last-child { border-bottom: none; }
@@ -1222,12 +1226,33 @@
         // Funções de Histórico e Sorteio
         function executarSorteio() {
             if(!isMaster) return alert("Faça login com a senha Master para escalar.");
+            
             let presentes = atletasFC.filter(a => a.presente === true).map(a => a.nome);
-            if(presentes.length < 2) return alert("Ao menos 2 jogadores confirmados!");
-            for (let i = presentes.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [presentes[i], presentes[j]] = [presentes[j], presentes[i]]; }
-            sorteioEquipasAtuais = { real: [], milan: [] };
-            presentes.forEach((jogador, i) => { if (i % 2 === 0) sorteioEquipasAtuais.real.push(jogador); else sorteioEquipasAtuais.milan.push(jogador); });
-            renderListasSorteio(); if(modoManualAtivo) atualizarPainelManual(); alert("Sorteados!");
+            if(presentes.length < 2) return alert("Ao menos 2 jogadores confirmados para o sorteio!");
+            
+            // Filtra quem ainda não foi escalado manualmente
+            let disponiveis = presentes.filter(j => 
+                !sorteioEquipasAtuais.real.includes(j) && !sorteioEquipasAtuais.milan.includes(j)
+            );
+            
+            // Embaralha (Fisher-Yates) apenas os disponíveis
+            for (let i = disponiveis.length - 1; i > 0; i--) { 
+                const j = Math.floor(Math.random() * (i + 1)); 
+                [disponiveis[i], disponiveis[j]] = [disponiveis[j], disponiveis[i]]; 
+            }
+            
+            // Distribui validando o tamanho dos times
+            disponiveis.forEach((jogador) => { 
+                if (sorteioEquipasAtuais.real.length <= sorteioEquipasAtuais.milan.length) {
+                    sorteioEquipasAtuais.real.push(jogador); 
+                } else {
+                    sorteioEquipasAtuais.milan.push(jogador); 
+                }
+            });
+            
+            renderListasSorteio(); 
+            if(modoManualAtivo) atualizarPainelManual(); 
+            alert("Atletas sem time sorteados com sucesso! (As alocações manuais foram preservadas).");
         }
 
         function compartilharSorteio() {
