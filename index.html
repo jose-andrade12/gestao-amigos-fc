@@ -651,19 +651,42 @@
         let modoManualAtivo = false, juizTimeAtual = "", juizAcaoAtual = "";
         let configSistema = { dataProximaPartida: "", presencaLiberada: false };
 
-        /* === SISTEMA DE LOGIN E AUTENTICAÇÃO === */
+        /* === SISTEMA DE LOGIN E AUTENTICAÇÃO (ATUALIZADO) === */
         
         auth.onAuthStateChanged((user) => {
             if (user) {
                 authUserEmail = user.email;
-                isAmigos = true; 
-                document.body.classList.add('is-amigos');
-                document.getElementById('cadEmail').value = user.email;
-                document.getElementById('btnLogin').innerHTML = `<span class="menu-icon">🚪</span><span class="menu-text">Sair (Logado)</span>`;
-                verificarVinculoJogador(user.email);
+
+                // Verifica se o login foi feito pelas contas restritas do Firebase Auth
+                if (user.email === "master@amigosfc.com") {
+                    isMaster = true; isJuiz = true; isAmigos = true;
+                    document.getElementById('btnLogin').innerHTML = `<span class="menu-icon">🔓</span><span class="menu-text">Sair (Master)</span>`;
+                    document.body.classList.add('is-master', 'is-juiz', 'is-amigos');
+                    atualizarListaSorteio(); refreshTelas();
+                } 
+                else if (user.email === "juiz@amigosfc.com") {
+                    isJuiz = true; isAmigos = true;
+                    document.getElementById('btnLogin').innerHTML = `<span class="menu-icon">🔓</span><span class="menu-text">Sair (Juiz)</span>`;
+                    document.body.classList.add('is-juiz', 'is-amigos');
+                    atualizarListaSorteio(); refreshTelas();
+                } 
+                else if (user.email === "amigos@amigosfc.com") {
+                    isMaster = true; isJuiz = true; isAmigos = true; 
+                    document.getElementById('btnLogin').innerHTML = `<span class="menu-icon">🔓</span><span class="menu-text">Sair (Amigos)</span>`;
+                    document.body.classList.add('is-master', 'is-juiz', 'is-amigos');
+                    atualizarListaSorteio(); refreshTelas();
+                } 
+                else {
+                    // Login normal de jogador via conta do Google
+                    isAmigos = true; 
+                    document.body.classList.add('is-amigos');
+                    document.getElementById('cadEmail').value = user.email;
+                    document.getElementById('btnLogin').innerHTML = `<span class="menu-icon">🚪</span><span class="menu-text">Sair (Logado)</span>`;
+                    verificarVinculoJogador(user.email);
+                }
             } else {
                 authUserEmail = null;
-                if(!isMaster && !isJuiz) resetarAcessos();
+                resetarAcessos();
             }
         });
 
@@ -731,36 +754,24 @@
             fecharModalSenha();
             
             try {
-                const doc = await db.collection("sistema").doc("senhas").get();
-                if (doc.exists) {
-                    const senhasDB = doc.data();
-                    
-                    if (verificarSenha(s, senhasDB.master)) {
-                        isMaster = true; isJuiz = true; isAmigos = true; 
-                        document.getElementById('btnLogin').innerHTML = `<span class="menu-icon">🔓</span><span class="menu-text">Sair (Master)</span>`;
-                        document.body.classList.add('is-master', 'is-juiz', 'is-amigos');
-                        alert("Acesso MASTER Liberado!"); atualizarListaSorteio(); refreshTelas();
-                    } 
-                    else if (senhasDB.amigos && verificarSenha(s, senhasDB.amigos)) {
-                        isMaster = true; isJuiz = true; isAmigos = true; 
-                        document.getElementById('btnLogin').innerHTML = `<span class="menu-icon">🔓</span><span class="menu-text">Sair (Amigos)</span>`;
-                        document.body.classList.add('is-master', 'is-juiz', 'is-amigos');
-                        alert("Acesso AMIGOS (Privilégio Master) Liberado!"); atualizarListaSorteio(); refreshTelas();
-                    }
-                    else if (verificarSenha(s, senhasDB.juiz)) {
-                        isJuiz = true; isAmigos = true;
-                        document.getElementById('btnLogin').innerHTML = `<span class="menu-icon">🔓</span><span class="menu-text">Sair (Juiz)</span>`;
-                        document.body.classList.add('is-juiz', 'is-amigos');
-                        alert("Acesso JUIZ Liberado!"); atualizarListaSorteio(); refreshTelas();
-                    } else { 
-                        alert("Senha Incorreta!"); 
+                // Tenta fazer o login oficial no Firebase Authentication como Master
+                await auth.signInWithEmailAndPassword("master@amigosfc.com", s);
+                alert("Acesso MASTER Liberado!");
+            } catch (errorMaster) {
+                try {
+                    // Tenta fazer o login oficial no Firebase Authentication como Juiz
+                    await auth.signInWithEmailAndPassword("juiz@amigosfc.com", s);
+                    alert("Acesso JUIZ Liberado!");
+                } catch (errorJuiz) {
+                    try {
+                        // Tenta fazer o login oficial no Firebase Authentication como Amigos genérico
+                        await auth.signInWithEmailAndPassword("amigos@amigosfc.com", s);
+                        alert("Acesso AMIGOS (Privilégio Master) Liberado!");
+                    } catch (errorAmigos) {
+                        alert("Senha incorreta ou os e-mails de acesso ainda não foram criados no Console do Firebase!"); 
                     }
                 }
-            } catch (error) { alert("Erro ao conectar com o banco de dados."); }
-        }
-
-        function verificarSenha(input, hashEsperado) {
-            try { return btoa(input.split('').reverse().join('')) === hashEsperado; } catch(e) { return false; }
+            }
         }
 
         /* === SISTEMA DE DADOS (FIRESTORE) === */
@@ -814,13 +825,11 @@
             reader.onload = function(readerEvent) {
                 const img = new Image();
                 img.onload = function() {
-                    // Define o tamanho máximo desejado
                     const MAX_WIDTH = 400;
                     const MAX_HEIGHT = 400;
                     let width = img.width;
                     let height = img.height;
 
-                    // Calcula a proporção mantendo o aspecto da foto
                     if (width > height) {
                         if (width > MAX_WIDTH) {
                             height *= MAX_WIDTH / width;
@@ -833,14 +842,12 @@
                         }
                     }
 
-                    // Cria o canvas para redimensionar a imagem
                     const canvas = document.createElement('canvas');
                     canvas.width = width;
                     canvas.height = height;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
 
-                    // Exporta a imagem comprimida para JPEG com 60% de qualidade
                     const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
                     
                     fotoBase64Atual = dataUrl;
