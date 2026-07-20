@@ -605,12 +605,13 @@
     </div>
 
     <!-- MODAL SENHA RESTRITA -->
-    <div id="modalSenha" class="modal-overlay">
+<div id="modalSenha" class="modal-overlay">
         <div class="modal-content" style="max-width: 350px;">
             <h2 style="color: var(--admin-color); margin-top: 0;">Acesso Restrito</h2>
-            <p style="color: #a9b1d6; font-size: 14px; margin-bottom: 20px;">Digite a senha de Master ou Juiz:</p>
+            <p style="color: #a9b1d6; font-size: 14px; margin-bottom: 20px;">Digite seu e-mail e senha:</p>
             
-            <input type="password" id="inputSenhaAcesso" placeholder="Sua senha..." style="width: 100%; padding: 15px; margin-bottom: 20px; background: #16161e; border: 1px solid #414868; color: white; border-radius: 8px; text-align: center; font-size: 18px; letter-spacing: 2px;">
+            <input type="email" id="inputEmailAcesso" placeholder="E-mail (ex: master@amigosfc.com)" style="width: 100%; padding: 15px; margin-bottom: 10px; background: #16161e; border: 1px solid #414868; color: white; border-radius: 8px;">
+            <input type="password" id="inputSenhaAcesso" placeholder="Senha" style="width: 100%; padding: 15px; margin-bottom: 20px; background: #16161e; border: 1px solid #414868; color: white; border-radius: 8px;">
             
             <button class="btn-acao" onclick="confirmarLoginSenha()" style="background: var(--admin-color); color: #16161e;">Entrar</button>
             <button class="btn-acao" style="background: transparent; color: #7aa2f7; margin-top: 15px; font-weight: normal;" onclick="fecharModalSenha()">Cancelar</button>
