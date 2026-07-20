@@ -604,8 +604,8 @@
         </div>
     </div>
 
-    <!-- MODAL SENHA RESTRITA -->
-<div id="modalSenha" class="modal-overlay">
+    <!-- MODAL SENHA RESTRITA (ATUALIZADO) -->
+    <div id="modalSenha" class="modal-overlay">
         <div class="modal-content" style="max-width: 350px;">
             <h2 style="color: var(--admin-color); margin-top: 0;">Acesso Restrito</h2>
             <p style="color: #a9b1d6; font-size: 14px; margin-bottom: 20px;">Digite seu e-mail e senha:</p>
@@ -740,15 +740,16 @@
         function fazerLoginSenha() {
             fecharModalLogin();
             document.getElementById('modalSenha').style.display = 'flex';
+            document.getElementById('inputEmailAcesso').value = ''; 
             document.getElementById('inputSenhaAcesso').value = ''; 
-            setTimeout(() => document.getElementById('inputSenhaAcesso').focus(), 100);
+            setTimeout(() => document.getElementById('inputEmailAcesso').focus(), 100);
         }
 
         function fecharModalSenha() {
             document.getElementById('modalSenha').style.display = 'none';
         }
 
-async function confirmarLoginSenha() {
+        async function confirmarLoginSenha() {
             let email = document.getElementById('inputEmailAcesso').value;
             let pass = document.getElementById('inputSenhaAcesso').value;
             
@@ -762,8 +763,6 @@ async function confirmarLoginSenha() {
                 // O estado do usuário mudará automaticamente graças ao auth.onAuthStateChanged
             } catch (error) {
                 alert("Erro ao logar: " + error.message);
-        	    }
-        	}
             }
         }
 
