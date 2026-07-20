@@ -6,6 +6,11 @@
     <meta name="referrer" content="no-referrer" />
     <title>Gestão Amigos FC - Pro Edition</title>
     
+    <!-- Configurações do App (PWA) -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1a1b26">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/87/87330.png">
+    
     <!-- Firebase core, Firestore e Auth -->
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -645,7 +650,7 @@
         let filtroDataGlobal = "", chartInstancia = null, sorteioEquipasAtuais = { real: [], milan: [] };
         let modoManualAtivo = false, juizTimeAtual = "", juizAcaoAtual = "";
         let configSistema = { dataProximaPartida: "", presencaLiberada: false };
-        let bancoConectado = false; // NOVA VARIÁVEL PARA CONTROLE DE SEGURANÇA
+        let bancoConectado = false; 
 
         /* === SISTEMA DE LOGIN E AUTENTICAÇÃO === */
         
@@ -694,7 +699,6 @@
                     localStorage.removeItem('meuJogadorId');
                     auth.signOut().then(() => {
                         alert("Logout realizado com sucesso.");
-                        // Recarrega a página para limpar toda a memória do banco de dados
                         window.location.reload(); 
                     });
                 }
@@ -792,7 +796,7 @@
                 }
             });
 
-db.collection("atletas").onSnapshot(snap => { 
+            db.collection("atletas").onSnapshot(snap => { 
                 atletasFC = snap.docs.map(doc => ({id: doc.id, ...doc.data()})).sort((a, b) => a.nome.localeCompare(b.nome)); 
                 
                 // Mantém o jogador sempre conectado à sua própria identidade
@@ -1576,6 +1580,13 @@ db.collection("atletas").onSnapshot(snap => {
 
         setInterval(() => { if (document.getElementById('sorteio').classList.contains('active')) atualizarListaSorteio(); }, 60000);
         window.onload = () => { const dataAtual = new Date().toISOString().split('T')[0]; mudarDataGlobal(dataAtual); updateC(); abrirAba('painelJuiz'); }
+    </script>
+    
+    <!-- Script de Registro do App Instalável (Service Worker) -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js');
+      }
     </script>
 </body>
 </html>
