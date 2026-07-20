@@ -720,18 +720,24 @@
             });
         }
 
-        function verificarVinculoJogador(email) {
-            const atleta = atletasFC.find(a => a.email === email);
-            if (atleta) {
-                localStorage.setItem('meuJogadorId', atleta.id);
-                preencherFormularioPerfil(atleta);
-            } else {
-                abrirAba('cadastro');
-                alert("Olá! Vimos que é seu primeiro acesso. Por favor, preencha seus dados abaixo e escolha seu grupo para criar seu perfil de jogador.");
-                document.getElementById('cadEmail').value = email;
+        async function verificarVinculoJogador(email) {
+            try {
+                // Vai direto no banco de dados garantir que o jogador existe
+                const snapshot = await db.collection("atletas").where("email", "==", email).get();
+                if (!snapshot.empty) {
+                    const atleta = { id: snapshot.docs[0].id, ...snapshot.docs[0].data() };
+                    localStorage.setItem('meuJogadorId', atleta.id);
+                    preencherFormularioPerfil(atleta);
+                } else {
+                    abrirAba('cadastro');
+                    alert("Olá! Vimos que é seu primeiro acesso. Preencha seus dados e escolha seu grupo para criar seu perfil.");
+                    document.getElementById('cadEmail').value = email;
+                }
+                atualizarListaSorteio(); 
+                refreshTelas();
+            } catch(e) {
+                console.error("Erro ao verificar vínculo:", e);
             }
-            atualizarListaSorteio(); 
-            refreshTelas();
         }
 
         function fazerLoginSenha() {
@@ -786,16 +792,21 @@
                 }
             });
 
-            db.collection("atletas").onSnapshot(snap => { 
+db.collection("atletas").onSnapshot(snap => { 
                 atletasFC = snap.docs.map(doc => ({id: doc.id, ...doc.data()})).sort((a, b) => a.nome.localeCompare(b.nome)); 
+                
+                // Mantém o jogador sempre conectado à sua própria identidade
+                if(authUserEmail && !isMaster && !isJuiz) {
+                    let eu = atletasFC.find(a => a.email === authUserEmail);
+                    if(eu) {
+                        localStorage.setItem('meuJogadorId', eu.id);
+                        preencherFormularioPerfil(eu);
+                    }
+                }
+
                 atualizarListaSorteio(); 
                 if(modoManualAtivo) atualizarPainelManual(); 
                 refreshTelas(); 
-                
-                if(authUserEmail) {
-                    let eu = atletasFC.find(a => a.email === authUserEmail);
-                    if(eu && !isMaster) preencherFormularioPerfil(eu);
-                }
             });
             
             db.collection("scouts").onSnapshot(snap => { scoutsFC = snap.docs.map(doc => ({id: doc.id, ...doc.data()})).sort((a,b) => a.timestamp - b.timestamp); refreshTelas(); });
