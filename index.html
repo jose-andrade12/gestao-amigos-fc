@@ -748,30 +748,22 @@
             document.getElementById('modalSenha').style.display = 'none';
         }
 
-        async function confirmarLoginSenha() {
-            let s = document.getElementById('inputSenhaAcesso').value;
-            if (!s) return;
+async function confirmarLoginSenha() {
+            let email = document.getElementById('inputEmailAcesso').value;
+            let pass = document.getElementById('inputSenhaAcesso').value;
+            
+            if (!email || !pass) return alert("Por favor, preencha o e-mail e a senha!");
             
             fecharModalSenha();
             
             try {
-                // Tenta fazer o login oficial no Firebase Authentication como Master
-                await auth.signInWithEmailAndPassword("master@amigosfc.com", s);
-                alert("Acesso MASTER Liberado!");
-            } catch (errorMaster) {
-                try {
-                    // Tenta fazer o login oficial no Firebase Authentication como Juiz
-                    await auth.signInWithEmailAndPassword("juiz@amigosfc.com", s);
-                    alert("Acesso JUIZ Liberado!");
-                } catch (errorJuiz) {
-                    try {
-                        // Tenta fazer o login oficial no Firebase Authentication como Amigos genérico
-                        await auth.signInWithEmailAndPassword("amigos@amigosfc.com", s);
-                        alert("Acesso AMIGOS (Privilégio Master) Liberado!");
-                    } catch (errorAmigos) {
-                        alert("Senha incorreta ou os e-mails de acesso ainda não foram criados no Console do Firebase!"); 
-                    }
-                }
+                await auth.signInWithEmailAndPassword(email, pass);
+                alert("Login realizado com sucesso!");
+                // O estado do usuário mudará automaticamente graças ao auth.onAuthStateChanged
+            } catch (error) {
+                alert("Erro ao logar: " + error.message);
+        	    }
+        	}
             }
         }
 
