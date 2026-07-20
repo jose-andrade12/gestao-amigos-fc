@@ -1,0 +1,15 @@
+{
+  "name": "Amigos FC Gestão",
+  "short_name": "Amigos FC",
+  "start_url": "/gestao-amigos-fc/index.html",
+  "display": "standalone",
+  "background_color": "#1a1b26",
+  "theme_color": "#1a1b26",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/87/87330.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
