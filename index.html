@@ -69,7 +69,6 @@
         input:focus, select:focus { border-color: var(--cyan); }
         input[readonly] { background-color: #24283b; color: #7aa2f7; cursor: not-allowed; }
         
-        /* Grid para o Cadastro Completo */
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .form-section { background: #16161e; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #414868;}
         .form-section h4 { margin-top: 0; color: var(--cyan); border-bottom: 1px solid #292e42; padding-bottom: 10px; margin-bottom: 15px;}
@@ -158,7 +157,6 @@
         .flex-row { display: flex; gap: 15px; }
         .flex-row > div { flex: 1; }
         
-        /* ADIÇÃO DO GRID-SORTEIO PARA LAYOUT DESKTOP LADO A LADO */
         .grid-sorteio { display: flex; gap: 15px; }
         
         .log-container { background-color: #16161e; border: 1px solid #414868; border-radius: 5px; max-height: 250px; overflow-y: auto; margin-top: 15px; }
@@ -319,7 +317,6 @@
             <div class="req-logged">
                 <h3 id="tituloAbaCadastro">Meu Perfil de Jogador</h3>
                 
-                <!-- Dados Fotografia -->
                 <div class="form-section" style="display: flex; flex-direction: column; align-items: center;">
                     <label style="cursor:pointer; display:flex; flex-direction:column; align-items:center;">
                         <img id="previewFoto" src="https://via.placeholder.com/150/414868/FFFFFF?text=FOTO" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid var(--cyan); margin-bottom: 10px;">
@@ -328,7 +325,6 @@
                     </label>
                 </div>
 
-                <!-- Dados Pessoais & Login -->
                 <div class="form-section">
                     <h4>👤 Dados Pessoais & Acesso</h4>
                     <div class="form-grid">
@@ -343,7 +339,6 @@
                     </div>
                 </div>
 
-                <!-- Dados do Jogador -->
                 <div class="form-section">
                     <h4>⚽ Dados do Atleta</h4>
                     <div class="form-grid">
@@ -368,7 +363,6 @@
                 <button id="btnSalvarAtleta" class="btn-acao" onclick="salvarAtleta()" style="font-size: 18px; padding: 15px;">💾 Salvar Meu Cadastro</button>
             </div>
 
-            <!-- Área Exclusiva do Administrador -->
             <div class="req-master" style="margin-top: 40px; border-top: 2px dashed #414868; padding-top: 30px;">
                 <h3 style="color:var(--admin-color);">🛠️ Painel do Master: Gerenciamento</h3>
                 
@@ -604,7 +598,7 @@
         </div>
     </div>
 
-    <!-- MODAL SENHA RESTRITA (ATUALIZADO) -->
+    <!-- MODAL SENHA RESTRITA -->
     <div id="modalSenha" class="modal-overlay">
         <div class="modal-content" style="max-width: 350px;">
             <h2 style="color: var(--admin-color); margin-top: 0;">Acesso Restrito</h2>
@@ -651,14 +645,17 @@
         let filtroDataGlobal = "", chartInstancia = null, sorteioEquipasAtuais = { real: [], milan: [] };
         let modoManualAtivo = false, juizTimeAtual = "", juizAcaoAtual = "";
         let configSistema = { dataProximaPartida: "", presencaLiberada: false };
+        let bancoConectado = false; // NOVA VARIÁVEL PARA CONTROLE DE SEGURANÇA
 
-        /* === SISTEMA DE LOGIN E AUTENTICAÇÃO (ATUALIZADO) === */
+        /* === SISTEMA DE LOGIN E AUTENTICAÇÃO === */
         
         auth.onAuthStateChanged((user) => {
             if (user) {
                 authUserEmail = user.email;
+                
+                // INICIA O BANCO DE DADOS SOMENTE APÓS CONFIRMAR O LOGIN
+                iniciarConexaoBanco(); 
 
-                // Verifica se o login foi feito pelas contas restritas do Firebase Auth
                 if (user.email === "master@amigosfc.com") {
                     isMaster = true; isJuiz = true; isAmigos = true;
                     document.getElementById('btnLogin').innerHTML = `<span class="menu-icon">🔓</span><span class="menu-text">Sair (Master)</span>`;
@@ -678,7 +675,6 @@
                     atualizarListaSorteio(); refreshTelas();
                 } 
                 else {
-                    // Login normal de jogador via conta do Google
                     isAmigos = true; 
                     document.body.classList.add('is-amigos');
                     document.getElementById('cadEmail').value = user.email;
@@ -697,8 +693,9 @@
                     isMaster = false; isJuiz = false; isAmigos = false;
                     localStorage.removeItem('meuJogadorId');
                     auth.signOut().then(() => {
-                        resetarAcessos();
                         alert("Logout realizado com sucesso.");
+                        // Recarrega a página para limpar toda a memória do banco de dados
+                        window.location.reload(); 
                     });
                 }
             } else {
@@ -760,7 +757,6 @@
             try {
                 await auth.signInWithEmailAndPassword(email, pass);
                 alert("Login realizado com sucesso!");
-                // O estado do usuário mudará automaticamente graças ao auth.onAuthStateChanged
             } catch (error) {
                 alert("Erro ao logar: " + error.message);
             }
@@ -768,41 +764,46 @@
 
         /* === SISTEMA DE DADOS (FIRESTORE) === */
         
-        db.collection("sistema").doc("config").onSnapshot(doc => {
-            if (doc.exists) {
-                configSistema = doc.data();
-                if(configSistema.dataProximaPartida && !filtroDataGlobal) {
-                    mudarDataGlobal(configSistema.dataProximaPartida);
-                    document.getElementById('dataAgendamento').value = configSistema.dataProximaPartida;
+        function iniciarConexaoBanco() {
+            if(bancoConectado) return; // Evita carregar duas vezes
+            bancoConectado = true;
+
+            db.collection("sistema").doc("config").onSnapshot(doc => {
+                if (doc.exists) {
+                    configSistema = doc.data();
+                    if(configSistema.dataProximaPartida && !filtroDataGlobal) {
+                        mudarDataGlobal(configSistema.dataProximaPartida);
+                        document.getElementById('dataAgendamento').value = configSistema.dataProximaPartida;
+                    }
+                    atualizarListaSorteio();
                 }
-                atualizarListaSorteio();
-            }
-        });
+            });
 
-        db.collection("sistema").doc("grupos").onSnapshot(doc => {
-            if(doc.exists) {
-                gruposFC = doc.data().lista || [];
-                renderizarSelectGrupos();
-            }
-        });
+            db.collection("sistema").doc("grupos").onSnapshot(doc => {
+                if(doc.exists) {
+                    gruposFC = doc.data().lista || [];
+                    renderizarSelectGrupos();
+                }
+            });
 
-        db.collection("atletas").onSnapshot(snap => { 
-            atletasFC = snap.docs.map(doc => ({id: doc.id, ...doc.data()})).sort((a, b) => a.nome.localeCompare(b.nome)); 
-            atualizarListaSorteio(); 
-            if(modoManualAtivo) atualizarPainelManual(); 
-            refreshTelas(); 
+            db.collection("atletas").onSnapshot(snap => { 
+                atletasFC = snap.docs.map(doc => ({id: doc.id, ...doc.data()})).sort((a, b) => a.nome.localeCompare(b.nome)); 
+                atualizarListaSorteio(); 
+                if(modoManualAtivo) atualizarPainelManual(); 
+                refreshTelas(); 
+                
+                if(authUserEmail) {
+                    let eu = atletasFC.find(a => a.email === authUserEmail);
+                    if(eu && !isMaster) preencherFormularioPerfil(eu);
+                }
+            });
             
-            if(authUserEmail) {
-                let eu = atletasFC.find(a => a.email === authUserEmail);
-                if(eu && !isMaster) preencherFormularioPerfil(eu);
-            }
-        });
-        
-        db.collection("scouts").onSnapshot(snap => { scoutsFC = snap.docs.map(doc => ({id: doc.id, ...doc.data()})).sort((a,b) => a.timestamp - b.timestamp); refreshTelas(); });
-        db.collection("premiacoes").onSnapshot(snap => { premiacoesFC = snap.docs.map(doc => ({id: doc.id, ...doc.data()})).sort((a,b) => b.timestamp - a.timestamp); refreshTelas(); });
-        db.collection("escalacoes").onSnapshot(snap => { escalacoesFC = snap.docs.map(doc => ({id: doc.id, ...doc.data()})); refreshTelas(); });
+            db.collection("scouts").onSnapshot(snap => { scoutsFC = snap.docs.map(doc => ({id: doc.id, ...doc.data()})).sort((a,b) => a.timestamp - b.timestamp); refreshTelas(); });
+            db.collection("premiacoes").onSnapshot(snap => { premiacoesFC = snap.docs.map(doc => ({id: doc.id, ...doc.data()})).sort((a,b) => b.timestamp - a.timestamp); refreshTelas(); });
+            db.collection("escalacoes").onSnapshot(snap => { escalacoesFC = snap.docs.map(doc => ({id: doc.id, ...doc.data()})); refreshTelas(); });
+        }
 
-        /* === FUNÇÕES DE CADASTRO E FOTO (ATUALIZADO COM COMPRESSÃO) === */
+        /* === FUNÇÕES DE CADASTRO E FOTO === */
 
         function handleFotoUpload(e) {
             const file = e.target.files[0];
@@ -993,7 +994,7 @@
 
         function excluirDoc(coll, id) { if(!isMaster) return; if(confirm("Excluir permanentemente?")) db.collection(coll).doc(id).delete(); }
 
-        /* === SISTEMA DE CRONÔMETRO ABSOLUTO === */
+        /* === SISTEMA DE CRONÔMETRO === */
         let tempoRodando = false, tempoInicio = 0, tempoPausadoTotal = 0, cInt = null;
 
         function updateC() { 
@@ -1222,25 +1223,21 @@
             window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(txt)}`, '_blank');
         }
 
-        // Funções de Histórico e Sorteio
         function executarSorteio() {
             if(!isMaster) return alert("Faça login com a senha Master para escalar.");
             
             let presentes = atletasFC.filter(a => a.presente === true).map(a => a.nome);
             if(presentes.length < 2) return alert("Ao menos 2 jogadores confirmados para o sorteio!");
             
-            // Filtra quem ainda não foi escalado manualmente
             let disponiveis = presentes.filter(j => 
                 !sorteioEquipasAtuais.real.includes(j) && !sorteioEquipasAtuais.milan.includes(j)
             );
             
-            // Embaralha (Fisher-Yates) apenas os disponíveis
             for (let i = disponiveis.length - 1; i > 0; i--) { 
                 const j = Math.floor(Math.random() * (i + 1)); 
                 [disponiveis[i], disponiveis[j]] = [disponiveis[j], disponiveis[i]]; 
             }
             
-            // Distribui validando o tamanho dos times
             disponiveis.forEach((jogador) => { 
                 if (sorteioEquipasAtuais.real.length <= sorteioEquipasAtuais.milan.length) {
                     sorteioEquipasAtuais.real.push(jogador); 
@@ -1251,7 +1248,7 @@
             
             renderListasSorteio(); 
             if(modoManualAtivo) atualizarPainelManual(); 
-            alert("Atletas sem time sorteados com sucesso! (As alocações manuais foram preservadas).");
+            alert("Atletas sem time sorteados com sucesso!");
         }
 
         function compartilharSorteio() {
@@ -1334,10 +1331,8 @@
 
             let txt = `⚽ *RESUMO DA PARTIDA - AMIGOS FC* ⚽\n📅 Data: ${dFormatada}\n\n`;
             
-            // 1. PLACAR NO TOPO
             txt += `*PLACAR*\n⚪ REAL MADRID  ${golsR} x ${golsM}  MILAN 🔴\n\n`;
 
-            // 2. JOGADORES EM CAMPO (Separados por Time)
             const escalacaoDoDia = escalacoesFC.find(e => e.data === data);
             if (escalacaoDoDia) {
                 txt += `👥 *JOGADORES EM CAMPO*\n`;
@@ -1345,14 +1340,12 @@
                 txt += `🔴 *Milan:* ${escalacaoDoDia.milan.length > 0 ? escalacaoDoDia.milan.join(', ') : 'Nenhum'}\n\n`;
             }
 
-            // 3. SÚMULA GERAL (Eventos separados por Time)
             const scoutsDia = scoutsFC.filter(s => s.data === data);
             txt += `📜 *SÚMULA GERAL*\n`;
             
             if (scoutsDia.length === 0) {
                 txt += "Nenhum evento registrado nesta partida.\n\n";
             } else {
-                // Função auxiliar para agrupar e formatar eventos de um time específico
                 const formatarEventos = (timeScouts) => {
                     let txtTime = "";
                     let gols = timeScouts.filter(s => s.acao === 'Gol');
@@ -1367,7 +1360,6 @@
                     return txtTime || "  Nenhum evento.\n";
                 };
 
-                // Filtra os eventos do Real Madrid e do Milan
                 let scoutsReal = scoutsDia.filter(s => s.time === 'Real Madrid');
                 let scoutsMilan = scoutsDia.filter(s => s.time === 'Milan');
 
@@ -1379,13 +1371,11 @@
                 txt += `\n`;
             }
             
-            // 4. PREMIAÇÕES (Resenha)
             let premioDia = premiacoesFC.find(p => p.data === data);
             if (premioDia) {
                 txt += `🏆 *PREMIAÇÕES (RESENHA)*\n⭐ Craque: ${premioDia.craque}\n🧱 Paredão: ${premioDia.paredao}\n🛡️ Xerifão: ${premioDia.xerifao}\n🎈 Bola Murcha: ${premioDia.bolaMurcha}\n`;
             }
 
-            // Envia para o WhatsApp
             window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(txt)}`, '_blank');
         }
 
@@ -1455,7 +1445,6 @@
             });
         }
 
-        // Função do Dashboard Refatorada conforme solicitado
         function compartilharEstatisticas() {
             let inicio = document.getElementById('dashDataInicio') ? document.getElementById('dashDataInicio').value : '';
             let fim = document.getElementById('dashDataFim') ? document.getElementById('dashDataFim').value : '';
@@ -1476,7 +1465,6 @@
                 let txtTime = "";
                 let statsGols = {}, statsAssists = {}, statsAmarelos = {}, statsVermelhos = {};
 
-                // Agrega a quantidade de ocorrências por jogador
                 timeScouts.forEach(s => {
                     if(s.acao === 'Gol') statsGols[s.jogador] = (statsGols[s.jogador] || 0) + 1;
                     if(s.acao === 'Assistência') statsAssists[s.jogador] = (statsAssists[s.jogador] || 0) + 1;
@@ -1487,8 +1475,6 @@
                 const montarLinha = (obj, icone, label) => {
                     let arr = Object.keys(obj).map(k => ({nome: k, val: obj[k]})).sort((a,b) => b.val - a.val);
                     if(arr.length === 0) return "";
-                    
-                    // Mostra o nome, e se for maior que 1 ocorrência, mostra a quantidade em parênteses.
                     let formatado = arr.map(i => i.val > 1 ? `${i.nome} (${i.val})` : i.nome).join(', ');
                     return `  ${icone} *${label}:* ${formatado}\n`;
                 };
@@ -1501,7 +1487,6 @@
                 return txtTime || "  Nenhum evento registrado.\n";
             };
 
-            // Filtra os registros consolidados de cada equipe para o período
             let scoutsReal = scoutsFiltradosParaDash.filter(s => s.time === 'Real Madrid');
             let scoutsMilan = scoutsFiltradosParaDash.filter(s => s.time === 'Milan');
 
@@ -1583,4 +1568,3 @@
     </script>
 </body>
 </html>
- 
