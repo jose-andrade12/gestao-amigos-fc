@@ -443,11 +443,11 @@
             <div class="grid-sorteio" style="margin-top: 15px;">
                 <div style="flex: 1; background: #16161e; padding: 15px; border-radius: 8px; border-left: 4px solid #ffffff;">
                     <h4 style="margin-top:0; color: #ffffff;">⚪ Real Madrid</h4>
-                    <ul id="sorteioReal" style="padding-left: 20px; color: #ffffff; line-height: 1.8;"></ul>
+                    <ul id="sorteioReal" style="padding-left: 20px; color: #ffffff; line-height: 1.8; list-style: none;"></ul>
                 </div>
                 <div style="flex: 1; background: #16161e; padding: 15px; border-radius: 8px; border-left: 4px solid #f7768e;">
                     <h4 style="margin-top:0; color: #f7768e;">🔴 Milan</h4>
-                    <ul id="sorteioMilan" style="padding-left: 20px; color: #ffffff; line-height: 1.8;"></ul>
+                    <ul id="sorteioMilan" style="padding-left: 20px; color: #ffffff; line-height: 1.8; list-style: none;"></ul>
                 </div>
             </div>
         </div>
@@ -648,6 +648,7 @@
         let atletasFC = [], scoutsFC = [], premiacoesFC = [], escalacoesFC = [], gruposFC = [];
         let atletaEditandoId = null;
         let filtroDataGlobal = "", chartInstancia = null, sorteioEquipasAtuais = { real: [], milan: [] };
+        let titularesPartida = { real: [], milan: [] }; // NOVA VARIÁVEL AQUI
         let modoManualAtivo = false, juizTimeAtual = "", juizAcaoAtual = "";
         let configSistema = { dataProximaPartida: "", presencaLiberada: false };
         let bancoConectado = false; 
@@ -1238,8 +1239,22 @@
             window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(txt)}`, '_blank');
         }
 
+        // Funções Adicionadas - Separação Titular/Reserva
+        function alternarTitularSorteio(jogador, time) {
+            if(!isMaster) return; 
+            let lista = titularesPartida[time];
+            if (lista.includes(jogador)) {
+                titularesPartida[time] = lista.filter(j => j !== jogador); 
+            } else {
+                titularesPartida[time].push(jogador); 
+            }
+            renderListasSorteio();
+        }
+
         function executarSorteio() {
             if(!isMaster) return alert("Faça login com a senha Master para escalar.");
+            
+            titularesPartida = { real: [], milan: [] }; // Zera titulares
             
             let presentes = atletasFC.filter(a => a.presente === true).map(a => a.nome);
             if(presentes.length < 2) return alert("Ao menos 2 jogadores confirmados para o sorteio!");
@@ -1270,8 +1285,31 @@
             if(sorteioEquipasAtuais.real.length === 0 && sorteioEquipasAtuais.milan.length === 0) return alert("Realize o sorteio primeiro!");
             let d = configSistema.dataProximaPartida ? configSistema.dataProximaPartida.split('-').reverse().join('/') : "Data não definida";
             let txt = `⚽ *ESCALAÇÃO DEFINIDA - AMIGOS FC* ⚽\n📅 Data: ${d}\n\n`;
-            txt += `⚪ *REAL MADRID*\n`; sorteioEquipasAtuais.real.forEach(j => txt += `- ${j}\n`);
-            txt += `\n🔴 *MILAN*\n`; sorteioEquipasAtuais.milan.forEach(j => txt += `- ${j}\n`);
+
+            const formatarTimeWpp = (jogadores, timeId) => {
+                let titulares = jogadores.filter(j => titularesPartida[timeId].includes(j));
+                let reservas = jogadores.filter(j => !titularesPartida[timeId].includes(j));
+                let texto = '';
+                
+                if(titulares.length > 0) {
+                    texto += `  ⭐ *Titulares:*\n`;
+                    titulares.forEach(j => texto += `  - ${j}\n`);
+                }
+                if(reservas.length > 0) {
+                    texto += `  🔄 *Reservas:*\n`;
+                    reservas.forEach(j => texto += `  - ${j}\n`);
+                }
+                if(titulares.length === 0) { 
+                    jogadores.forEach(j => texto += `  - ${j}\n`);
+                }
+                return texto;
+            };
+
+            txt += `⚪ *REAL MADRID*\n`;
+            txt += formatarTimeWpp(sorteioEquipasAtuais.real, 'real');
+            txt += `\n🔴 *MILAN*\n`;
+            txt += formatarTimeWpp(sorteioEquipasAtuais.milan, 'milan');
+            
             window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(txt)}`, '_blank');
         }
 
@@ -1291,11 +1329,42 @@
             document.getElementById('listaDisponiveisManual').innerHTML = disponiveis.length === 0 ? `<span style="color:#a9b1d6;">Todos escalados.</span>` : disponiveis.map(j => `<div style="background:#292e42; padding:8px; border-radius:5px; display:flex; align-items:center; gap:10px;"><span style="font-size:14px;">${j}</span><button onclick="alocarManual('${j}', 'real')" style="background:#fff; color:#000; border:none; border-radius:3px; padding:5px; cursor:pointer; font-size:12px;">⚪ Real</button><button onclick="alocarManual('${j}', 'milan')" style="background:#f7768e; color:#fff; border:none; border-radius:3px; padding:5px; cursor:pointer; font-size:12px;">🔴 Milan</button></div>`).join('');
         }
         function alocarManual(jogador, time) { if(!isMaster) return; sorteioEquipasAtuais.real = sorteioEquipasAtuais.real.filter(j => j !== jogador); sorteioEquipasAtuais.milan = sorteioEquipasAtuais.milan.filter(j => j !== jogador); if(time === 'real') sorteioEquipasAtuais.real.push(jogador); if(time === 'milan') sorteioEquipasAtuais.milan.push(jogador); atualizarPainelManual(); renderListasSorteio(); }
-        function removerDoTimeManual(jogador) { if(!isMaster) return; sorteioEquipasAtuais.real = sorteioEquipasAtuais.real.filter(j => j !== jogador); sorteioEquipasAtuais.milan = sorteioEquipasAtuais.milan.filter(j => j !== jogador); atualizarPainelManual(); renderListasSorteio(); }
+        
+        function removerDoTimeManual(jogador) { 
+            if(!isMaster) return; 
+            sorteioEquipasAtuais.real = sorteioEquipasAtuais.real.filter(j => j !== jogador); 
+            sorteioEquipasAtuais.milan = sorteioEquipasAtuais.milan.filter(j => j !== jogador); 
+            titularesPartida.real = titularesPartida.real.filter(j => j !== jogador);
+            titularesPartida.milan = titularesPartida.milan.filter(j => j !== jogador);
+            atualizarPainelManual(); 
+            renderListasSorteio(); 
+        }
+
         function renderListasSorteio() {
-            const lReal = document.getElementById('sorteioReal'); const lMilan = document.getElementById('sorteioMilan'); if(!lReal || !lMilan) return;
-            lReal.innerHTML = sorteioEquipasAtuais.real.map(j => `<li style="display:flex; justify-content:space-between; margin-bottom:5px;">${j} ${modoManualAtivo && isMaster ? `<button onclick="removerDoTimeManual('${j}')" style="background:transparent; color:var(--red-deny); border:none; cursor:pointer;">❌</button>` : ''}</li>`).join('');
-            lMilan.innerHTML = sorteioEquipasAtuais.milan.map(j => `<li style="display:flex; justify-content:space-between; margin-bottom:5px;">${j} ${modoManualAtivo && isMaster ? `<button onclick="removerDoTimeManual('${j}')" style="background:transparent; color:var(--red-deny); border:none; cursor:pointer;">❌</button>` : ''}</li>`).join('');
+            const lReal = document.getElementById('sorteioReal'); 
+            const lMilan = document.getElementById('sorteioMilan'); 
+            if(!lReal || !lMilan) return;
+
+            const gerarHTML = (jogadores, timeId) => {
+                let titulares = jogadores.filter(j => titularesPartida[timeId].includes(j));
+                let reservas = jogadores.filter(j => !titularesPartida[timeId].includes(j));
+                let html = '';
+
+                if (titulares.length > 0) {
+                    html += `<div style="color:var(--admin-color); font-size:12px; font-weight:bold; margin-top:10px; border-bottom:1px solid #414868; padding-bottom:3px;">⭐ TITULARES (${titulares.length})</div>`;
+                    html += titulares.map(j => `<li style="display:flex; justify-content:space-between; align-items:center; margin-top:5px; padding:4px 0;">${j} <div>${isMaster ? `<button onclick="alternarTitularSorteio('${j}', '${timeId}')" style="background:transparent; border:none; cursor:pointer; font-size:14px;" title="Mover para Banco">👇</button>` : ''} ${modoManualAtivo && isMaster ? `<button onclick="removerDoTimeManual('${j}')" style="background:transparent; color:var(--red-deny); border:none; cursor:pointer;">❌</button>` : ''}</div></li>`).join('');
+                }
+
+                if (reservas.length > 0) {
+                    html += `<div style="color:var(--text-muted); font-size:12px; font-weight:bold; margin-top:10px; border-bottom:1px solid #414868; padding-bottom:3px;">🔄 RESERVAS (${reservas.length})</div>`;
+                    html += reservas.map(j => `<li style="display:flex; justify-content:space-between; align-items:center; margin-top:5px; padding:4px 0;">${j} <div>${isMaster ? `<button onclick="alternarTitularSorteio('${j}', '${timeId}')" style="background:transparent; border:none; cursor:pointer; font-size:14px;" title="Promover a Titular">⭐</button>` : ''} ${modoManualAtivo && isMaster ? `<button onclick="removerDoTimeManual('${j}')" style="background:transparent; color:var(--red-deny); border:none; cursor:pointer;">❌</button>` : ''}</div></li>`).join('');
+                }
+                
+                return html || `<span style="color:#7aa2f7; font-size: 14px;">Aguardando sorteio...</span>`;
+            };
+
+            lReal.innerHTML = gerarHTML(sorteioEquipasAtuais.real, 'real');
+            lMilan.innerHTML = gerarHTML(sorteioEquipasAtuais.milan, 'milan');
         }
 
         // Funções de Registro de Jogo
