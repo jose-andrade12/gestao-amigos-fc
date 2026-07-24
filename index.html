@@ -62,6 +62,7 @@
         .menu-btn .menu-icon { font-size: 20px; }
         .btn-juiz { border-color: var(--cyan); border-left: 4px solid var(--cyan) !important; }
         .btn-login { margin-top: auto; border-color: var(--admin-color); }
+        .btn-notificacao { border-color: var(--accent); }
         
         .main-content { flex: 1; padding: 30px; overflow-y: auto; position: relative;}
         .modulo { display: none; background-color: var(--panel-bg); padding: 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); animation: fadeIn 0.3s ease-in-out; }
@@ -241,6 +242,13 @@
                 <span class="menu-icon">📊</span>
                 <span class="menu-text">Dashboard</span>
             </button>
+            
+            <!-- NOVO BOTÃO DE NOTIFICAÇÕES AQUI -->
+            <button class="menu-btn btn-notificacao" onclick="solicitarPermissaoNotificacao()" id="btnNotificacao">
+                <span class="menu-icon">🔔</span>
+                <span class="menu-text">Ativar Alertas</span>
+            </button>
+
             <button class="menu-btn btn-login" onclick="abrirModalLogin()" id="btnLogin">
                 <span class="menu-icon">🔑</span>
                 <span class="menu-text">Login</span>
@@ -335,7 +343,6 @@
                     <div class="form-grid">
                         <div class="form-group"><label>E-mail (Vinculado via Google)</label><input type="email" id="cadEmail" readonly placeholder="Faça login para vincular"></div>
                         <div class="form-group"><label>Nome Completo</label><input type="text" id="cadNome" placeholder="Seu nome"></div>
-                        <!-- CAMPO NOVO ADICIONADO AQUI -->
                         <div class="form-group"><label>Apelido (Como quer ser chamado)</label><input type="text" id="cadApelido" placeholder="Seu apelido"></div>
                         <div class="form-group"><label>Celular / WhatsApp</label><input type="text" id="cadWhatsApp" placeholder="(00) 00000-0000"></div>
                         <div class="form-group"><label>Data de Nascimento</label><input type="date" id="cadNascimento"></div>
@@ -417,7 +424,6 @@
                 <div class="header-lista" style="margin-top: 30px;"><h4>⭐ Titulares</h4><span id="countDentroTitulares">0</span></div>
                 <div id="listaDentroTitulares"></div>
 
-                <!-- NOME DA LISTA ALTERADO AQUI DE 'Reservas' PARA 'Confirmados' -->
                 <div class="header-lista" style="margin-top: 30px;"><h4>🔄 Confirmados</h4><span id="countDentroReservas">0</span></div>
                 <div id="listaDentroReservas"></div>
 
@@ -655,6 +661,52 @@
         let modoManualAtivo = false, juizTimeAtual = "", juizAcaoAtual = "";
         let configSistema = { dataProximaPartida: "", presencaLiberada: false };
         let bancoConectado = false; 
+        let primeiraCargaNotificacao = true; // Para evitar apitar todos quando o app abrir
+
+        /* === SISTEMA DE NOTIFICAÇÕES (WEB API + PWA) === */
+        
+        function solicitarPermissaoNotificacao() {
+            if (!("Notification" in window)) {
+                alert("Este navegador não suporta notificações de sistema.");
+                return;
+            }
+            if (Notification.permission === "granted") {
+                alert("As notificações já estão ativadas para este dispositivo!");
+            } else if (Notification.permission !== "denied") {
+                Notification.requestPermission().then(permission => {
+                    if (permission === "granted") {
+                        alert("Notificações ativadas com sucesso! Você será avisado quando alguém confirmar presença.");
+                    }
+                });
+            } else {
+                alert("Você bloqueou as notificações. Libere nas configurações do seu navegador/celular para o site.");
+            }
+        }
+
+        function enviarNotificacaoLocal(titulo, corpo) {
+            if (!("Notification" in window) || Notification.permission !== "granted") return;
+            
+            try {
+                // Tenta usar o Service Worker (melhor experiência no Android, gera o card nativo da imagem)
+                navigator.serviceWorker.getRegistration().then(function(reg) {
+                    if (reg && reg.showNotification) {
+                        reg.showNotification(titulo, {
+                            body: corpo,
+                            icon: 'https://via.placeholder.com/150/00d65f/FFFFFF?text=AFC', // Ícone que aparece
+                            badge: 'https://via.placeholder.com/150/00d65f/FFFFFF?text=AFC',
+                            vibrate: [200, 100, 200],
+                            tag: 'amigos-fc-presenca' // Agrupa notificações repetidas
+                        });
+                    } else {
+                        // Fallback nativo
+                        new Notification(titulo, { body: corpo });
+                    }
+                });
+            } catch (e) {
+                new Notification(titulo, { body: corpo });
+            }
+        }
+
 
         /* === SISTEMA DE LOGIN E AUTENTICAÇÃO === */
         
@@ -801,8 +853,33 @@
             });
 
             db.collection("atletas").onSnapshot(snap => { 
-                atletasFC = snap.docs.map(doc => ({id: doc.id, ...doc.data()})).sort((a, b) => a.nome.localeCompare(b.nome)); 
+                let novosAtletas = snap.docs.map(doc => ({id: doc.id, ...doc.data()})).sort((a, b) => a.nome.localeCompare(b.nome)); 
                 
+                // === LÓGICA DO DISPARO DA NOTIFICAÇÃO ===
+                if (!primeiraCargaNotificacao && Notification.permission === "granted") {
+                    let meuId = localStorage.getItem('meuJogadorId');
+                    novosAtletas.forEach(novo => {
+                        // Não dispara notificação do Jogador "Contra"
+                        if (novo.nome.includes("Contra (a favor do")) return;
+
+                        let antigo = atletasFC.find(a => a.id === novo.id);
+                        if (antigo && antigo.statusPresenca !== novo.statusPresenca) {
+                            let nomeExibicao = novo.apelido ? novo.apelido : novo.nome;
+                            
+                            // Dispara se não for uma ação que o PRÓPRIO usuário logado fez (evita apitar pra mim mesmo quando clico)
+                            if (novo.id !== meuId) {
+                                if (novo.statusPresenca === 'dentro') {
+                                    enviarNotificacaoLocal('Amigos FC', `${nomeExibicao} está Dentro da próxima pelada!`);
+                                } else if (novo.statusPresenca === 'fora') {
+                                    enviarNotificacaoLocal('Amigos FC', `${nomeExibicao} marcou que está Fora.`);
+                                }
+                            }
+                        }
+                    });
+                }
+                primeiraCargaNotificacao = false;
+                atletasFC = novosAtletas;
+
                 // Mantém o jogador sempre conectado à sua própria identidade
                 if(authUserEmail && !isMaster && !isJuiz) {
                     let eu = atletasFC.find(a => a.email === authUserEmail);
@@ -1158,7 +1235,6 @@
             let dg = [], dt = [], dr = [], f = [], d = [];
             
             atletasFC.forEach(a => {
-                // IGNORAR ATLETAS 'CONTRA' NO MÓDULO PRESENÇA VISUAL
                 if (a.nome.includes("Contra (a favor do")) return;
 
                 let status = a.statusPresenca || (a.presente ? 'dentro' : 'duvida');
@@ -1229,7 +1305,6 @@
             let numGoleiro = 1, numLinha = 1;
 
             atletasOrdenados.forEach(a => {
-                // IGNORAR ATLETAS 'CONTRA' NO ENVIO DO WHATSAPP
                 if (a.nome.includes("Contra (a favor do")) return;
 
                 let status = a.statusPresenca || (a.presente ? 'dentro' : 'duvida');
@@ -1305,7 +1380,7 @@
                 
                 if(titulares.length > 0) {
                     texto += `  ⭐ *Titulares:*\n`;
-                    titulares.forEach(j => texto += `  - ${j}\n`);
+                    titulares.forEach(j => txt += `  - ${j}\n`);
                 }
                 if(reservas.length > 0) {
                     texto += `  🔄 *Reservas:*\n`;
