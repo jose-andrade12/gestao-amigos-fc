@@ -335,6 +335,8 @@
                     <div class="form-grid">
                         <div class="form-group"><label>E-mail (Vinculado via Google)</label><input type="email" id="cadEmail" readonly placeholder="Faça login para vincular"></div>
                         <div class="form-group"><label>Nome Completo</label><input type="text" id="cadNome" placeholder="Seu nome"></div>
+                        <!-- CAMPO NOVO ADICIONADO AQUI -->
+                        <div class="form-group"><label>Apelido (Como quer ser chamado)</label><input type="text" id="cadApelido" placeholder="Seu apelido"></div>
                         <div class="form-group"><label>Celular / WhatsApp</label><input type="text" id="cadWhatsApp" placeholder="(00) 00000-0000"></div>
                         <div class="form-group"><label>Data de Nascimento</label><input type="date" id="cadNascimento"></div>
                         <div class="form-group"><label>Estado</label><input type="text" id="cadEstado" placeholder="Ex: SP"></div>
@@ -415,7 +417,8 @@
                 <div class="header-lista" style="margin-top: 30px;"><h4>⭐ Titulares</h4><span id="countDentroTitulares">0</span></div>
                 <div id="listaDentroTitulares"></div>
 
-                <div class="header-lista" style="margin-top: 30px;"><h4>🔄 Confirmados </h4><span id="countDentroReservas">0</span></div>
+                <!-- NOME DA LISTA ALTERADO AQUI DE 'Reservas' PARA 'Confirmados' -->
+                <div class="header-lista" style="margin-top: 30px;"><h4>🔄 Confirmados</h4><span id="countDentroReservas">0</span></div>
                 <div id="listaDentroReservas"></div>
 
                 <div class="header-lista" style="margin-top: 40px;"><h4>Dúvida</h4><span id="countDuvida">0</span></div>
@@ -648,7 +651,7 @@
         let atletasFC = [], scoutsFC = [], premiacoesFC = [], escalacoesFC = [], gruposFC = [];
         let atletaEditandoId = null;
         let filtroDataGlobal = "", chartInstancia = null, sorteioEquipasAtuais = { real: [], milan: [] };
-        let titularesPartida = { real: [], milan: [] }; // NOVA VARIÁVEL
+        let titularesPartida = { real: [], milan: [] };
         let modoManualAtivo = false, juizTimeAtual = "", juizAcaoAtual = "";
         let configSistema = { dataProximaPartida: "", presencaLiberada: false };
         let bancoConectado = false; 
@@ -896,6 +899,7 @@
 
         function preencherFormularioPerfil(atleta) {
             document.getElementById('cadNome').value = atleta.nome || '';
+            document.getElementById('cadApelido').value = atleta.apelido || '';
             document.getElementById('cadEmail').value = atleta.email || authUserEmail || '';
             document.getElementById('cadWhatsApp').value = atleta.celular || '';
             document.getElementById('cadNascimento').value = atleta.dataNascimento || '';
@@ -933,6 +937,7 @@
             
             const dados = {
                 nome: document.getElementById('cadNome').value,
+                apelido: document.getElementById('cadApelido').value,
                 email: document.getElementById('cadEmail').value,
                 celular: document.getElementById('cadWhatsApp').value,
                 dataNascimento: document.getElementById('cadNascimento').value,
@@ -1094,7 +1099,8 @@
         }
 
         function gerarCardAtleta(a, isBloqueado, isDentro = false) {
-            let initial = a.nome.charAt(0).toUpperCase(); let isGol = a.posicao === 'Goleiro' || a.posicao === 'GOL';
+            let nomeExibicao = a.apelido ? a.apelido : a.nome;
+            let initial = nomeExibicao.charAt(0).toUpperCase(); let isGol = a.posicao === 'Goleiro' || a.posicao === 'GOL';
             let avatarClass = isGol ? 'avatar-circle goleiro' : 'avatar-circle';
             let status = a.statusPresenca || (a.presente ? 'dentro' : 'duvida');
             let isMeuJogador = (a.id === localStorage.getItem('meuJogadorId'));
@@ -1103,9 +1109,9 @@
 
             let avatarHTML = a.foto ? `<img src="${a.foto}" class="${avatarClass}">` : `<div class="${avatarClass}">${initial}</div>`;
             
-            let nomeDisplay = a.nome;
+            let nomeDisplay = nomeExibicao;
             if (isDentro && a.displayIndex) { 
-                nomeDisplay = `<span style="color:var(--text-muted); font-size:12px; margin-right:5px;">${a.displayIndex}º</span> ` + a.nome; 
+                nomeDisplay = `<span style="color:var(--text-muted); font-size:12px; margin-right:5px;">${a.displayIndex}º</span> ` + nomeExibicao; 
             }
 
             if (status === 'dentro') { 
@@ -1180,7 +1186,7 @@
 
             document.getElementById('listaDentroGoleiros').innerHTML = htmlDG || "<div class='presenca-card'><span style='color:#7aa2f7; font-size:14px;'>Nenhum goleiro confirmado.</span></div>";
             document.getElementById('listaDentroTitulares').innerHTML = htmlDT || "<div class='presenca-card'><span style='color:#7aa2f7; font-size:14px;'>Nenhum titular definido pelo Admin.</span></div>";
-            document.getElementById('listaDentroReservas').innerHTML = htmlDR || "<div class='presenca-card'><span style='color:#7aa2f7; font-size:14px;'>Nenhum jogador na reserva.</span></div>";
+            document.getElementById('listaDentroReservas').innerHTML = htmlDR || "<div class='presenca-card'><span style='color:#7aa2f7; font-size:14px;'>Nenhum jogador confirmado.</span></div>";
             document.getElementById('listaFora').innerHTML = htmlF || "<div class='presenca-card'><span style='color:#7aa2f7; font-size:14px;'>Ninguém de fora.</span></div>";
             document.getElementById('listaDuvida').innerHTML = htmlD || "<div class='presenca-card'><span style='color:#7aa2f7; font-size:14px;'>Nenhuma dúvida.</span></div>";
             
@@ -1227,10 +1233,11 @@
                 if (a.nome.includes("Contra (a favor do")) return;
 
                 let status = a.statusPresenca || (a.presente ? 'dentro' : 'duvida');
+                let nomeExibicao = a.apelido ? a.apelido : a.nome;
                 if (status === 'dentro') {
-                    if (a.posicao === 'Goleiro' || a.posicao === 'GOL') { dg.push(`${numGoleiro}º - ${a.nome}`); numGoleiro++; } 
-                    else { if (a.titular) dt.push(`${numLinha}º - ${a.nome}`); else dr.push(`${numLinha}º - ${a.nome}`); numLinha++; }
-                } else if (status === 'fora') { fora.push(a.nome); } else { duvida.push(a.nome); }
+                    if (a.posicao === 'Goleiro' || a.posicao === 'GOL') { dg.push(`${numGoleiro}º - ${nomeExibicao}`); numGoleiro++; } 
+                    else { if (a.titular) dt.push(`${numLinha}º - ${nomeExibicao}`); else dr.push(`${numLinha}º - ${nomeExibicao}`); numLinha++; }
+                } else if (status === 'fora') { fora.push(nomeExibicao); } else { duvida.push(nomeExibicao); }
             });
 
             let d = configSistema.dataProximaPartida ? configSistema.dataProximaPartida.split('-').reverse().join('/') : "Próximo Jogo";
@@ -1238,14 +1245,13 @@
             
             txt += `🧤 *GOLEIROS (${dg.length}):*\n`; if(dg.length === 0) txt += `- Nenhum\n`; else dg.forEach(n => txt += `${n}\n`);
             txt += `\n⭐ *TITULARES (${dt.length}):*\n`; if(dt.length === 0) txt += `- Nenhum\n`; else dt.forEach(n => txt += `${n}\n`);
-            txt += `\n🔄 *RESERVAS (${dr.length}):*\n`; if(dr.length === 0) txt += `- Nenhum\n`; else dr.forEach(n => txt += `${n}\n`);
+            txt += `\n🔄 *CONFIRMADOS (${dr.length}):*\n`; if(dr.length === 0) txt += `- Nenhum\n`; else dr.forEach(n => txt += `${n}\n`);
             txt += `\n❌ *FORA (${fora.length}):*\n`; if(fora.length === 0) txt += `- Ninguém\n`; else fora.forEach(n => txt += `- ${n}\n`);
             txt += `\n❓ *DÚVIDA (${duvida.length}):*\n`; if(duvida.length === 0) txt += `- Ninguém\n`; else duvida.forEach(n => txt += `- ${n}\n`);
             
             window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(txt)}`, '_blank');
         }
 
-        // Funções Adicionadas - Separação Titular/Reserva
         function alternarTitularSorteio(jogador, time) {
             if(!isMaster) return; 
             let lista = titularesPartida[time];
