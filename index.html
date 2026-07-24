@@ -648,7 +648,7 @@
         let atletasFC = [], scoutsFC = [], premiacoesFC = [], escalacoesFC = [], gruposFC = [];
         let atletaEditandoId = null;
         let filtroDataGlobal = "", chartInstancia = null, sorteioEquipasAtuais = { real: [], milan: [] };
-        let titularesPartida = { real: [], milan: [] }; // NOVA VARIÁVEL AQUI
+        let titularesPartida = { real: [], milan: [] }; // NOVA VARIÁVEL
         let modoManualAtivo = false, juizTimeAtual = "", juizAcaoAtual = "";
         let configSistema = { dataProximaPartida: "", presencaLiberada: false };
         let bancoConectado = false; 
@@ -1152,6 +1152,9 @@
             let dg = [], dt = [], dr = [], f = [], d = [];
             
             atletasFC.forEach(a => {
+                // IGNORAR ATLETAS 'CONTRA' NO MÓDULO PRESENÇA VISUAL
+                if (a.nome.includes("Contra (a favor do")) return;
+
                 let status = a.statusPresenca || (a.presente ? 'dentro' : 'duvida');
                 if (status === 'dentro') {
                     if (a.posicao === 'Goleiro' || a.posicao === 'GOL') dg.push(a); 
@@ -1220,6 +1223,9 @@
             let numGoleiro = 1, numLinha = 1;
 
             atletasOrdenados.forEach(a => {
+                // IGNORAR ATLETAS 'CONTRA' NO ENVIO DO WHATSAPP
+                if (a.nome.includes("Contra (a favor do")) return;
+
                 let status = a.statusPresenca || (a.presente ? 'dentro' : 'duvida');
                 if (status === 'dentro') {
                     if (a.posicao === 'Goleiro' || a.posicao === 'GOL') { dg.push(`${numGoleiro}º - ${a.nome}`); numGoleiro++; } 
@@ -1256,7 +1262,7 @@
             
             titularesPartida = { real: [], milan: [] }; // Zera titulares
             
-            let presentes = atletasFC.filter(a => a.presente === true).map(a => a.nome);
+            let presentes = atletasFC.filter(a => a.presente === true && !a.nome.includes("Contra (a favor do")).map(a => a.nome);
             if(presentes.length < 2) return alert("Ao menos 2 jogadores confirmados para o sorteio!");
             
             let disponiveis = presentes.filter(j => 
@@ -1322,12 +1328,14 @@
         }
 
         function toggleModoManual() { if(!isMaster) return alert("Faça login Master para escalar."); modoManualAtivo = !modoManualAtivo; document.getElementById('painelManual').style.display = modoManualAtivo ? 'block' : 'none'; atualizarPainelManual(); renderListasSorteio(); }
+        
         function atualizarPainelManual() {
             if(!modoManualAtivo) return;
-            let presentes = atletasFC.filter(a => a.presente === true).map(a => a.nome);
+            let presentes = atletasFC.filter(a => a.presente === true && !a.nome.includes("Contra (a favor do")).map(a => a.nome);
             let disponiveis = presentes.filter(j => !sorteioEquipasAtuais.real.includes(j) && !sorteioEquipasAtuais.milan.includes(j));
             document.getElementById('listaDisponiveisManual').innerHTML = disponiveis.length === 0 ? `<span style="color:#a9b1d6;">Todos escalados.</span>` : disponiveis.map(j => `<div style="background:#292e42; padding:8px; border-radius:5px; display:flex; align-items:center; gap:10px;"><span style="font-size:14px;">${j}</span><button onclick="alocarManual('${j}', 'real')" style="background:#fff; color:#000; border:none; border-radius:3px; padding:5px; cursor:pointer; font-size:12px;">⚪ Real</button><button onclick="alocarManual('${j}', 'milan')" style="background:#f7768e; color:#fff; border:none; border-radius:3px; padding:5px; cursor:pointer; font-size:12px;">🔴 Milan</button></div>`).join('');
         }
+        
         function alocarManual(jogador, time) { if(!isMaster) return; sorteioEquipasAtuais.real = sorteioEquipasAtuais.real.filter(j => j !== jogador); sorteioEquipasAtuais.milan = sorteioEquipasAtuais.milan.filter(j => j !== jogador); if(time === 'real') sorteioEquipasAtuais.real.push(jogador); if(time === 'milan') sorteioEquipasAtuais.milan.push(jogador); atualizarPainelManual(); renderListasSorteio(); }
         
         function removerDoTimeManual(jogador) { 
@@ -1372,11 +1380,24 @@
             if(!isJuiz) return alert("Faça login de Juiz."); juizTimeAtual = time; juizAcaoAtual = acao;
             document.getElementById('modalJuizTitulo').innerText = `Time: ${time}`;
             document.getElementById('modalJuizAcao').innerText = acao === 'Gol' ? '⚽ GOL' : acao === 'Assistência' ? '👟 ASSISTÊNCIA' : acao === 'Amarelo' ? '🟨 AMARELO' : '🟥 VERMELHO';
-            let elencoTime = time === 'Real Madrid' ? sorteioEquipasAtuais.real : sorteioEquipasAtuais.milan;
-            if(elencoTime.length === 0) elencoTime = atletasFC.map(a => a.nome);
+            
+            // Fazemos uma cópia da lista de jogadores do time
+            let elencoTime = time === 'Real Madrid' ? [...sorteioEquipasAtuais.real] : [...sorteioEquipasAtuais.milan];
+            
+            // Se o time estiver vazio (sorteio ainda não foi feito), puxa todos os atletas normais
+            if(elencoTime.length === 0) elencoTime = atletasFC.filter(a => !a.nome.includes("Contra (a favor do")).map(a => a.nome);
+
+            // Injeta forçadamente o jogador "Contra" específico para que o Juiz sempre possa selecioná-lo
+            if (time === 'Real Madrid' && !elencoTime.includes("Contra (a favor do Real)")) {
+                elencoTime.push("Contra (a favor do Real)");
+            } else if (time === 'Milan' && !elencoTime.includes("Contra (a favor do Milan)")) {
+                elencoTime.push("Contra (a favor do Milan)");
+            }
+
             document.getElementById('listaJogadoresJuiz').innerHTML = elencoTime.map(nome => `<button class="btn-jogador-juiz" onclick="registrarScoutJuiz('${nome}')">${nome}</button>`).join('');
             document.getElementById('modalJuiz').style.display = 'flex';
         }
+
         function fecharModalJuiz() { document.getElementById('modalJuiz').style.display = 'none'; }
         
         function registrarScoutJuiz(jogador) {
